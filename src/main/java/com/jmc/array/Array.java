@@ -9,7 +9,7 @@ import java.util.Iterator;
  * @author Jmc
  * @param <T> 数组元素类型
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"all", "unchecked"})
 public abstract class Array<T> implements Iterable<T> {
     /**
      * 获得数组中指定下标的元素
