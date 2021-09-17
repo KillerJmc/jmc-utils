@@ -102,6 +102,7 @@ import java.util.zip.ZipOutputStream;
  *   2021.8.18     懒惰初始化Logger，减少能源损耗（降低3%耗时）
  *   2021.8.21     1. 内联ZipOutputThread和多个loop系列方法（copyLoop等），降低耦合度
  *                 2. 删除两个CopyThread，改为普通方法
+ *                 3. 改进拷贝时目标文件路径推算算法，增强源码可读性
  * </pre>
  * @since 1.0
  * @author Jmc
@@ -193,39 +194,33 @@ public class Files
         } else {
 			log(() -> "正在复制" + src.getName() + "这个文件夹");
 
-			// 源路径长度
-			int srcPathLength = src.getAbsolutePath().length();
-
-			// 目标根路径
-			String destRootPath = des.getAbsolutePath();
-
 			// 线程池
 			var pool = Executors.newFixedThreadPool(MAX_OPERATING_AMOUNT);
 
         	// 复制文件夹
 			new Object() {
-            	void loop(File dirFile) {
-					File[] fs = dirFile.listFiles();
+            	void loop(File srcDir, File desDir) {
+					File[] fs = srcDir.listFiles();
 					if (fs == null) {
 						throw new RuntimeException("展开文件夹失败");
 					}
 
 					for (File src : fs) {
-						File des = new File(destRootPath + src.getAbsolutePath().substring(srcPathLength));
+						File des = new File(desDir, src.getName());
 
 						if (src.isDirectory()) {
 							// 创建这个目录
 							mkdirs(des);
 
 							// 递归复制
-							loop(src);
+							loop(src, des);
 						} else {
 							pool.execute(src.length() < LARGE_FILE_SIZE ?
 									() -> copySmallFile(src, des) : () -> copyLargeFile(src, des));
 						}
 					}
 				}
-			}.loop(src);
+			}.loop(src, des);
 
 			pool.shutdown();
 
