@@ -2,7 +2,8 @@ package com.jmc.reference;
 
 /**
  * 函数引用 <br><br>
- * 可将方法作为参数传入另一个方法以便调用，且支持直接传入lambda（参数均必须小于等于7个）<br>
+ * 可将方法作为参数传入另一个方法以便调用，且支持直接传入lambda <br>
+ * （参数均必须小于等于7个，支持传入基本数据类型）<br>
  * 提供了of和bind方法
  * @since 1.0
  * @author Jmc
@@ -199,6 +200,97 @@ public abstract class Func<R> {
         };
     }
 
+    /**
+     * @since 1.4
+     */
+    public static <T> Func<T> of(Number1<T> m) {
+        return new Func<>() {
+            @Override
+            public T invoke(Object... args) {
+                checkParams(args.length, 1);
+                return m.invoke((T) args[0]);
+            }
+        };
+    }
+
+    /**
+     * @since 1.4
+     */
+    public static <T> Func<T> of(Number2<T> m) {
+        return new Func<>() {
+            @Override
+            public T invoke(Object... args) {
+                checkParams(args.length, 2);
+                return m.invoke((T) args[0], (T) args[1]);
+            }
+        };
+    }
+
+    /**
+     * @since 1.4
+     */
+    public static <T> Func<T> of(Number3<T> m) {
+        return new Func<>() {
+            @Override
+            public T invoke(Object... args) {
+                checkParams(args.length, 3);
+                return m.invoke((T) args[0], (T) args[1], (T) args[2]);
+            }
+        };
+    }
+
+    /**
+     * @since 1.4
+     */
+    public static <T> Func<T> of(Number4<T> m) {
+        return new Func<>() {
+            @Override
+            public T invoke(Object... args) {
+                checkParams(args.length, 4);
+                return m.invoke((T) args[0], (T) args[1], (T) args[2], (T) args[3]);
+            }
+        };
+    }
+
+    /**
+     * @since 1.4
+     */
+    public static <T> Func<T> of(Number5<T> m) {
+        return new Func<>() {
+            @Override
+            public T invoke(Object... args) {
+                checkParams(args.length, 5);
+                return m.invoke((T) args[0], (T) args[1], (T) args[2], (T) args[3], (T) args[4]);
+            }
+        };
+    }
+
+    /**
+     * @since 1.4
+     */
+    public static <T> Func<T> of(Number6<T> m) {
+        return new Func<>() {
+            @Override
+            public T invoke(Object... args) {
+                checkParams(args.length, 6);
+                return m.invoke((T) args[0], (T) args[1], (T) args[2], (T) args[3], (T) args[4], (T) args[5]);
+            }
+        };
+    }
+
+    /**
+     * @since 1.4
+     */
+    public static <T> Func<T> of(Number7<T> m) {
+        return new Func<>() {
+            @Override
+            public T invoke(Object... args) {
+                checkParams(args.length, 7);
+                return m.invoke((T) args[0], (T) args[1], (T) args[2], (T) args[3], (T) args[4], (T) args[5], (T) args[6]);
+            }
+        };
+    }
+
     public static Func<Void> bind(Void0 m) {
         return new Func<>() {
             @Override
@@ -367,6 +459,110 @@ public abstract class Func<R> {
         };
     }
 
+    /**
+     * @since 1.4
+     */
+    public static <T> Func<T> bind(Number0<T> m) {
+        return new Func<>() {
+            @Override
+            public T invoke(Object... args) {
+                checkParams(args.length, 0);
+                return m.invoke();
+            }
+        };
+    }
+
+    /**
+     * @since 1.4
+     */
+    public static <T> Func<T> bind(Number1<T> m, T t) {
+        return new Func<>() {
+            @Override
+            public T invoke(Object... args) {
+                checkParams(args.length, 1);
+                return m.invoke(t);
+            }
+        };
+    }
+
+    /**
+     * @since 1.4
+     */
+    public static <T> Func<T> bind(Number2<T> m, T t1, T t2) {
+        return new Func<>() {
+            @Override
+            public T invoke(Object... args) {
+                checkParams(args.length, 2);
+                return m.invoke(t1, t2);
+            }
+        };
+    }
+
+    /**
+     * @since 1.4
+     */
+    public static <T> Func<T> bind(Number3<T> m, T t1, T t2, T t3) {
+        return new Func<>() {
+            @Override
+            public T invoke(Object... args) {
+                checkParams(args.length, 3);
+                return m.invoke(t1, t2, t3);
+            }
+        };
+    }
+
+    /**
+     * @since 1.4
+     */
+    public static <T> Func<T> bind(Number4<T> m, T t1, T t2, T t3, T t4) {
+        return new Func<>() {
+            @Override
+            public T invoke(Object... args) {
+                checkParams(args.length, 4);
+                return m.invoke(t1, t2, t3, t4);
+            }
+        };
+    }
+
+    /**
+     * @since 1.4
+     */
+    public static <T> Func<T> bind(Number5<T> m, T t1, T t2, T t3, T t4, T t5) {
+        return new Func<>() {
+            @Override
+            public T invoke(Object... args) {
+                checkParams(args.length, 5);
+                return m.invoke(t1, t2, t3, t4, t5);
+            }
+        };
+    }
+
+    /**
+     * @since 1.4
+     */
+    public static <T> Func<T> bind(Number6<T> m, T t1, T t2, T t3, T t4, T t5, T t6) {
+        return new Func<>() {
+            @Override
+            public T invoke(Object... args) {
+                checkParams(args.length, 6);
+                return m.invoke(t1, t2, t3, t4, t5, t6);
+            }
+        };
+    }
+
+    /**
+     * @since 1.4
+     */
+    public static <T> Func<T> bind(Number7<T> m, T t1, T t2, T t3, T t4, T t5, T t6, T t7) {
+        return new Func<>() {
+            @Override
+            public T invoke(Object... args) {
+                checkParams(args.length, 7);
+                return m.invoke(t1, t2, t3, t4, t5, t6, t7);
+            }
+        };
+    }
+
     public interface Void0 {
         void invoke();
     }
@@ -429,6 +625,62 @@ public abstract class Func<R> {
 
     public interface Object7<T, U, V, W, X, Y, Z, R> {
         R invoke(T t, U u, V v, W w, X x, Y y, Z z);
+    }
+
+    /**
+     * @since 1.4
+     */
+    public interface Number0<T> {
+        T invoke();
+    }
+
+    /**
+     * @since 1.4
+     */
+    public interface Number1<T> {
+        T invoke(T t);
+    }
+
+    /**
+     * @since 1.4
+     */
+    public interface Number2<T> {
+        T invoke(T t1, T t2);
+    }
+
+    /**
+     * @since 1.4
+     */
+    public interface Number3<T> {
+        T invoke(T t1, T t2, T t3);
+    }
+
+    /**
+     * @since 1.4
+     */
+    public interface Number4<T> {
+        T invoke(T t1, T t2, T t3, T t4);
+    }
+
+    /**
+     * @since 1.4
+     */
+    public interface Number5<T> {
+        T invoke(T t1, T t2, T t3, T t4, T t5);
+    }
+
+    /**
+     * @since 1.4
+     */
+    public interface Number6<T> {
+        T invoke(T t1, T t2, T t3, T t4, T t5, T t6);
+    }
+
+    /**
+     * @since 1.4
+     */
+    public interface Number7<T> {
+        T invoke(T t1, T t2, T t3, T t4, T t5, T t6, T t7);
     }
 }
 
