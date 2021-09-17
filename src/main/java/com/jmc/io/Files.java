@@ -10,7 +10,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -101,6 +100,8 @@ import java.util.zip.ZipOutputStream;
  *   2021.7.22     优化文件树，使其返回实体对象并且自动按文件/文件夹自动降序排列
  *   2021.8.17     优化Logger打印，在其关闭情况下减少资源损耗（降低了20%耗时）
  *   2021.8.18     懒惰初始化Logger，减少能源损耗（降低3%耗时）
+ *   2021.8.21     1. 内联ZipOutputThread和多个loop系列方法（copyLoop等），降低耦合度
+ *                 2. 删除两个CopyThread，改为普通方法
  * </pre>
  * @since 1.0
  * @author Jmc
@@ -148,7 +149,7 @@ public class Files
 	 * 打印日志（懒加载提高性能）
 	 * @param msg 日志内容
 	 */
-	public static void log(Supplier<String> msg) {
+	private static void log(Supplier<String> msg) {
 		if (enableLog) {
 			log.info(msg.get());
 		}
@@ -160,9 +161,7 @@ public class Files
 	 * @param desPath 目标路径
 	 */
 	public static void copy(String srcPath, String desPath) {
-        // 路径不能为空
-        Objs.throwsIfNullOrEmpty("源路径和目标路径不能为空！",
-				srcPath, desPath);
+        Objs.throwsIfNullOrEmpty("源路径和目标路径不能为空！", srcPath, desPath);
 
         // 创建源文件
         File src = new File(srcPath);
@@ -175,36 +174,64 @@ public class Files
         // 创建目标文件
         File des = new File(desPath + "/" + src.getName());
 
-        // 创建目标路径
-		mkdirs(src.isDirectory() ? des : des.getParentFile());
-
-        // 线程池
-		var pool = Executors.newFixedThreadPool(MAX_OPERATING_AMOUNT);
-        
         // 记录开始时间
         long startTime = System.currentTimeMillis();       
               
-		log(() -> "正在复制 %s 这个%s".formatted(src.getName(), src.isFile() ? "文件" : "文件夹"));
-
         // 如果是文件
         if (src.isFile()) {
-        	// 如果是小文件
+			log(() -> "正在复制" + src.getName() + "这个文件");
+
+			// 创建父目录
+			mkdirs(des.getParent());
+
+			// 如果是小文件
             if (src.length() < LARGE_FILE_SIZE) {
-            	// 小文件复制通道
-            	pool.execute(new SmallCopyThread(src, des));
+            	copySmallFile(src, des);
 			} else {
-            	// 大文件复制通道
-				pool.execute(new LargeCopyThread(src, des));
+				copyLargeFile(src, des);
 			}
         } else {
-            // 递归复制文件
-            copyLoop(src, src.getAbsolutePath().length(), des.getAbsolutePath(), pool);
-        }
+			log(() -> "正在复制" + src.getName() + "这个文件夹");
 
-		pool.shutdown();
-        
-        // 等待执行完成
-		Tries.tryThis(() -> { while (!pool.awaitTermination(1, TimeUnit.HOURS)); });
+			// 源路径长度
+			int srcPathLength = src.getAbsolutePath().length();
+
+			// 目标根路径
+			String destRootPath = des.getAbsolutePath();
+
+			// 线程池
+			var pool = Executors.newFixedThreadPool(MAX_OPERATING_AMOUNT);
+
+        	// 复制文件夹
+			new Object() {
+            	void loop(File dirFile) {
+					File[] fs = dirFile.listFiles();
+					if (fs == null) {
+						throw new RuntimeException("展开文件夹失败");
+					}
+
+					for (File src : fs) {
+						File des = new File(destRootPath + src.getAbsolutePath().substring(srcPathLength));
+
+						if (src.isDirectory()) {
+							// 创建这个目录
+							mkdirs(des);
+
+							// 递归复制
+							loop(src);
+						} else {
+							pool.execute(src.length() < LARGE_FILE_SIZE ?
+									() -> copySmallFile(src, des) : () -> copyLargeFile(src, des));
+						}
+					}
+				}
+			}.loop(src);
+
+			pool.shutdown();
+
+			// 等待执行完成
+			Tries.tryThis(() -> { while (!pool.awaitTermination(1, TimeUnit.DAYS)); });
+        }
 
 		// 统计时间
 		long endTime = System.currentTimeMillis();
@@ -221,39 +248,65 @@ public class Files
 	}
 
 	/**
-	 * 递归复制文件
-	 * @param f 复制的文件
-	 * @param srcPathLength 源路径长度
-	 * @param destRootPath 目标根路径
-	 * @param pool 线程池
+	 * 复制小文件
+	 * @param src 源文件
+	 * @param des 目标文件
 	 */
-	private static void copyLoop(File f, int srcPathLength, String destRootPath, ExecutorService pool) {
-        File[] fs = f.listFiles();
-        if (fs == null) {
-        	throw new RuntimeException("展开文件夹失败");
-		}
+	private static void copySmallFile(File src, File des) {
+		// 日志信息
+		log(() -> "正在复制文件: " + src.getAbsolutePath());
 
-        for (File src : fs) {
-            // 创建目标文件/文件夹
-            File des = new File(destRootPath + src.getAbsolutePath().substring(srcPathLength));
-            // 若现在循环内的这个文件是个目录
-            if (src.isDirectory()) {
-                // 创建这个目录
-                mkdirs(des);
-                // 递归复制
-                copyLoop(src, srcPathLength, destRootPath, pool);
-            } else {
-                // 如果该文件为大文件
-                if (src.length() > LARGE_FILE_SIZE) {
-                    // 大文件通道
-                	pool.execute(new LargeCopyThread(src, des));
-                } else {
-                    // 小文件通道
-					pool.execute(new SmallCopyThread(src, des));
-                }
-            }
-        }
-    }
+		try (var in = new FileInputStream(src);
+			 var out = new FileOutputStream(des)) {
+			in.transferTo(out);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 复制大文件 <br>
+	 * 使用的是Java的零拷贝技术
+	 * @param src 源文件
+	 * @param des 目标文件
+	 */
+	private static void copyLargeFile(File src, File des) {
+		// 日志信息
+		log(() -> "正在复制大文件: " + src.getAbsolutePath());
+
+		/*
+		1. 采用磁盘映射 -> 内存的Buffer, 直接用指针方式控制该Buffer（Linux: mmap），从而取消Buffer和JVM的双向复制过程
+
+		2. 此方法方便于in.transferTo，因为受硬件限制，transferTo在Windows和Linux下均限制每次最多只能复制2GB
+		（FileChannelImpl.transferTo的icount变量限制）
+
+		3. 此方法快于in.transferTo，因为transferTo在Windows下不支持linux的sendfile技术
+		（FileChannelImpl.transferToDirectly()）
+
+		4. transferTo最终调用的具体实现与以下循环实现一致，并且其每次循环都新建并释放一个buff（8MB），效率不高
+		（FileChannelImpl.transferToTrustedChannel()）
+		 */
+		try (var in = new FileInputStream(src).getChannel();
+			 var out = new FileOutputStream(des).getChannel()) {
+
+			// 申请8M的堆外内存
+			var buff = ByteBuffer.allocateDirect(8 * 1024 * 1024);
+
+			// 读取通道中数据到buff
+			while (in.read(buff) != -1) {
+				// 改变buff为读模式
+				buff.flip();
+				// 将buff写入输出通道
+				out.write(buff);
+				// buff的复位
+				buff.clear();
+			}
+			// 强制将内存中剩余数据写入硬盘，保证数据完整性
+			out.force(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * 移动文件或文件夹
@@ -261,8 +314,7 @@ public class Files
 	 * @param desPath 目标路径
 	 */
 	public static void move(String srcPath, String desPath) {
-		Objs.throwsIfNullOrEmpty("根路径和目标路径不能为空",
-				srcPath, desPath);
+		Objs.throwsIfNullOrEmpty("根路径和目标路径不能为空", srcPath, desPath);
 
         // 创建源文件
         File src = new File(srcPath);
@@ -276,10 +328,7 @@ public class Files
         File des = new File(desPath + "/" + src.getName());
 
         // 创建目标父目录
-        File parent = des.getParentFile();
-
-        // 创建目录
-        mkdirs(parent);
+		mkdirs(desPath);
 
 		// 移动文件，若移动失败就该用传统方式
 		if (!src.renameTo(des)) {
@@ -293,7 +342,7 @@ public class Files
 		}
 
         // 日志信息
-        log(() -> "成功将 " + src.getName() + " 移动到 " + parent.getName() + " 文件夹!");
+        log(() -> "成功将 " + src.getName() + " 移动到 " + des.getParentFile().getName() + " 文件夹!");
     }
 
 	/**
@@ -311,8 +360,7 @@ public class Files
 	 * @param newName 新名称
 	 */
     public static void rename(String filePath, String newName) {
-    	Objs.throwsIfNullOrEmpty("文件路径和新名称不能为空",
-				filePath, newName);
+    	Objs.throwsIfNullOrEmpty("文件路径和新名称不能为空", filePath, newName);
 
         // 创建源文件
         File file = new File(filePath);
@@ -364,7 +412,30 @@ public class Files
         log(() -> "正在删除 " + f.getName() + " 这个" + (f.isFile() ? "文件" : "文件夹"));
 
         // 递归删除
-        deleteLoop(f);
+		new Object() {
+			void loop(File f) {
+				// 如果不能直接删除
+				if (!f.delete()){
+					// 递归删除
+					File[] fs = f.listFiles();
+
+					if (fs == null) {
+						throw new RuntimeException("展开文件夹失败！");
+					}
+
+					for (File del : fs) {
+						loop(del);
+					}
+
+					// 删除之前的非空文件夹
+					if (!f.delete()) {
+						throw new RuntimeException("删除失败！");
+					}
+				} else {
+					log(() -> "正在删除：" + f.getAbsolutePath());
+				}
+			}
+		}.loop(f);
 
         // 统计时间
         long endTime = System.currentTimeMillis();
@@ -401,41 +472,13 @@ public class Files
     }
 
 	/**
-	 * 递归删除文件或文件夹
-	 * @param f 文件
-	 */
-	private static void deleteLoop(File f) {
-        // 如果不能直接删除
-        if (!f.delete()){
-            // 递归删除
-            File[] fs = f.listFiles();
-
-            if (fs == null) {
-            	throw new RuntimeException("展开文件夹失败！");
-			}
-
-            for (File del : fs) {
-                deleteLoop(del);
-            }
-
-            // 删除之前的非空文件夹
-            if (!f.delete()) {
-            	throw new RuntimeException("删除失败！");
-			}
-        } else {
-        	log(() -> "正在删除：" + f.getAbsolutePath());
-		}
-    }
-
-	/**
 	 * 压缩文件或文件夹
 	 * @param srcPath 源路径
 	 * @param zipPath zip路径
 	 * @param storeMode 是否用储存式压缩
 	 */
     public static void zip(String srcPath, String zipPath, boolean storeMode) {
-		Objs.throwsIfNullOrEmpty("源路径和zip路径不能为空",
-				srcPath, zipPath);
+		Objs.throwsIfNullOrEmpty("源路径和zip路径不能为空", srcPath, zipPath);
 
         // 创建源文件
         File src = new File(srcPath);
@@ -468,7 +511,65 @@ public class Files
         log(() -> "正在压缩 " + src.getName() + " 这个" + (src.isFile() ? "文件" : "文件夹"));
 
         // 递归创建zip
-        zipLoop(out, src, src.getName(), storeMode);
+		new Object() {
+			void loop(File f, String root) {
+				// 若f是一个文件夹
+				if (f.isDirectory()) {
+					File[] fs = f.listFiles();
+					if (fs == null) {
+						throw new RuntimeException("文件夹展开失败！");
+					}
+
+					if (fs.length == 0) {
+						// 创建(放入)此文件夹
+						ZipEntry entry = new ZipEntry(root + "/");
+						if (storeMode) {
+							entry.setCrc(0);
+							entry.setSize(0);
+						}
+						Tries.tryThis(() -> out.putNextEntry(entry));
+					} else {
+						for (File src : fs) {
+							// 即将被复制文件的完整路径(root为根目录)
+							String filePath = root + "/" + src.getName();
+							// 递归创建
+							loop(src, filePath);
+						}
+					}
+				} else {
+					// 提示信息
+					log(() -> "正在压缩: " + f.getAbsolutePath());
+
+					// 放入上文提到的完整路径
+					try {
+						ZipEntry entry = new ZipEntry(root);
+						if (storeMode) {
+							CRC32 crc = new CRC32();
+							var in = new FileInputStream(f);
+							byte[] b = new byte[8192];
+							int i;
+							while ((i = in.read(b)) != -1) {
+								crc.update(b, 0, i);
+							}
+							in.close();
+
+							entry.setCrc(crc.getValue());
+							entry.setSize(f.length());
+						}
+						out.putNextEntry(entry);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+					// 输出文件到zip流
+					try (var in = new FileInputStream(f)) {
+						in.transferTo(out);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}.loop(src, src.getName());
 
         // 关闭zip输出流
 		Tries.tryThis(out::close);
@@ -511,78 +612,12 @@ public class Files
 	}
 
 	/**
-	 * 递归创建zip
-	 * @param out zip输出流
-	 * @param f 源文件
-	 * @param root 根路径
-	 * @param storeMode 是否用储存式压缩
-	 */
-    private static void zipLoop(ZipOutputStream out, File f, String root, boolean storeMode) {
-        // 若f是一个文件夹
-        if (f.isDirectory()) {
-            File[] fs = f.listFiles();
-            if (fs == null) {
-            	throw new RuntimeException("文件夹展开失败！");
-			}
-
-            if (fs.length == 0) {
-                // 创建(放入)此文件夹
-				ZipEntry entry = new ZipEntry(root + "/");
-				if (storeMode) {
-					entry.setCrc(0);
-					entry.setSize(0);
-				}
-				Tries.tryThis(() -> out.putNextEntry(entry));
-            } else {
-                for (File src : fs) {
-                    // 即将被复制文件的完整路径(root为根目录)
-                    String filePath = root + "/" + src.getName();
-                    // 递归创建
-                    zipLoop(out, src, filePath, storeMode);
-                }
-            }
-        } else {
-			// 提示信息
-            log(() -> "正在压缩: " + f.getAbsolutePath());
-
-            // 放入上文提到的完整路径
-            try {
-				ZipEntry entry = new ZipEntry(root);
-				if (storeMode) {
-					CRC32 crc = new CRC32();
-					var in = new FileInputStream(f);
-					byte[] b = new byte[8192];
-					int i;
-					while ((i = in.read(b)) != -1) {
-						crc.update(b, 0, i);
-					}
-					in.close();
-
-					entry.setCrc(crc.getValue());
-					entry.setSize(f.length());
-				}
-				out.putNextEntry(entry);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			// 输出文件到zip流
-			try (var in = new FileInputStream(f)) {
-				in.transferTo(out);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-        }
-    }
-
-	/**
 	 * 解压文件
 	 * @param zipPath zip路径
 	 * @param desPath 目标路径
 	 */
 	public static void unzip(String zipPath, String desPath) {
-		Objs.throwsIfNullOrEmpty("zip路径和目标路径不能为空",
-				zipPath, desPath);
+		Objs.throwsIfNullOrEmpty("zip路径和目标路径不能为空", zipPath, desPath);
 
         // 创建源文件
         File src = new File(zipPath);
@@ -622,13 +657,26 @@ public class Files
             } else {
 				mkdirs(des.getParentFile());
 				// 多线程
-                pool.execute(new ZipOutputThread(zip, des, entry));
+                pool.execute(() -> {
+					// 日志信息
+					log(() -> "正在解压: " + entry.getName());
+
+					// 创建父目录
+					mkdirs(des.getParentFile());
+
+					try (var in = zip.getInputStream(entry);
+						 var out = new FileOutputStream(des)) {
+						in.transferTo(out);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				});
             }
         }
         pool.shutdown();
 
 		// 等待执行完成
-		Tries.tryThis(() -> { while (!pool.awaitTermination(1, TimeUnit.HOURS)); });
+		Tries.tryThis(() -> { while (!pool.awaitTermination(1, TimeUnit.DAYS)); });
 
         //关闭流
 		Tries.tryThis(zip::close);
@@ -830,8 +878,7 @@ public class Files
 	 * @param appendMode 是否为追加模式
 	 */
 	public static void out(byte[] bs, File des, boolean appendMode) {
-		Objs.throwsIfNullOrEmpty("byte数组和目标文件不能为空",
-				bs, des);
+		Objs.throwsIfNullOrEmpty("byte数组和目标文件不能为空", bs, des);
 
 		// 创建父目录
 		mkdirs(des.getParentFile());
@@ -861,8 +908,7 @@ public class Files
 	 * @param appendMode 是否用追加模式
 	 */
 	public static void out(InputStream in, File f, boolean appendMode) {
-		Objs.throwsIfNullOrEmpty("输入流和文件参数不能为空",
-				in, f);
+		Objs.throwsIfNullOrEmpty("输入流和文件参数不能为空", in, f);
 
 		mkdirs(f.getParentFile());
 
@@ -1004,7 +1050,7 @@ public class Files
 	 * @param suffix 后缀（含小数点）
 	 */
 	public static void renameByTime(File dirFile, String suffix) {
-		Objs.throwsIfNullOrEmpty(dirFile, suffix);
+		Objs.throwsIfNullOrEmpty("文件夹对象和后缀不能为空", dirFile, suffix);
 
 		File[] fs = dirFile.listFiles(File::isFile);
 		if (fs == null) return;
@@ -1055,7 +1101,22 @@ public class Files
 		// 搜索文件夹存放集合
 		var dirList = new LinkedList<File>();
 
-		findLoop(src, filter, fileList, dirList);
+		// 递归查找文件/文件夹
+		new Object() {
+			void loop(File src) {
+				File[] fs = src.listFiles();
+				if (fs == null) return;
+
+				for (File f : fs) {
+					if (f.isFile()) {
+						if (filter.accept(f)) fileList.add(f);
+					} else {
+						if (filter.accept(f)) dirList.add(f);
+						loop(f);
+					}
+				}
+			}
+		}.loop(src);
 
 		return new FindResult(fileList, dirList);
 	}
@@ -1098,27 +1159,6 @@ public class Files
 	 */
 	public static List<File> findDirs(String dirPath, String... contains) {
 		return findAll(dirPath, contains).dirs();
-	}
-
-	/**
-	 * 递归搜索文件
-	 * @param src 源文件
-	 * @param filter 文件过滤器
-	 * @param fileList 结果文件列表
-	 * @param dirList 结果文件夹列表
-	 */
-	private static void findLoop(File src, FileFilter filter, List<File> fileList, List<File> dirList) {
-		File[] fs = src.listFiles();
-		if (fs == null) return;
-
-		for (File f : fs) {
-			if (f.isFile()) {
-				if (filter.accept(f)) fileList.add(f);
-			} else {
-				if (filter.accept(f)) dirList.add(f);
-				findLoop(f, filter, fileList, dirList);
-			}
-		}
 	}
 
 	/**
@@ -1173,7 +1213,7 @@ public class Files
 	 * @return 字符串形式的搜索结果
 	 */
 	public static String findInfo(String dirPath, String content) {
-		Objs.throwsIfNullOrEmpty(content);
+		Objs.throwsIfNullOrEmpty("搜索内容不能为null", content);
 
 		long startTime = System.currentTimeMillis();
 		var map = Files.findAll(dirPath, content);
@@ -1504,98 +1544,6 @@ public class Files
 				sb.append(toString(subTree, currDepth));
 			}
 			return sb.toString();
-		}
-	}
-
-	/**
-	 * 大文件复制通道 <br>
-	 * 使用的是Java的零拷贝技术
-	 * @param src 源文件
-	 * @param des 目标文件
-	 */
-	private record LargeCopyThread(File src, File des) implements Runnable {
-		@Override
-		public void run() {
-			// 日志信息
-			log(() -> "正在复制大文件: " + src.getAbsolutePath());
-
-			/*
-			1. 采用磁盘映射 -> 内存的Buffer, 直接用指针方式控制该Buffer（Linux: mmap），从而取消Buffer和JVM的双向复制过程
-
-			2. 此方法方便于in.transferTo，因为受硬件限制，transferTo在Windows和Linux下均限制每次最多只能复制2GB
-			（FileChannelImpl.transferTo的icount变量限制）
-
-			3. 此方法快于in.transferTo，因为transferTo在Windows下不支持linux的sendfile技术
-			（FileChannelImpl.transferToDirectly()）
-
-			4. transferTo最终调用的具体实现与以下循环实现一致，并且其每次循环都新建并释放一个buff（8MB），效率不高
-			（FileChannelImpl.transferToTrustedChannel()）
-			 */
-			try (var in = new FileInputStream(src).getChannel();
-				 var out = new FileOutputStream(des).getChannel()) {
-
-				// 申请8M的堆外内存
-				var buff = ByteBuffer.allocateDirect(8 * 1024 * 1024);
-
-				// 读取通道中数据到buff
-				while (in.read(buff) != -1) {
-					// 改变buff为读模式
-					buff.flip();
-					// 将buff写入输出通道
-					out.write(buff);
-					// buff的复位
-					buff.clear();
-				}
-				// 强制将内存中剩余数据写入硬盘，保证数据完整性
-				out.force(true);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	/**
-	 * 小文件复制通道
-	 * @param src 源文件
-	 * @param des 目标文件
-	 */
-	private record SmallCopyThread(File src, File des) implements Runnable {
-		@Override
-		public void run() {
-			// 日志信息
-			log(() -> "正在复制文件: " + src.getAbsolutePath());
-
-			try (var in = new FileInputStream(src);
-				 var out = new FileOutputStream(des)) {
-				in.transferTo(out);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	/**
-	 * Zip输出通道
-	 * @param zip   zip文件
-	 * @param des   目标文件
-	 * @param entry zip节点
-	 */
-	private record ZipOutputThread(ZipFile zip, File des,
-								   ZipEntry entry) implements Runnable {
-		@Override
-		public void run() {
-			// 日志信息
-			log(() -> "正在解压: " + entry.getName());
-
-			// 创建父目录
-			mkdirs(des.getParentFile());
-
-			try (var in = zip.getInputStream(entry);
-				 var out = new FileOutputStream(des)) {
-				in.transferTo(out);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 		}
 	}
 }

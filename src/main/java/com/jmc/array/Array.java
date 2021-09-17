@@ -61,8 +61,8 @@ public abstract class Array<T> implements Iterable<T> {
             }
 
             @Override
-            public <Arr> Arr toArray() {
-                return (Arr) a;
+            public byte[] toArray() {
+                return a;
             }
 
             @Override
@@ -107,8 +107,8 @@ public abstract class Array<T> implements Iterable<T> {
             }
 
             @Override
-            public <Arr> Arr toArray() {
-                return (Arr) a;
+            public char[] toArray() {
+                return a;
             }
 
             @Override
@@ -153,8 +153,8 @@ public abstract class Array<T> implements Iterable<T> {
             }
 
             @Override
-            public <Arr> Arr toArray() {
-                return (Arr) a;
+            public boolean[] toArray() {
+                return a;
             }
 
             @Override
@@ -199,8 +199,8 @@ public abstract class Array<T> implements Iterable<T> {
             }
 
             @Override
-            public <Arr> Arr toArray() {
-                return (Arr) a;
+            public short[] toArray() {
+                return a;
             }
 
             @Override
@@ -245,8 +245,8 @@ public abstract class Array<T> implements Iterable<T> {
             }
 
             @Override
-            public <Arr> Arr toArray() {
-                return (Arr) a;
+            public int[] toArray() {
+                return a;
             }
 
             @Override
@@ -291,8 +291,8 @@ public abstract class Array<T> implements Iterable<T> {
             }
 
             @Override
-            public <Arr> Arr toArray() {
-                return (Arr) a;
+            public long[] toArray() {
+                return a;
             }
 
             @Override
@@ -337,8 +337,8 @@ public abstract class Array<T> implements Iterable<T> {
             }
 
             @Override
-            public <Arr> Arr toArray() {
-                return (Arr) a;
+            public float[] toArray() {
+                return a;
             }
 
             @Override
@@ -383,8 +383,8 @@ public abstract class Array<T> implements Iterable<T> {
             }
 
             @Override
-            public <Arr> Arr toArray() {
-                return (Arr) a;
+            public double[] toArray() {
+                return a;
             }
 
             @Override
@@ -429,10 +429,9 @@ public abstract class Array<T> implements Iterable<T> {
                 return a.length;
             }
 
-            @SuppressWarnings("unchecked")
             @Override
-            public <Arr> Arr toArray() {
-                return (Arr) a;
+            public T[] toArray() {
+                return a;
             }
 
             @Override
