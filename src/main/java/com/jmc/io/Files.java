@@ -20,6 +20,7 @@ import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+
 /**
  * 文件操作
  * <p>时间: 2019.1.12
@@ -105,6 +106,7 @@ import java.util.zip.ZipOutputStream;
  *                 3. 改进拷贝时目标文件路径推算算法，增强源码可读性
  *   2021.8.23     1. 修改Logger名称为类全限定名
  *                 2. 删除enableLog成员变量（boolean）
+ *   2021.8.28     添加代码折叠，使总体结构更清晰
  * </pre>
  * @since 1.0
  * @author Jmc
@@ -112,6 +114,8 @@ import java.util.zip.ZipOutputStream;
 @SuppressWarnings("unused")
 public class Files
 {
+	// region init
+
 	/**
 	 * 大文件指定界限
 	 */
@@ -155,6 +159,10 @@ public class Files
 			log.info(msg);
 		}
 	}
+
+	// endregion
+
+	// region basic
 
 	/**
 	 * 复制文件或文件夹
@@ -914,12 +922,9 @@ public class Files
 		}
 	}
 
-	/**
-	 * 搜索结果类
-	 * @param files 结果文件列表
-	 * @param dirs 结果文件夹列表
-	 */
-	public static record FindResult(List<File> files, List<File> dirs) {}
+	// endregion
+
+	// region attr
 
 	/**
 	 * 文件信息
@@ -1063,6 +1068,17 @@ public class Files
 	public static void renameByTime(String dirPath, String suffix) {
 		renameByTime(new File(dirPath), suffix);
 	}
+
+	// endregion
+
+	// region find
+
+	/**
+	 * 搜索结果类
+	 * @param files 结果文件列表
+	 * @param dirs 结果文件夹列表
+	 */
+	public static record FindResult(List<File> files, List<File> dirs) {}
 
 	/**
 	 * 搜索路径下符合要求的所有文件和文件夹
@@ -1342,6 +1358,10 @@ public class Files
 		c.accept(findFiles(dirPath, orContains));
 	}
 
+	// endregion
+
+	// region tree
+
 	/**
 	 * 普通树状图（搜索深度5层，文件夹最小大小为50MB）
 	 * @param dirPath 搜索文件夹路径
@@ -1541,4 +1561,5 @@ public class Files
 			return sb.toString();
 		}
 	}
+	// endregion
 }

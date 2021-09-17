@@ -13,6 +13,7 @@ import java.time.temporal.ChronoField;
  * @since 1.0
  * @author Jmc
  */
+@SuppressWarnings("unused")
 public class Time {
     /**
      * 默认格式
@@ -36,14 +37,13 @@ public class Time {
         return LocalDateTime.now().format(getFormatter(format));
     }
 
-
     /**
      * 用新纪元时间到现在的毫秒值获取时间
      * @param epochMilli 新纪元时间到现在的毫秒值
      * @return 默认格式的时间结果
      */
-    public static String ofEpochMilli(long epochMilli) {
-        return ofEpochMilli(epochMilli, DEFAULT_FORMAT);
+    public static String ofMilli(long epochMilli) {
+        return ofMilli(epochMilli, DEFAULT_FORMAT);
     }
 
     /**
@@ -52,19 +52,27 @@ public class Time {
      * @param format 指定的时间格式
      * @return 指定格式的时间结果
      */
-    public static String ofEpochMilli(long epochMilli, String format) {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMilli), ZoneId.systemDefault())
-                .format(getFormatter(format));
+    public static String ofMilli(long epochMilli, String format) {
+        return ofMilliToLocalDateTime(epochMilli).format(getFormatter(format));
     }
 
+    /**
+     * 用新纪元时间到现在的毫秒值获取时间
+     * @param epochMilli 新纪元时间到现在的毫秒值
+     * @return LocalDateTime对象
+     * @since 1.3
+     */
+    public static LocalDateTime ofMilliToLocalDateTime(long epochMilli) {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMilli), ZoneId.systemDefault());
+    }
 
     /**
      * 将指定格式的字符串转化为新纪元时间到指定时间的毫秒值
      * @param timeWithDefaultFormat 指定的时间字符串（使用默认的时间格式）
      * @return 新纪元时间到指定时间的毫秒值
      */
-    public static long toEpochMilli(String timeWithDefaultFormat) {
-        return toEpochMilli(timeWithDefaultFormat, DEFAULT_FORMAT);
+    public static long toMilli(String timeWithDefaultFormat) {
+        return toMilli(timeWithDefaultFormat, DEFAULT_FORMAT);
     }
 
     /**
@@ -73,11 +81,19 @@ public class Time {
      * @param time 指定的时间字符串
      * @return 新纪元时间到指定时间的毫秒值
      */
-    public static long toEpochMilli(String time, String format) {
+    public static long toMilli(String time, String format) {
+        return toMilli(LocalDateTime.parse(time, getFormatter(format)));
+    }
 
-        // +8区
-        return LocalDateTime.parse(time, getFormatter(format))
-                .toInstant(ZoneOffset.ofHours(+8)).toEpochMilli();
+    /**
+     * 将LocalDateTime对象转化为新纪元时间到指定时间的毫秒值
+     * @param ldt LocalDateTime对象
+     * @return 新纪元时间到指定时间的毫秒值
+     * @since 1.3
+     */
+    public static long toMilli(LocalDateTime ldt) {
+        // 东8区
+        return ldt.toInstant(ZoneOffset.ofHours(+8)).toEpochMilli();
     }
 
     /**
