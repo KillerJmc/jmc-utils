@@ -4,7 +4,7 @@ package com.jmc.reference;
  * 函数引用 <br><br>
  * 可将方法作为参数传入另一个方法以便调用，且支持直接传入lambda（参数均必须小于等于7个）<br>
  * 提供了of和bind方法
- * @since 1.0.0
+ * @since 1.0
  * @author Jmc
  * @param <R> 返回值类型
  */

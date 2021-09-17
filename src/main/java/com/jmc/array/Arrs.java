@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 /**
  * 数组增强类
- * @since 1.0.0
+ * @since 1.0
  * @author Jmc
  */
 @SuppressWarnings("unused")
@@ -103,7 +103,7 @@ public class Arrs {
      * @param idx1 第一个元素对应的下标
      * @param idx2 第二个元素对应的下标
      * @param <T> 数组元素类型
-     * @since 1.1.0
+     * @since 1.1
      */
     public static <T> void swap(Array<T> a, int idx1, int idx2) {
         T tmp = a.get(idx1);

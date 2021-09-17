@@ -26,7 +26,7 @@ import java.util.List;
  *      2021.6.20   让sub系列方法在找不到开始或结束字符串时返回原字符串本身
  *      2021.8.2    添加capitalize方法
  * </pre>
- * @since 1.0.0
+ * @since 1.0
  * @author Jmc
  */
 @SuppressWarnings("unused")

@@ -10,7 +10,7 @@ import java.time.temporal.ChronoField;
 
 /**
  * 时间类
- * @since 1.0.0
+ * @since 1.0
  * @author Jmc
  */
 public class Time {

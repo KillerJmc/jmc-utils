@@ -10,7 +10,7 @@ import java.util.Stack;
 
 /**
  * 精准计算表达式的结果
- * @since 1.0.0
+ * @since 1.0
  * @author Jmc
  */
 @SuppressWarnings("unused")

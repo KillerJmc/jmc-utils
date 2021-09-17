@@ -4,7 +4,7 @@ import com.jmc.lang.extend.Tries;
 
 /**
  * 计时器类
- * @since 1.0.0
+ * @since 1.0
  * @author Jmc
  */
 @SuppressWarnings("unused")

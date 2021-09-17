@@ -5,7 +5,7 @@ import java.util.Map;
 
 /**
  * Object类扩展
- * @since 1.0.0
+ * @since 1.0
  * @author Jmc
  */
 @SuppressWarnings("unused")

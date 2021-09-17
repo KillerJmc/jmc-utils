@@ -3,8 +3,9 @@ package com.jmc.array;
 import java.util.Iterator;
 
 /**
- * 通用数组类
- * @since 1.1.0
+ * 通用数组类 <br>
+ * 基本类型数组访问速度慢10倍左右，对象数组访问速度相差不大
+ * @since 1.1
  * @author Jmc
  * @param <T> 数组元素类型
  */

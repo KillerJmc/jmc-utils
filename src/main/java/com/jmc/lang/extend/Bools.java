@@ -2,7 +2,7 @@ package com.jmc.lang.extend;
 
 /**
  * boolean拓展
- * @since 1.0.0
+ * @since 1.0
  * @author Jmc
  */
 @SuppressWarnings("unused")

@@ -4,7 +4,7 @@ import com.jmc.array.Array;
 
 /**
  * 比较工具类
- * @since 1.0.0
+ * @since 1.0
  * @author Jmc
  */
 @SuppressWarnings("unused")
@@ -70,7 +70,7 @@ public class Compare {
      * @param idx1 第一个元素的下标
      * @param idx2 第二个元素的下标
      * @return 第一个元素是否大于第二个元素
-     * @since 1.2.0
+     * @since 1.2
      */
     public static <T extends Comparable<T>> boolean gt(Array<T> a, int idx1, int idx2) {
         return Compare.gt(a.get(idx1), a.get(idx2));
@@ -82,7 +82,7 @@ public class Compare {
      * @param idx1 第一个元素的下标
      * @param idx2 第二个元素的下标
      * @return 第一个元素是否大于或等于第二个元素
-     * @since 1.2.0
+     * @since 1.2
      */
     public static <T extends Comparable<T>> boolean ge(Array<T> a, int idx1, int idx2) {
         return Compare.ge(a.get(idx1), a.get(idx2));
@@ -94,7 +94,7 @@ public class Compare {
      * @param idx1 第一个元素的下标
      * @param idx2 第二个元素的下标
      * @return 第一个元素是否小于第二个元素
-     * @since 1.2.0
+     * @since 1.2
      */
     public static <T extends Comparable<T>> boolean lt(Array<T> a, int idx1, int idx2) {
         return Compare.lt(a.get(idx1), a.get(idx2));
@@ -106,7 +106,7 @@ public class Compare {
      * @param idx1 第一个元素的下标
      * @param idx2 第二个元素的下标
      * @return 第一个元素是否小于或等于第二个元素
-     * @since 1.2.0
+     * @since 1.2
      */
     public static <T extends Comparable<T>> boolean le(Array<T> a, int idx1, int idx2) {
         return Compare.le(a.get(idx1), a.get(idx2));
@@ -118,7 +118,7 @@ public class Compare {
      * @param idx1 第一个元素的下标
      * @param idx2 第二个元素的下标
      * @return 第一个元素是否等于第二个元素
-     * @since 1.2.0
+     * @since 1.2
      */
     public static <T extends Comparable<T>> boolean eq(Array<T> a, int idx1, int idx2) {
         return Compare.eq(a.get(idx1), a.get(idx2));

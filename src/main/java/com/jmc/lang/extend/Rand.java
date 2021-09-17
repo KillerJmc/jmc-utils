@@ -4,7 +4,7 @@ import java.util.Random;
 
 /**
  * 产生指定随机数
- * @since 1.0.0
+ * @since 1.0
  * @author Jmc
  */
 @SuppressWarnings("unused")

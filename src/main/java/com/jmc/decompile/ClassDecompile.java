@@ -7,7 +7,7 @@ import java.lang.reflect.Modifier;
 
 /**
  * 反编译类
- * @since 1.0.0
+ * @since 1.0
  * @author Jmc
  */
 @SuppressWarnings("unused")

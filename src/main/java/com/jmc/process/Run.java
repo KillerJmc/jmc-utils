@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 
 /**
  * 执行系统内部命令
- * @since 1.0.0
+ * @since 1.0
  * @author Jmc
  */
 @SuppressWarnings("unused")

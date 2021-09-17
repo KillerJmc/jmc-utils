@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * 数学增强类
- * @since 1.0.0
+ * @since 1.0
  * @author Jmc
  */
 @SuppressWarnings("unused")
