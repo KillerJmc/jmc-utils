@@ -14,12 +14,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
-
 /**
  * 文件操作
  * <p>时间: 2019.1.12
@@ -103,6 +103,8 @@ import java.util.zip.ZipOutputStream;
  *   2021.8.21     1. 内联ZipOutputThread和多个loop系列方法（copyLoop等），降低耦合度
  *                 2. 删除两个CopyThread，改为普通方法
  *                 3. 改进拷贝时目标文件路径推算算法，增强源码可读性
+ *   2021.8.23     1. 修改Logger名称为类全限定名
+ *                 2. 删除enableLog成员变量（boolean）
  * </pre>
  * @since 1.0
  * @author Jmc
@@ -126,11 +128,6 @@ public class Files
 	private static Logger log;
 
 	/**
-	 * 是否开启日志打印
-	 */
-	private static boolean enableLog = false;
-
-	/**
 	 * 工具类不能被实例化
 	 */
 	private Files() {}
@@ -140,10 +137,13 @@ public class Files
 	 * @param enable 是否打印日志
 	 */
 	public static synchronized void enableLog(boolean enable) {
-		if (enable && log == null) {
-			log = Logger.getLogger("Files");
+		if (log == null) {
+			if (enable) {
+				log = Logger.getLogger(Files.class.getName());
+			}
+		} else {
+			log.setLevel(enable ? Level.INFO : Level.OFF);
 		}
-		enableLog = enable;
 	}
 
 	/**
@@ -151,8 +151,8 @@ public class Files
 	 * @param msg 日志内容
 	 */
 	private static void log(Supplier<String> msg) {
-		if (enableLog) {
-			log.info(msg.get());
+		if (log != null) {
+			log.info(msg);
 		}
 	}
 
@@ -166,7 +166,7 @@ public class Files
 
         // 创建源文件
         File src = new File(srcPath);
-        
+
         // 检查路径是否存在
         if (!src.exists()) {
         	throw new RuntimeException("源文件不存在，复制失败");
@@ -176,8 +176,8 @@ public class Files
         File des = new File(desPath + "/" + src.getName());
 
         // 记录开始时间
-        long startTime = System.currentTimeMillis();       
-              
+        long startTime = System.currentTimeMillis();
+
         // 如果是文件
         if (src.isFile()) {
 			log(() -> "正在复制" + src.getName() + "这个文件");
