@@ -1,5 +1,7 @@
 package com.jmc.util;
 
+import com.jmc.array.Array;
+
 /**
  * 比较工具类
  * @since 1.0.0
@@ -64,56 +66,61 @@ public class Compare {
 
     /**
      * 比较是否大于
-     * @param a 可排序数组
+     * @param a 可排序通用数组
      * @param idx1 第一个元素的下标
      * @param idx2 第二个元素的下标
      * @return 第一个元素是否大于第二个元素
+     * @since 1.2.0
      */
-    public static <T extends Comparable<T>> boolean gt(T[] a, int idx1, int idx2) {
-        return Compare.gt(a[idx1], a[idx2]);
+    public static <T extends Comparable<T>> boolean gt(Array<T> a, int idx1, int idx2) {
+        return Compare.gt(a.get(idx1), a.get(idx2));
     }
 
     /**
      * 比较是否大于或等于
-     * @param a 可排序数组
+     * @param a 可排序通用数组
      * @param idx1 第一个元素的下标
      * @param idx2 第二个元素的下标
      * @return 第一个元素是否大于或等于第二个元素
+     * @since 1.2.0
      */
-    public static <T extends Comparable<T>> boolean ge(T[] a, int idx1, int idx2) {
-        return Compare.ge(a[idx1], a[idx2]);
+    public static <T extends Comparable<T>> boolean ge(Array<T> a, int idx1, int idx2) {
+        return Compare.ge(a.get(idx1), a.get(idx2));
     }
 
     /**
      * 比较是否小于
-     * @param a 可排序数组
+     * @param a 可排序通用数组
      * @param idx1 第一个元素的下标
      * @param idx2 第二个元素的下标
      * @return 第一个元素是否小于第二个元素
+     * @since 1.2.0
      */
-    public static <T extends Comparable<T>> boolean lt(T[] a, int idx1, int idx2) {
-        return Compare.lt(a[idx1], a[idx2]);
+    public static <T extends Comparable<T>> boolean lt(Array<T> a, int idx1, int idx2) {
+        return Compare.lt(a.get(idx1), a.get(idx2));
     }
 
     /**
      * 比较是否小于或等于
-     * @param a 可排序数组
+     * @param a 可排序通用数组
      * @param idx1 第一个元素的下标
      * @param idx2 第二个元素的下标
      * @return 第一个元素是否小于或等于第二个元素
+     * @since 1.2.0
      */
-    public static <T extends Comparable<T>> boolean le(T[] a, int idx1, int idx2) {
-        return Compare.le(a[idx1], a[idx2]);
+    public static <T extends Comparable<T>> boolean le(Array<T> a, int idx1, int idx2) {
+        return Compare.le(a.get(idx1), a.get(idx2));
     }
 
     /**
      * 比较是否等于
-     * @param a 可排序数组
+     * @param a 可排序通用数组
      * @param idx1 第一个元素的下标
      * @param idx2 第二个元素的下标
      * @return 第一个元素是否等于第二个元素
+     * @since 1.2.0
      */
-    public static <T extends Comparable<T>> boolean eq(T[] a, int idx1, int idx2) {
-        return Compare.eq(a[idx1], a[idx2]);
+    public static <T extends Comparable<T>> boolean eq(Array<T> a, int idx1, int idx2) {
+        return Compare.eq(a.get(idx1), a.get(idx2));
     }
 }
