@@ -1,9 +1,11 @@
 package com.jmc.lang.reflect;
 
+import com.jmc.lang.extend.Strs;
 import com.jmc.lang.extend.Tries;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -38,8 +40,16 @@ public class Reflects {
             Method m = instance.getClass().getDeclaredMethod(methodName, parameterTypes);
             m.setAccessible(true);
             return m;
+        }, e -> {
+            if (e instanceof InaccessibleObjectException) {
+                var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
+                throw new RuntimeException("获取方法失败，%s 并不向你开放！".formatted(packageName));
+            } else {
+                e.printStackTrace();
+            }
         });
     }
+
 
     /**
      * 获取类中指定名称的成员变量
@@ -52,6 +62,71 @@ public class Reflects {
             Field f = instance.getClass().getDeclaredField(fieldName);
             f.setAccessible(true);
             return f.get(instance);
+        }, e -> {
+            if (e instanceof InaccessibleObjectException) {
+                var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
+                throw new RuntimeException("获取字段失败，%s 并不向你开放！".formatted(packageName));
+            } else {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * 执行指定的静态方法（不支持参数存在基本数据类型的方法）
+     * @param c 类对象
+     * @param methodName 方法名称
+     * @param args 方法参数
+     * @return 方法返回值
+     * @since 1.5
+     */
+    public static <T> T invokeStaticMethod(Class<?> c, String methodName, Object... args) {
+        return (T) Tries.tryReturnsT(() -> getStaticMethod(c, methodName,
+                Arrays.stream(args).map(Object::getClass).toArray(Class[]::new)).invoke(null, args));
+    }
+
+    /**
+     * 获取指定的静态方法
+     * @param c 类对象
+     * @param methodName 方法名称
+     * @param parameterTypes 参数类型
+     * @return 方法对象
+     * @since 1.5
+     */
+    public static Method getStaticMethod(Class<?> c, String methodName, Class<?>... parameterTypes) {
+        return Tries.tryReturnsT(() -> {
+            Method m = c.getDeclaredMethod(methodName, parameterTypes);
+            m.setAccessible(true);
+            return m;
+        }, e -> {
+            if (e instanceof InaccessibleObjectException) {
+                var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
+                throw new RuntimeException("获取静态方法失败，%s 并不向你开放！".formatted(packageName));
+            } else {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * 获取类中指定名称的静态成员变量
+     * @param c 类对象
+     * @param fieldName 成员变量名称
+     * @return 指定的成员变量
+     * @since 1.5
+     */
+    public static <T> T getStaticField(Class<?> c, String fieldName) {
+        return (T) Tries.tryReturnsT(() -> {
+            Field f = c.getDeclaredField(fieldName);
+            f.setAccessible(true);
+            return f.get(null);
+        }, e -> {
+            if (e instanceof InaccessibleObjectException) {
+                var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
+                throw new RuntimeException("获取静态字段失败，%s 并不向你开放！".formatted(packageName));
+            } else {
+                e.printStackTrace();
+            }
         });
     }
 

@@ -1,4 +1,4 @@
-package com.jmc.lang.extend;
+package com.jmc.lang.primitive;
 
 /**
  * boolean拓展

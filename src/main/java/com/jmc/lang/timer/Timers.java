@@ -14,7 +14,7 @@ public class Timers {
      * @param r 代码块
      * @param name 计时模块名称
      */
-    public static void secondTimer(Tries.RunnableThrowsException r, String name) {
+    public static void secondTimer(Tries.RunnableThrowsE r, String name) {
         printTimer(name, nano(r), 9);
     }
 
@@ -22,7 +22,7 @@ public class Timers {
      * 秒计时器
      * @param r 代码块
      */
-    public static void secondTimer(Tries.RunnableThrowsException r) {
+    public static void secondTimer(Tries.RunnableThrowsE r) {
         secondTimer(r, "");
     }
 
@@ -31,7 +31,7 @@ public class Timers {
      * @param r 代码块
      * @param name 计时模块名称
      */
-    public static void milliTimer(Tries.RunnableThrowsException r, String name) {
+    public static void milliTimer(Tries.RunnableThrowsE r, String name) {
         printTimer(name, nano(r), 6);
     }
 
@@ -39,7 +39,7 @@ public class Timers {
      * 毫秒计时器
      * @param r 代码块
      */
-    public static void milliTimer(Tries.RunnableThrowsException r) {
+    public static void milliTimer(Tries.RunnableThrowsE r) {
         milliTimer(r, "");
     }
 
@@ -48,7 +48,7 @@ public class Timers {
      * @param r 代码块
      * @param name 计时模块名称
      */
-    public static void nanoTimer(Tries.RunnableThrowsException r, String name) {
+    public static void nanoTimer(Tries.RunnableThrowsE r, String name) {
         printTimer(name, nano(r), 1);
     }
 
@@ -56,7 +56,7 @@ public class Timers {
      * 纳秒计时器
      * @param r 代码块
      */
-    public static void nanoTimer(Tries.RunnableThrowsException r) {
+    public static void nanoTimer(Tries.RunnableThrowsE r) {
         nanoTimer(r, "");
     }
 
@@ -65,7 +65,7 @@ public class Timers {
      * @param r 代码块
      * @return 计时的纳秒值
      */
-    private static long nano(Tries.RunnableThrowsException r) {
+    private static long nano(Tries.RunnableThrowsE r) {
         long startTime = System.nanoTime();
         try {r.run();} catch (Exception e) {e.printStackTrace();}
         long endTime = System.nanoTime();

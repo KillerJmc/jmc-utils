@@ -1,6 +1,6 @@
 package com.jmc.array;
 
-import com.jmc.lang.extend.Rand;
+import com.jmc.lang.rand.Rand;
 import com.jmc.lang.extend.Tries;
 
 import java.util.Arrays;

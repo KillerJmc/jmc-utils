@@ -1,4 +1,6 @@
-package com.jmc.lang.extend;
+package com.jmc.lang.primitive;
+
+import com.jmc.lang.extend.Objs;
 
 /**
  * 字符增强类

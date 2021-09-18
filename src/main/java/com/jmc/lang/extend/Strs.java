@@ -52,7 +52,7 @@ public class Strs
      */
     public static String subExclusive(String src, String start, String end) {
         var startIdx = src.indexOf(start);
-        var endIdx = src.indexOf(end);
+        var endIdx = src.indexOf(end, startIdx + 1);
         return startIdx == -1 || endIdx == -1 ? src : src.substring(startIdx + start.length(), endIdx);
     }
 

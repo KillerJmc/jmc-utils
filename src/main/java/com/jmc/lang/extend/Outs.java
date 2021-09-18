@@ -18,7 +18,7 @@ public class Outs {
      * 在代码块的输出部分前后插入分隔符
      * @param r 代码块
      */
-    public static void newLine(Tries.RunnableThrowsException r) {
+    public static void newLine(Tries.RunnableThrowsE r) {
         newLine();
         try {r.run();} catch (Exception e) {e.printStackTrace();}
         newLine();
