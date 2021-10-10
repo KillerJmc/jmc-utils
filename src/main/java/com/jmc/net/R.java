@@ -30,7 +30,6 @@ public class R {
     /**
      * 返回状态为成功的数据类
      * @return 数据类
-     * @since 1.6
      */
     public static R ok() {
         R r = new R();
@@ -41,7 +40,6 @@ public class R {
     /**
      * 返回状态为禁止访问的数据类
      * @return 数据类
-     * @since 1.6
      */
     public static R forbidden() {
         R r = new R();
@@ -52,7 +50,6 @@ public class R {
     /**
      * 返回状态为页面不存在的数据类
      * @return 数据类
-     * @since 1.6
      */
     public static R notFound() {
         R r = new R();
@@ -63,7 +60,6 @@ public class R {
     /**
      * 返回状态为错误的数据类
      * @return 数据类
-     * @since 1.6
      */
     public static R error() {
         R r = new R();
@@ -75,7 +71,6 @@ public class R {
      * 指定数据类的返回信息
      * @param message 返回信息
      * @return 数据类本身
-     * @since 1.6
      */
     public R msg(String message) {
         this.message = message;
@@ -86,7 +81,6 @@ public class R {
      * 指定数据类的返回对象
      * @param data 返回对象
      * @return 数据类本身
-     * @since 1.6
      */
     public R data(Object data) {
         this.data = data;

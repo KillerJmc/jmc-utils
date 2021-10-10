@@ -5,27 +5,6 @@ import java.util.List;
 
 /**
  * String类扩展
- * <p> 时间:
- * <pre>
- *      2020.3.11   加入重复方法
- *      2020.3.24   添加高级重复（以吊状图精简代码为灵感开发了此功能）
- *      2020.3.26   添加or系列方法
- *      2020.4.1    添加orEquals系列方法和substrings系列方法
- *      2020.4.10   添加removeAll方法
- *      2020.4.12   1.添加getLines和getLine方法
- *                  2.removeAll方法改为StringBuilder编辑提高效率
- *      2020.5.1    开创stream模式
- *      2020.6.20   解决stream模式方法名称歧义
- *      2020.8.6    添加encrypt和decrypt方法（之后改名为xor：2021.1.30补充）
- *      2020.8.30   添加linesToStr方法
- *      2020.9.5    添加collectAll方法
- *      2020.11.18  添加format方法
- *      2021.1.22   修改substrings方法，并改名为sub
- *      2021.1.30   移除stream模式，删除getLine系列，linesToStr，format方法
- *      2021.6.16   将sub方法分成subInclusive和subExclusive方法
- *      2021.6.20   让sub系列方法在找不到开始或结束字符串时返回原字符串本身
- *      2021.8.2    添加capitalize方法
- * </pre>
  * @since 1.0
  * @author Jmc
  */
@@ -36,11 +15,38 @@ public class Strs
      * 获取字符串的子串
      * @param src 原字符串
      * @param start 开始的子串（不包含）
+     * @param fromIdx 从哪个下标开始查找
+     * @return 结果子串
+     * @since 1.7
+     */
+    public static String subExclusive(String src, String start, int fromIdx) {
+        var startIdx = src.indexOf(start, fromIdx);
+        return startIdx == -1 ? src : src.substring(startIdx + start.length());
+    }
+
+    /**
+     * 获取字符串的子串
+     * @param src 原字符串
+     * @param start 开始的子串（不包含）
      * @return 结果子串
      */
     public static String subExclusive(String src, String start) {
-        var startIdx = src.indexOf(start);
-        return startIdx == -1 ? src : src.substring(startIdx + start.length());
+        return subExclusive(src, start, 0);
+    }
+
+    /**
+     * 获取字符串的子串
+     * @param src 原字符串
+     * @param start 开始的子串（不包含）
+     * @param end 结束的子串（不包含）
+     * @param fromIdx 从哪个下标开始查找
+     * @return 结果子串
+     * @since 1.7
+     */
+    public static String subExclusive(String src, String start, String end, int fromIdx) {
+        var startIdx = src.indexOf(start, fromIdx);
+        var endIdx = src.indexOf(end, startIdx + start.length());
+        return startIdx == -1 || endIdx == -1 ? src : src.substring(startIdx + start.length(), endIdx);
     }
 
     /**
@@ -51,9 +57,21 @@ public class Strs
      * @return 结果子串
      */
     public static String subExclusive(String src, String start, String end) {
-        var startIdx = src.indexOf(start);
-        var endIdx = src.indexOf(end, startIdx + 1);
-        return startIdx == -1 || endIdx == -1 ? src : src.substring(startIdx + start.length(), endIdx);
+        return subExclusive(src, start, end, 0);
+    }
+
+
+    /**
+     * 获取字符串的子串
+     * @param src 原字符串
+     * @param start 开始的子串（包含）
+     * @param fromIdx 从哪个下标开始查找
+     * @return 结果子串
+     * @since 1.7
+     */
+    public static String subInclusive(String src, String start, int fromIdx) {
+        var startIdx = src.indexOf(start, fromIdx);
+        return startIdx == -1 ? src : src.substring(startIdx);
     }
 
     /**
@@ -63,8 +81,23 @@ public class Strs
      * @return 结果子串
      */
     public static String subInclusive(String src, String start) {
-        var startIdx = src.indexOf(start);
-        return startIdx == -1 ? src : src.substring(startIdx);
+        return subInclusive(src, start, 0);
+    }
+
+    /**
+     * 获取字符串的子串
+     * @param src 原字符串
+     * @param start 开始的子串（包含）
+     * @param end 结束的子串（包含）
+     * @param fromIdx 从哪个下标开始查找
+     * @return 结果子串
+     * @since 1.7
+     */
+    public static String subInclusive(String src, String start, String end, int fromIdx) {
+        int startIdx = src.indexOf(start, fromIdx);
+        int endIdx = src.indexOf(end, startIdx + start.length());
+
+        return startIdx == -1 || endIdx == -1 ? src : src.substring(startIdx, endIdx + end.length());
     }
 
     /**
@@ -75,10 +108,7 @@ public class Strs
      * @return 结果子串
      */
     public static String subInclusive(String src, String start, String end) {
-        int startIdx = src.indexOf(start);
-        int endIdx = src.indexOf(end, startIdx);
-
-        return startIdx == -1 || endIdx == -1 ? src :  src.substring(startIdx, endIdx + end.length());
+        return subInclusive(src, start, end, 0);
     }
 
     /**
