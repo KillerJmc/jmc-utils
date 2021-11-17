@@ -42,6 +42,7 @@ public class Reflects {
             return m;
         }, e -> {
             if (e instanceof InaccessibleObjectException) {
+                // Unable to make method %s accessible: module %s does not "opens %s" to unnamed module @%s
                 var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
                 throw new RuntimeException("获取方法失败，%s 并不向你开放！".formatted(packageName));
             } else {
@@ -65,6 +66,7 @@ public class Reflects {
         }, e -> {
             if (e instanceof InaccessibleObjectException) {
                 var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
+                // Unable to make field %s accessible: module %s does not "opens %s" to unnamed module @%s
                 throw new RuntimeException("获取字段失败，%s 并不向你开放！".formatted(packageName));
             } else {
                 e.printStackTrace();
@@ -100,6 +102,7 @@ public class Reflects {
             return m;
         }, e -> {
             if (e instanceof InaccessibleObjectException) {
+                // Unable to make method %s accessible: module %s does not "opens %s" to unnamed module @%s
                 var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
                 throw new RuntimeException("获取静态方法失败，%s 并不向你开放！".formatted(packageName));
             } else {
@@ -123,6 +126,7 @@ public class Reflects {
         }, e -> {
             if (e instanceof InaccessibleObjectException) {
                 var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
+                // Unable to make field %s accessible: module %s does not "opens %s" to unnamed module @%s
                 throw new RuntimeException("获取静态字段失败，%s 并不向你开放！".formatted(packageName));
             } else {
                 e.printStackTrace();
