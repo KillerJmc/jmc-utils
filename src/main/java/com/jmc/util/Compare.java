@@ -69,6 +69,7 @@ public class Compare {
      * @param a 可排序通用数组
      * @param idx1 第一个元素的下标
      * @param idx2 第二个元素的下标
+     * @param <T> 可排序元素类型
      * @return 第一个元素是否大于第二个元素
      * @since 1.2
      */
@@ -81,6 +82,7 @@ public class Compare {
      * @param a 可排序通用数组
      * @param idx1 第一个元素的下标
      * @param idx2 第二个元素的下标
+     * @param <T> 可排序元素类型
      * @return 第一个元素是否大于或等于第二个元素
      * @since 1.2
      */
@@ -93,6 +95,7 @@ public class Compare {
      * @param a 可排序通用数组
      * @param idx1 第一个元素的下标
      * @param idx2 第二个元素的下标
+     * @param <T> 可排序元素类型
      * @return 第一个元素是否小于第二个元素
      * @since 1.2
      */
@@ -105,6 +108,7 @@ public class Compare {
      * @param a 可排序通用数组
      * @param idx1 第一个元素的下标
      * @param idx2 第二个元素的下标
+     * @param <T> 可排序元素类型
      * @return 第一个元素是否小于或等于第二个元素
      * @since 1.2
      */
@@ -117,6 +121,7 @@ public class Compare {
      * @param a 可排序通用数组
      * @param idx1 第一个元素的下标
      * @param idx2 第二个元素的下标
+     * @param <T> 可排序元素类型
      * @return 第一个元素是否等于第二个元素
      * @since 1.2
      */

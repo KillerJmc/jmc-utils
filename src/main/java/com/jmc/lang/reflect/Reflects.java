@@ -21,10 +21,11 @@ public class Reflects {
      * @param instance 类的实例
      * @param methodName 方法名称
      * @param args 方法参数
+     * @param <R> 返回值类型
      * @return 方法返回值
      */
-    public static <T> T invokeMethod(Object instance, String methodName, Object... args) {
-        return (T) Tries.tryReturnsT(() -> getMethod(instance, methodName,
+    public static <R> R invokeMethod(Object instance, String methodName, Object... args) {
+        return (R) Tries.tryReturnsT(() -> getMethod(instance, methodName,
                 Arrays.stream(args).map(Object::getClass).toArray(Class[]::new)).invoke(instance, args));
     }
 
@@ -56,6 +57,7 @@ public class Reflects {
      * 获取类中指定名称的成员变量
      * @param instance 类的实例
      * @param fieldName 成员变量名称
+     * @param <T> 成员变量类型
      * @return 指定的成员变量
      */
     public static <T> T getField(Object instance, String fieldName) {
@@ -79,11 +81,12 @@ public class Reflects {
      * @param c 类对象
      * @param methodName 方法名称
      * @param args 方法参数
+     * @param <R> 返回值类型
      * @return 方法返回值
      * @since 1.5
      */
-    public static <T> T invokeStaticMethod(Class<?> c, String methodName, Object... args) {
-        return (T) Tries.tryReturnsT(() -> getStaticMethod(c, methodName,
+    public static <R> R invokeStaticMethod(Class<?> c, String methodName, Object... args) {
+        return (R) Tries.tryReturnsT(() -> getStaticMethod(c, methodName,
                 Arrays.stream(args).map(Object::getClass).toArray(Class[]::new)).invoke(null, args));
     }
 
@@ -115,6 +118,7 @@ public class Reflects {
      * 获取类中指定名称的静态成员变量
      * @param c 类对象
      * @param fieldName 成员变量名称
+     * @param <T> 成员变量类型
      * @return 指定的成员变量
      * @since 1.5
      */

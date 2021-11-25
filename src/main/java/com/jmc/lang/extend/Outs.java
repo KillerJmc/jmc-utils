@@ -20,7 +20,7 @@ public class Outs {
      */
     public static void newLine(Tries.RunnableThrowsE r) {
         newLine();
-        try {r.run();} catch (Exception e) {e.printStackTrace();}
+        Tries.tryThis(r);
         newLine();
     }
 }

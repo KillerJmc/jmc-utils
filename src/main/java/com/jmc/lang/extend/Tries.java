@@ -17,7 +17,7 @@ public class Tries {
     public static void tryThis(RunnableThrowsE r) {
         try {
             r.run();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }
@@ -28,10 +28,10 @@ public class Tries {
      * @param exceptionHandler 异常处理器
      * @since 1.5
      */
-    public static void tryHandlesE(RunnableThrowsE r, Consumer<Exception> exceptionHandler) {
+    public static void tryHandlesE(RunnableThrowsE r, Consumer<Throwable> exceptionHandler) {
         try {
             r.run();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             exceptionHandler.accept(e);
         }
     }
@@ -41,7 +41,11 @@ public class Tries {
      * 可抛出异常的代码块接口
      */
     public interface RunnableThrowsE {
-        void run() throws Exception;
+        /**
+         * 执行方法
+         * @throws Throwable 抛出的异常
+         */
+        void run() throws Throwable;
     }
 
     /**
@@ -53,7 +57,7 @@ public class Tries {
     public static <T> T tryReturnsT(Callable<T> c) {
         try {
             return c.call();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
         return null;
@@ -65,14 +69,15 @@ public class Tries {
      * @param c 代码块
      * @param exceptionHandler 异常处理器
      * @param <T> 返回结果类型
+     * @param <E> 异常类型
      * @return 结果
      * @since 1.5
      */
     @SuppressWarnings("unchecked")
-    public static <T, E extends Exception> T tryReturnsT(Callable<T> c, Consumer<E> exceptionHandler) {
+    public static <T, E extends Throwable> T tryReturnsT(Callable<T> c, Consumer<E> exceptionHandler) {
         try {
             return c.call();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             exceptionHandler.accept((E) e);
         }
         return null;
@@ -95,6 +100,11 @@ public class Tries {
      * @since 1.5
      */
     public interface ConsumerThrowsE<T> {
-        void accept(T t) throws Exception;
+        /**
+         * 消耗方法
+         * @param t 消耗对象
+         * @throws Throwable 抛出的异常
+         */
+        void accept(T t) throws Throwable;
     }
 }

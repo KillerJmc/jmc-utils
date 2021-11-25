@@ -16,6 +16,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -107,6 +109,8 @@ import java.util.zip.ZipOutputStream;
  *   2021.8.23     1. 修改Logger名称为类全限定名
  *                 2. 删除enableLog成员变量（boolean）
  *   2021.8.28     添加代码折叠，使总体结构更清晰
+ *   2021.11.24    添加exists, createFile和delete(String...)方法
+ *   2021.11.25    添加lines方法
  * </pre>
  * @since 1.0
  * @author Jmc
@@ -456,6 +460,17 @@ public class Files
 
 	/**
 	 * 删除多个文件或文件夹
+	 * @param paths 多个路径
+	 * @since 1.8
+	 */
+	public static void delete(String... paths) {
+		for (var path : paths) {
+			delete(path);
+		}
+	}
+
+	/**
+	 * 删除多个文件或文件夹
 	 * @param fs 文件或文件夹
 	 */
 	public static void delete(File... fs) {
@@ -787,6 +802,50 @@ public class Files
 	}
 
 	/**
+	 * 用默认系统编码读取文件中的所有行到字符串流
+	 * @param path 文件路径
+	 * @return 所有行集合
+	 * @since 1.8
+	 */
+	public static Stream<String> lines(String path) {
+		return lines(path, Charset.defaultCharset());
+	}
+
+	/**
+	 * 用默认系统编码读取文件中的所有行到字符串流
+	 * @param src 文件对象
+	 * @return 所有行集合
+	 * @since 1.8
+	 */
+	public static Stream<String> lines(File src) {
+		return lines(src, Charset.defaultCharset());
+	}
+
+	/**
+	 * 读取文件中的所有行到字符串流
+	 * @param path 文件路径
+	 * @param cs 文件编码
+	 * @return 所有行集合
+	 * @since 1.8
+	 */
+	public static Stream<String> lines(String path, Charset cs) {
+		Objs.throwsIfNullOrEmpty("文件路径不能为空", path);
+		return lines(new File(path), cs);
+	}
+
+	/**
+	 * 读取文件中的所有行到字符串流
+	 * @param src 文件对象
+	 * @param cs 文件编码
+	 * @return 所有行集合
+	 * @since 1.8
+	 */
+	public static Stream<String> lines(File src, Charset cs) {
+		var content = read(src, cs);
+		return Arrays.stream(content.split("\n"));
+	}
+
+	/**
 	 * 用非追加模式和系统默认编码输出字符串到文件
 	 * @param s 字符串
 	 * @param desPath 目标文件路径
@@ -999,6 +1058,35 @@ public class Files
 	}
 
 	/**
+	 * 创建新文件
+	 * @param f 新文件对象
+	 * @since 1.8
+	 */
+	public static void createFile(File f) {
+		Objs.throwsIfNullOrEmpty("文件对象不能为空！", f);
+
+		if (!f.exists()) {
+			File parentFile;
+			if (!(parentFile = f.getParentFile()).exists()) {
+				mkdirs(parentFile);
+			}
+
+			if (Boolean.FALSE.equals(Tries.tryReturnsT(f::createNewFile))) {
+				throw new RuntimeException("文件创建失败!");
+			}
+		}
+	}
+
+	/**
+	 * 创建新文件
+	 * @param path 文件路径
+	 * @since 1.8
+	 */
+	public static void createFile(String path) {
+		createFile(new File(path));
+	}
+
+	/**
 	 * 创建多级目录
 	 * @param path 多级目录路径
 	 */
@@ -1018,6 +1106,26 @@ public class Files
 		if (!f.mkdirs()) {
 			throw new RuntimeException("创建多级目录失败！");
 		}
+	}
+
+	/**
+	 * 判断文件/文件夹是否存在
+	 * @param f 文件/文件夹 File对象
+	 * @return 是否存在
+	 * @since 1.8
+	 */
+	public static boolean exists(File f) {
+		return f != null && f.exists();
+	}
+
+	/**
+	 * 判断路径是否存在
+	 * @param path 路径
+	 * @return 是否存在
+	 * @since 1.8
+	 */
+	public static boolean exists(String path) {
+		return exists(new File(path));
 	}
 
 	/**

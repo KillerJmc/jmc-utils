@@ -39,11 +39,33 @@ public abstract class Array<T> implements Iterable<T> {
     public abstract <Arr> Arr toArray();
 
     /**
+     * 把通用数组转化成字符串
+     * @return 结果字符串
+     * @since 1.8
+     */
+    @Override
+    public String toString() {
+        if (len() == 0) {
+            return "[]";
+        }
+
+        var res = new StringBuilder("[ ");
+        for (var t : this) {
+            res.append(t).append(", ");
+        }
+
+        // 删除最后一个", "
+        res.delete(res.length() - 2, res.length());
+        res.append(" ]");
+        return res.toString();
+    }
+
+    /**
      * 返回通用数组
      * @param a byte类型数组
      * @return 通用数组
      */
-    public static Array<Byte> of(byte[] a) {
+    public static Array<Byte> of(byte... a) {
         return new Array<>() {
             @Override
             public Byte get(int pos) {
@@ -89,7 +111,7 @@ public abstract class Array<T> implements Iterable<T> {
      * @param a char类型数组
      * @return 通用数组
      */
-    public static Array<Character> of(char[] a) {
+    public static Array<Character> of(char... a) {
         return new Array<>() {
             @Override
             public Character get(int pos) {
@@ -135,7 +157,7 @@ public abstract class Array<T> implements Iterable<T> {
      * @param a boolean类型数组
      * @return 通用数组
      */
-    public static Array<Boolean> of(boolean[] a) {
+    public static Array<Boolean> of(boolean... a) {
         return new Array<>() {
             @Override
             public Boolean get(int pos) {
@@ -181,7 +203,7 @@ public abstract class Array<T> implements Iterable<T> {
      * @param a short类型数组
      * @return 通用数组
      */
-    public static Array<Short> of(short[] a) {
+    public static Array<Short> of(short... a) {
         return new Array<>() {
             @Override
             public Short get(int pos) {
@@ -227,7 +249,7 @@ public abstract class Array<T> implements Iterable<T> {
      * @param a int类型数组
      * @return 通用数组
      */
-    public static Array<Integer> of(int[] a) {
+    public static Array<Integer> of(int... a) {
         return new Array<>() {
             @Override
             public Integer get(int pos) {
@@ -273,7 +295,7 @@ public abstract class Array<T> implements Iterable<T> {
      * @param a long类型数组
      * @return 通用数组
      */
-    public static Array<Long> of(long[] a) {
+    public static Array<Long> of(long... a) {
         return new Array<>() {
             @Override
             public Long get(int pos) {
@@ -319,7 +341,7 @@ public abstract class Array<T> implements Iterable<T> {
      * @param a float类型数组
      * @return 通用数组
      */
-    public static Array<Float> of(float[] a) {
+    public static Array<Float> of(float... a) {
         return new Array<>() {
             @Override
             public Float get(int pos) {
@@ -365,7 +387,7 @@ public abstract class Array<T> implements Iterable<T> {
      * @param a double类型数组
      * @return 通用数组
      */
-    public static Array<Double> of(double[] a) {
+    public static Array<Double> of(double... a) {
         return new Array<>() {
             @Override
             public Double get(int pos) {

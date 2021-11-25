@@ -1,4 +1,4 @@
-package com.jmc.reference;
+package com.jmc.ref;
 
 import java.util.function.Function;
 
@@ -20,6 +20,7 @@ public class Pointer<T> {
     /**
      * 获得一个指针
      * @param initValue 指向的初始值
+     * @param <T> 初始值类型
      * @return 指针
      */
     public static <T> Pointer<T> of(T initValue) {

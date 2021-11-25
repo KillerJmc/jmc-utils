@@ -39,7 +39,7 @@ public class Arrs {
      * @param n 生成个数
      * @return 生成结果的数组
      */
-    public static int[] getDiffRandArr(int min, int max, int n){
+    public static int[] getDiffRandArr(int min, int max, int n) {
         // 如果参数不合法就返回
         if (max < min || n > max - min + 1) {
             return null;
@@ -81,7 +81,7 @@ public class Arrs {
      * @param n 数组长度
      * @return 结果数组
      */
-    public static int[] getRandArr(int min, int max, int n){
+    public static int[] getRandArr(int min, int max, int n) {
         // 如果参数不合法就返回
         if (max < min) {
             return null;

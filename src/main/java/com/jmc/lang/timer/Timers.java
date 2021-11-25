@@ -67,7 +67,7 @@ public class Timers {
      */
     private static long nano(Tries.RunnableThrowsE r) {
         long startTime = System.nanoTime();
-        try {r.run();} catch (Exception e) {e.printStackTrace();}
+        Tries.tryThis(r);
         long endTime = System.nanoTime();
         return endTime - startTime;
     }
