@@ -12,6 +12,9 @@ import java.util.List;
  */
 @SuppressWarnings("unused")
 public class Maths {
+
+    private Maths() {}
+
     /**
      * 埃式筛法计算质数，时间复杂度O(N * loglogN)
      * @param max 最大值（若也为质数，结果中也会包括）

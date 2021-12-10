@@ -6,8 +6,10 @@ package com.jmc.lang.primitive;
  * @author Jmc
  */
 @SuppressWarnings("unused")
-public class Bools
-{
+public class Bools {
+
+    private Bools() {}
+
     /**
      * 判断一个数字是否在两数之间
      * @param t 被判断的数字

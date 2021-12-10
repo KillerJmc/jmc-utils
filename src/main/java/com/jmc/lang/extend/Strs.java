@@ -9,8 +9,10 @@ import java.util.List;
  * @author Jmc
  */
 @SuppressWarnings("unused")
-public class Strs
-{
+public class Strs {
+
+    private Strs() {}
+
     /**
      * 获取字符串的子串
      * @param src 原字符串

@@ -11,8 +11,10 @@ import java.lang.reflect.Modifier;
  * @author Jmc
  */
 @SuppressWarnings("unused")
-public class ClassDecompile
-{
+public class ClassDecompile {
+
+    private ClassDecompile() {}
+
     /**
      * 反编译类
      * @param className Class名称

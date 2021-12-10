@@ -9,6 +9,9 @@ import com.jmc.lang.extend.Strs;
  */
 @SuppressWarnings("unused")
 public class Binary {
+
+    private Binary() {}
+
     /**
      * 将long转成二进制字符串
      * @param x 长整数

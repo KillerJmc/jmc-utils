@@ -8,12 +8,13 @@ import java.util.Random;
  * @author Jmc
  */
 @SuppressWarnings("unused")
-public class Rand
-{
+public class Rand {
     /**
      * 随机数类
      */
     private static final Random RAND = new Random(System.currentTimeMillis());
+
+    private Rand() {}
 
     /**
      * 产生指定范围的随机数

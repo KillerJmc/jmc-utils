@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * 反射增强类
@@ -16,6 +17,20 @@ import java.util.Arrays;
  */
 @SuppressWarnings({"unchecked", "unused"})
 public class Reflects {
+
+    private Reflects() {}
+
+    /**
+     * 非法访问检测
+     * @param c 被反射的类
+     * @since 1.9
+     */
+    private static void illegalAccessCheck(Class<?> c) {
+        if (c.getPackageName().startsWith("com.jmc")) {
+            throw new RuntimeException(new IllegalAccessException("你不能反射jmc.utils模块中的类！"));
+        }
+    }
+
     /**
      * 执行指定的方法（不支持参数存在基本数据类型的方法）
      * @param instance 类的实例
@@ -37,6 +52,8 @@ public class Reflects {
      * @return 方法对象
      */
     public static Method getMethod(Object instance, String methodName, Class<?>... parameterTypes) {
+        illegalAccessCheck(instance.getClass());
+
         return Tries.tryReturnsT(() -> {
             Method m = instance.getClass().getDeclaredMethod(methodName, parameterTypes);
             m.setAccessible(true);
@@ -45,7 +62,7 @@ public class Reflects {
             if (e instanceof InaccessibleObjectException) {
                 // Unable to make method %s accessible: module %s does not "opens %s" to unnamed module @%s
                 var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
-                throw new RuntimeException("获取方法失败，%s 并不向你开放！".formatted(packageName));
+                throw new RuntimeException("获取方法失败，模块 %s 并不向你开放！".formatted(packageName));
             } else {
                 e.printStackTrace();
             }
@@ -61,6 +78,8 @@ public class Reflects {
      * @return 指定的成员变量
      */
     public static <T> T getField(Object instance, String fieldName) {
+        illegalAccessCheck(instance.getClass());
+
         return (T) Tries.tryReturnsT(() -> {
             Field f = instance.getClass().getDeclaredField(fieldName);
             f.setAccessible(true);
@@ -69,7 +88,7 @@ public class Reflects {
             if (e instanceof InaccessibleObjectException) {
                 var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
                 // Unable to make field %s accessible: module %s does not "opens %s" to unnamed module @%s
-                throw new RuntimeException("获取字段失败，%s 并不向你开放！".formatted(packageName));
+                throw new RuntimeException("获取字段失败，模块 %s 并不向你开放！".formatted(packageName));
             } else {
                 e.printStackTrace();
             }
@@ -99,6 +118,8 @@ public class Reflects {
      * @since 1.5
      */
     public static Method getStaticMethod(Class<?> c, String methodName, Class<?>... parameterTypes) {
+        illegalAccessCheck(c);
+
         return Tries.tryReturnsT(() -> {
             Method m = c.getDeclaredMethod(methodName, parameterTypes);
             m.setAccessible(true);
@@ -107,7 +128,7 @@ public class Reflects {
             if (e instanceof InaccessibleObjectException) {
                 // Unable to make method %s accessible: module %s does not "opens %s" to unnamed module @%s
                 var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
-                throw new RuntimeException("获取静态方法失败，%s 并不向你开放！".formatted(packageName));
+                throw new RuntimeException("获取静态方法失败，模块 %s 并不向你开放！".formatted(packageName));
             } else {
                 e.printStackTrace();
             }
@@ -123,6 +144,8 @@ public class Reflects {
      * @since 1.5
      */
     public static <T> T getStaticField(Class<?> c, String fieldName) {
+        illegalAccessCheck(c);
+
         return (T) Tries.tryReturnsT(() -> {
             Field f = c.getDeclaredField(fieldName);
             f.setAccessible(true);
@@ -131,7 +154,7 @@ public class Reflects {
             if (e instanceof InaccessibleObjectException) {
                 var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
                 // Unable to make field %s accessible: module %s does not "opens %s" to unnamed module @%s
-                throw new RuntimeException("获取静态字段失败，%s 并不向你开放！".formatted(packageName));
+                throw new RuntimeException("获取静态字段失败，模块 %s 并不向你开放！".formatted(packageName));
             } else {
                 e.printStackTrace();
             }

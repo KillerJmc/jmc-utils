@@ -7,6 +7,9 @@ package com.jmc.lang.extend;
  */
 @SuppressWarnings("unused")
 public class Outs {
+
+    private Outs() {}
+
     /**
      * 输出分隔符
      */

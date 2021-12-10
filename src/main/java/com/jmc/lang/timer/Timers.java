@@ -9,6 +9,9 @@ import com.jmc.lang.extend.Tries;
  */
 @SuppressWarnings("unused")
 public class Timers {
+
+    private Timers() {}
+
     /**
      * 秒计时器
      * @param r 代码块

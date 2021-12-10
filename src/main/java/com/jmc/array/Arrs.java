@@ -12,6 +12,9 @@ import java.util.Arrays;
  */
 @SuppressWarnings("unused")
 public class Arrs {
+
+    private Arrs() {}
+
     /**
      * 获得指定类型的初始化完成的数组
      * @param c 指定类型的Class对象

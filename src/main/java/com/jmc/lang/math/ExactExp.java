@@ -15,6 +15,9 @@ import java.util.Stack;
  */
 @SuppressWarnings("unused")
 public class ExactExp {
+
+    private ExactExp() {}
+
     /**
      * 除法精度
      */

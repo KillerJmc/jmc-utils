@@ -9,6 +9,9 @@ import com.jmc.array.Array;
  */
 @SuppressWarnings("unused")
 public class Compare {
+
+    private Compare() {}
+
     /**
      * 比较是否大于
      * @param o1 第一个元素

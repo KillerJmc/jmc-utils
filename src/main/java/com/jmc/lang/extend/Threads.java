@@ -8,6 +8,9 @@ import java.util.concurrent.TimeUnit;
  * @author Jmc
  */
 public class Threads {
+
+    private Threads() {}
+
     /**
      * 线程以毫秒为单位睡眠一段时间，直接抛出中断异常
      * @param millis 休眠毫秒值

@@ -15,6 +15,9 @@ import java.time.temporal.ChronoField;
  */
 @SuppressWarnings("unused")
 public class Time {
+
+    private Time() {}
+
     /**
      * 默认格式
      */

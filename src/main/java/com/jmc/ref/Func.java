@@ -11,6 +11,7 @@ package com.jmc.ref;
  */
 @SuppressWarnings({"unchecked", "unused"})
 public abstract class Func<R> {
+
     private Func() {}
 
     /**

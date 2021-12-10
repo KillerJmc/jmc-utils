@@ -19,6 +19,11 @@ public class BigInt {
      */
     private final boolean isPositive;
 
+    private BigInt() {
+        this.data = null;
+        this.isPositive = false;
+    }
+
     /**
      * 用字符串构造大整数
      * @param s 字符串

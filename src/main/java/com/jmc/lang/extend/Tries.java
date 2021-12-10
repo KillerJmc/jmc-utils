@@ -10,6 +10,9 @@ import java.util.function.Consumer;
  */
 @SuppressWarnings("unused")
 public class Tries {
+
+    private Tries() {}
+
     /**
      * 执行需要被try包含的代码块，直接打印异常
      * @param r 代码块
@@ -18,7 +21,7 @@ public class Tries {
         try {
             r.run();
         } catch (Throwable e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -58,9 +61,8 @@ public class Tries {
         try {
             return c.call();
         } catch (Throwable e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
 

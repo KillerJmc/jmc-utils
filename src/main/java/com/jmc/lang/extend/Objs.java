@@ -1,5 +1,8 @@
 package com.jmc.lang.extend;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.util.Collection;
 import java.util.Map;
 
@@ -9,8 +12,10 @@ import java.util.Map;
  * @author Jmc
  */
 @SuppressWarnings("unused")
-public class Objs
-{
+public class Objs {
+
+	private Objs() {}
+
 	/**
 	 * 如果传入对象为空（包含字符串或集合为空），则抛出NPE
 	 * @param objs 传入的对象

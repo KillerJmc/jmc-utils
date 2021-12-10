@@ -8,6 +8,9 @@ import com.jmc.lang.extend.Objs;
  * @author Jmc
  */
 public class Chars {
+
+    private Chars() {}
+
     /**
      * 判断多个字符中是否存在至少一个字符与提供的字符相等
      * @param c 提供的字符
