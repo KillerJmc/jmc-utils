@@ -1,8 +1,8 @@
 package com.jmc.io;
 
-import com.jmc.lang.extend.Objs;
-import com.jmc.lang.extend.Strs;
-import com.jmc.lang.extend.Tries;
+import com.jmc.lang.Objs;
+import com.jmc.lang.Strs;
+import com.jmc.lang.Tries;
 import lombok.Getter;
 
 import java.io.*;
@@ -16,7 +16,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
@@ -1186,7 +1185,7 @@ public class Files
 	 * @param files 结果文件列表
 	 * @param dirs 结果文件夹列表
 	 */
-	public static record FindResult(List<File> files, List<File> dirs) {}
+	public record FindResult(List<File> files, List<File> dirs) {}
 
 	/**
 	 * 搜索路径下符合要求的所有文件和文件夹

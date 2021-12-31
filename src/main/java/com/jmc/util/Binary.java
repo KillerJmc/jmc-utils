@@ -1,6 +1,6 @@
 package com.jmc.util;
 
-import com.jmc.lang.extend.Strs;
+import com.jmc.lang.Strs;
 
 /**
  * 二进制工具类
