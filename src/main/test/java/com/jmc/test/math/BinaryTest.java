@@ -1,6 +1,6 @@
-package com.jmc.test.util;
+package com.jmc.test.math;
 
-import com.jmc.util.Binary;
+import com.jmc.math.Binary;
 import org.junit.Test;
 
 public class BinaryTest {

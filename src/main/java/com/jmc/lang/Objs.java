@@ -58,7 +58,7 @@ public class Objs {
 	 * @param objs 传入对象
 	 * @return 是否存在null值（包含字符串或集合为空）
 	 */
-	private static boolean nullOrEmpty(Object... objs) {
+	public static boolean nullOrEmpty(Object... objs) {
 		if (objs == null) {
 			return true;
 		}
