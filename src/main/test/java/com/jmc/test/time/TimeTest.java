@@ -8,16 +8,19 @@ import java.time.LocalDateTime;
 public class TimeTest {
     @Test
     public void test() {
-        // 获取当前时间字符串
-        System.out.println(Time.now());
+        // 获取当前时间
+        System.out.println(Time.of(LocalDateTime.now()));
 
         // 把时间转化为毫秒值
-        System.out.println(Time.toMilli(LocalDateTime.now()));
+        System.out.println(Time.of(LocalDateTime.now()).toMilli());
 
         // 把毫秒值转化为时间
-        System.out.println(Time.ofMilli(System.currentTimeMillis()));
+        System.out.println(Time.of(System.currentTimeMillis()));
 
         // 按格式表示当前时间
-        System.out.println(Time.now("yyyy年MM月dd日 HH时mm分"));
+        System.out.println(Time.of(LocalDateTime.now()).toString("yyyy年M月d日 H时m分"));
+
+        // 输入有格式的时间并转成LocalDateTime
+        System.out.println(Time.of("yyyy.M.d", "2001.8.9").toLocalDateTime());
     }
 }

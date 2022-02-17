@@ -1,9 +1,9 @@
 package com.jmc.math;
 
-import com.jmc.lang.Strs;
-
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 数学增强类

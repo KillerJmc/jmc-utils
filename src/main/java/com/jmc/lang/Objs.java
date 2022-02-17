@@ -1,8 +1,5 @@
 package com.jmc.lang;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
 import java.util.Collection;
 import java.util.Map;
 

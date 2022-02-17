@@ -1,7 +1,7 @@
 package com.jmc.array;
 
-import com.jmc.util.Rand;
 import com.jmc.lang.Tries;
+import com.jmc.util.Rand;
 
 import java.util.Arrays;
 

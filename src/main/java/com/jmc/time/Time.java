@@ -19,84 +19,85 @@ public class Time {
     private Time() {}
 
     /**
-     * 默认格式
+     * 储存的时间
+     * @since 2.1
+     */
+    public LocalDateTime ldt;
+
+    /**
+     * 默认时间格式
      */
     private static final String DEFAULT_FORMAT = "yyyy-M-d HH:mm:ss";
 
     /**
-     * 获取当前时间
-     * @return 默认格式的当前时间字符串
-     */
-    public static String now() {
-        return now(DEFAULT_FORMAT);
-    }
-
-    /**
-     * 获取当前时间
-     * @param format 指定的时间格式
-     * @return 指定格式的当前时间字符串
-     */
-    public static String now(String format) {
-        return LocalDateTime.now().format(getFormatter(format));
-    }
-
-    /**
-     * 用新纪元时间到现在的毫秒值获取时间
-     * @param epochMilli 新纪元时间到现在的毫秒值
-     * @return 默认格式的时间结果
-     */
-    public static String ofMilli(long epochMilli) {
-        return ofMilli(epochMilli, DEFAULT_FORMAT);
-    }
-
-    /**
-     * 用新纪元时间到现在的毫秒值获取时间
-     * @param epochMilli 新纪元时间到现在的毫秒值
-     * @param format 指定的时间格式
-     * @return 指定格式的时间结果
-     */
-    public static String ofMilli(long epochMilli, String format) {
-        return ofMilliToLocalDateTime(epochMilli).format(getFormatter(format));
-    }
-
-    /**
-     * 用新纪元时间到现在的毫秒值获取时间
-     * @param epochMilli 新纪元时间到现在的毫秒值
-     * @return LocalDateTime对象
-     * @since 1.3
-     */
-    public static LocalDateTime ofMilliToLocalDateTime(long epochMilli) {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMilli), ZoneId.systemDefault());
-    }
-
-    /**
-     * 将指定格式的字符串转化为新纪元时间到指定时间的毫秒值
-     * @param timeWithDefaultFormat 指定的时间字符串（使用默认的时间格式）
-     * @return 新纪元时间到指定时间的毫秒值
-     */
-    public static long toMilli(String timeWithDefaultFormat) {
-        return toMilli(timeWithDefaultFormat, DEFAULT_FORMAT);
-    }
-
-    /**
-     * 将指定格式的字符串转化为新纪元时间到指定时间的毫秒值
-     * @param format 指定的时间格式
-     * @param time 指定的时间字符串
-     * @return 新纪元时间到指定时间的毫秒值
-     */
-    public static long toMilli(String time, String format) {
-        return toMilli(LocalDateTime.parse(time, getFormatter(format)));
-    }
-
-    /**
-     * 将LocalDateTime对象转化为新纪元时间到指定时间的毫秒值
+     * 通过LocalDateTime创建实例
      * @param ldt LocalDateTime对象
-     * @return 新纪元时间到指定时间的毫秒值
-     * @since 1.3
+     * @return 实例
+     * @since 2.1
      */
-    public static long toMilli(LocalDateTime ldt) {
-        // 东8区
+    public static Time of(LocalDateTime ldt) {
+        var instance = new Time();
+        instance.ldt = ldt;
+        return instance;
+    }
+
+    /**
+     * 通过新纪元时间到现在的毫秒值创建实例
+     * @param milli 新纪元时间到现在的毫秒值
+     * @return 实例
+     * @since 2.1
+     */
+    public static Time of(long milli) {
+        return of(LocalDateTime.ofInstant(Instant.ofEpochMilli(milli), ZoneId.systemDefault()));
+    }
+
+    /**
+     * 通过带有格式的时间字符串创建实例
+     * @param format 指定时间格式
+     * @param time 时间字符串
+     * @return 实例
+     * @since 2.1
+     */
+    public static Time of(String format, String time) {
+        return of(LocalDateTime.parse(time, getFormatter(format)));
+    }
+
+    /**
+     * 转换为LocalDateTime
+     * @return 转换结果对象
+     * @since 2.1
+     */
+    public LocalDateTime toLocalDateTime() {
+        return ldt;
+    }
+
+    /**
+     * 转化为新纪元时间到现在的毫秒值
+     * @return 新纪元时间到现在的毫秒值
+     * @since 2.1
+     */
+    public long toMilli() {
         return ldt.toInstant(ZoneOffset.ofHours(+8)).toEpochMilli();
+    }
+
+    /**
+     * 转化为 {@link Time#DEFAULT_FORMAT 默认时间格式} 字符串
+     * @return 默认时间格式字符串
+     * @since 2.1
+     */
+    @Override
+    public String toString() {
+        return ldt.format(getFormatter(DEFAULT_FORMAT));
+    }
+
+    /**
+     * 转化为指定时间格式的字符串
+     * @param format 指定的时间格式
+     * @return 定时间格式的字符串
+     * @since 2.1
+     */
+    public String toString(String format) {
+        return ldt.format(getFormatter(format));
     }
 
     /**
@@ -104,10 +105,9 @@ public class Time {
      * @param format 指定的时间格式
      * @return 结果时间格式类（默认年份1970，月份和日期为1，小时为0）
      */
-    private static DateTimeFormatter getFormatter(String format) {
-        var formatter0 = DateTimeFormatter.ofPattern(format);
+    public static DateTimeFormatter getFormatter(String format) {
         return new DateTimeFormatterBuilder()
-                .append(formatter0)
+                .append(DateTimeFormatter.ofPattern(format))
                 .parseDefaulting(ChronoField.YEAR_OF_ERA, 1970)
                 .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
                 .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
