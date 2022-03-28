@@ -12,7 +12,7 @@ Providing a great number of utility classes to simplify the daily development.
 ```xml
 <repositories>
     <repository>
-        <id>jmc-repo</id>
+        <id>jmc-utils-repo</id>
         <url>https://killerjmc.github.io/jmc-utils/repo/maven</url>
     </repository>
 </repositories>

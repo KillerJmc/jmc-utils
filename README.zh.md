@@ -12,7 +12,7 @@
 ```xml
 <repositories>
     <repository>
-        <id>jmc-repo</id>
+        <id>jmc-utils-repo</id>
         <url>https://killerjmc.gitee.io/jmc-utils/repo/maven</url>
     </repository>
 </repositories>
