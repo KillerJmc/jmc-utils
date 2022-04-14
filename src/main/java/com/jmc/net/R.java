@@ -88,6 +88,18 @@ public class R<T> {
     }
 
     /**
+     * 返回包含数据，状态为成功的数据类
+     * @param data 返回数据
+     * @return 数据类
+     * @since 2.3
+     */
+    public static <T> R<T> ok(T data) {
+        var rBuilder = new RBuilder();
+        rBuilder.code = HttpStatus.OK;
+        return rBuilder.data(data);
+    }
+
+    /**
      * 返回状态为错误的数据类构造器
      * @return 数据类构造器
      */
@@ -95,6 +107,18 @@ public class R<T> {
         var rBuilder = new RBuilder();
         rBuilder.code = HttpStatus.ERROR;
         return rBuilder;
+    }
+
+    /**
+     * 返回包含错误信息，状态为错误的数据类
+     * @param errorMsg 错误信息
+     * @return 数据类
+     * @since 2.3
+     */
+    public static <T> R<T> error(String errorMsg) {
+        var rBuilder = new RBuilder();
+        rBuilder.code = HttpStatus.ERROR;
+        return rBuilder.msg(errorMsg).build();
     }
 
     /**
@@ -118,13 +142,22 @@ public class R<T> {
     }
 
     /**
+     * 判断某次请求是否失败
+     * @return 请求是否失败
+     * @since 2.3
+     */
+    public boolean failed() {
+        return this.code != HttpStatus.OK;
+    }
+
+    /**
      * 检查请求是否成功并获取返回数据
      * @return 返回数据
      * @since 2.2
      */
     public T get() {
         // 如果请求失败直接抛出异常，并打印错误信息
-        if (this.code != HttpStatus.OK) {
+        if (failed()) {
             throw new RuntimeException("Request failed: " + this.message);
         }
         return this.data;

@@ -1,11 +1,12 @@
 package com.jmc.test.lang.ref;
 
 import com.jmc.lang.ref.Pointer;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class PointerTest {
     @Test
-    public void test() {
+    public void simpleTest() {
         // 声明一个指针，并绑定一个初始值
         var p = Pointer.of(1);
 
@@ -29,5 +30,20 @@ public class PointerTest {
     private void changeValue(Pointer<Integer> p) {
         // 使指针指向的值 + 1
         p.update(t -> ++t);
+    }
+
+    @Test
+    public void emptyTest() {
+        // 声明一个空指针
+        Pointer<String> p = Pointer.empty();
+
+        // 指向的值应该为null
+        Assert.assertNull(p.get());
+
+        // 修改指向值
+        p.reset("data");
+
+        // 获取并打印值
+        System.out.println(p.get());
     }
 }

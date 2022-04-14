@@ -30,6 +30,15 @@ public class Pointer<T> {
     }
 
     /**
+     * 获得一个具有类型的空指针
+     * @return 具有类型的空指针
+     * @since 2.3
+     */
+    public static <T> Pointer<T> empty() {
+        return new Pointer<>();
+    }
+
+    /**
      * 获取指针指向的值
      * @return 指向的值
      */
