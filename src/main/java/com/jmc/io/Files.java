@@ -110,6 +110,7 @@ import java.util.zip.ZipOutputStream;
  *   2021.8.28     添加代码折叠，使总体结构更清晰
  *   2021.11.24    添加exists, createFile和delete(String...)方法
  *   2021.11.25    添加lines方法
+ *   2022.3.5      当文件树展开文件夹失败时，改为打印错误日志而不是直接抛出异常
  * </pre>
  * @since 1.0
  * @author Jmc
@@ -292,23 +293,27 @@ public class Files
 		4. transferTo最终调用的具体实现与以下循环实现一致，并且其每次循环都新建并释放一个buff（8MB），效率不高
 		（FileChannelImpl.transferToTrustedChannel()）
 		 */
-		try (var in = new FileInputStream(src).getChannel();
-			 var out = new FileOutputStream(des).getChannel()) {
+		try (var in = new FileInputStream(src);
+			 var out = new FileOutputStream(des)) {
+
+			// 获取文件通道
+			var inChannel = in.getChannel();
+			var outChannel = out.getChannel();
 
 			// 申请8M的堆外内存
 			var buff = ByteBuffer.allocateDirect(8 * 1024 * 1024);
 
 			// 读取通道中数据到buff
-			while (in.read(buff) != -1) {
+			while (inChannel.read(buff) != -1) {
 				// 改变buff为读模式
 				buff.flip();
 				// 将buff写入输出通道
-				out.write(buff);
+				outChannel.write(buff);
 				// buff的复位
 				buff.clear();
 			}
 			// 强制将内存中剩余数据写入硬盘，保证数据完整性
-			out.force(true);
+			outChannel.force(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1568,7 +1573,7 @@ public class Files
 		 * 当前文件/文件夹
 		 */
 		@Getter
-		private File currFile;
+		private final File currFile;
 
 		/**
 		 * 当前文件/文件夹长度（如果是文件夹则包含子项长度）
@@ -1583,9 +1588,11 @@ public class Files
 		/**
 		 * 子文件树列表默认的比较器
 		 */
-		private static final Comparator<FileTree> DEFAULT_COMPARATOR = Comparator.comparingLong(FileTree::getLength).reversed();
-		private FileTree() {
-			// 禁止外部调用构造器
+		private static final Comparator<FileTree> DEFAULT_COMPARATOR =
+				Comparator.comparingLong(FileTree::getLength).reversed();
+
+		private FileTree(File currFile) {
+			this.currFile = currFile;
 		}
 
 		/**
@@ -1609,16 +1616,19 @@ public class Files
 		 */
 		private static FileTree createLoop(File dirFile, long MIN_LENGTH, int depth, int currDepth) {
 			// 当前文件树对象
-			var fileTree = new FileTree();
+			var fileTree = new FileTree(dirFile);
 
 			// 当前文件夹大小
 			long length = 0;
 
 			var list = dirFile.listFiles();
 			if (list == null) {
-				throw new RuntimeException("展开文件夹失败！");
+				// 打印错误信息
+				System.err.println("展开文件夹失败：" + dirFile.getAbsolutePath());
+				return fileTree;
 			}
 
+			// 当前文件深度增加
 			currDepth++;
 
 			for (File f : list) {
@@ -1633,15 +1643,13 @@ public class Files
 				} else {
 					length += f.length();
 					if (currDepth <= depth && f.length() >= MIN_LENGTH) {
-						var subFile = new FileTree();
-						subFile.currFile = f;
+						var subFile = new FileTree(f);
 						subFile.length = f.length();
 						fileTree.subFileTrees.add(subFile);
 					}
 				}
 			}
 
-			fileTree.currFile = dirFile;
 			fileTree.length = length;
 
 			return fileTree;
