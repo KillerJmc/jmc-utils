@@ -1,3 +1,5 @@
+中文 &nbsp; | &nbsp; [English](README.md)
+
 # jmc-utils
 
 ## 介绍
@@ -13,7 +15,7 @@
 <repositories>
     <repository>
         <id>jmc-utils-repo</id>
-        <url>https://killerjmc.gitee.io/jmc-utils/repo/maven</url>
+        <url>https://killerjmc.github.io/jmc-utils/repo/maven</url>
     </repository>
 </repositories>
 ```
