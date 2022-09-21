@@ -8,7 +8,6 @@ import java.util.function.Function;
  * @since 1.7
  * @author Jmc
  */
-@SuppressWarnings("unused")
 public class Pointer<T> {
     /**
      * 指针指向值

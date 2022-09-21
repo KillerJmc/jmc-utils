@@ -7,16 +7,19 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * 反射增强类
  * @since 1.0
  * @author Jmc
  */
-@SuppressWarnings({"unchecked", "unused"})
+@SuppressWarnings("unchecked")
 public class Reflects {
-
     private Reflects() {}
 
     /**
@@ -25,8 +28,21 @@ public class Reflects {
      * @since 1.9
      */
     private static void illegalAccessCheck(Class<?> c) {
-        if (c.getPackageName().startsWith("com.jmc")) {
-            throw new RuntimeException(new IllegalAccessException("你不能反射jmc.utils模块中的类！"));
+        // Class必须非空
+        if (c == null) {
+            throw new NullPointerException("待检查的Class为空！");
+        }
+
+        // 获取Class对应的jar/class路径
+        var jarOrClassPath = Optional.of(c.getProtectionDomain())
+                .map(ProtectionDomain::getCodeSource) // 可能为空
+                .map(CodeSource::getLocation)
+                .map(URL::getPath)
+                .orElse("");
+
+        // 不能反射本模块的Class
+        if (jarOrClassPath.contains("jmc-utils")) {
+            throw new RuntimeException(new IllegalAccessException("你不能反射jmc-utils模块中的类！"));
         }
     }
 

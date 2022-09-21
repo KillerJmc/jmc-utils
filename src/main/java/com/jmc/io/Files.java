@@ -499,7 +499,8 @@ public class Files
 	 * @param zipPath zip路径
 	 * @param storeMode 是否用储存式压缩
 	 */
-    public static void zip(String srcPath, String zipPath, boolean storeMode) {
+    @SuppressWarnings("resource")
+	public static void zip(String srcPath, String zipPath, boolean storeMode) {
 		Objs.throwsIfNullOrEmpty("源路径和zip路径不能为空", srcPath, zipPath);
 
         // 创建源文件
@@ -638,6 +639,7 @@ public class Files
 	 * @param zipPath zip路径
 	 * @param desPath 目标路径
 	 */
+	@SuppressWarnings("resource")
 	public static void unzip(String zipPath, String desPath) {
 		Objs.throwsIfNullOrEmpty("zip路径和目标路径不能为空", zipPath, desPath);
 

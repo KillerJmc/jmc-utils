@@ -10,7 +10,6 @@ import java.lang.reflect.Modifier;
  * @since 1.0
  * @author Jmc
  */
-@SuppressWarnings("unused")
 public class ClassDecompile {
 
     private ClassDecompile() {}
@@ -21,6 +20,7 @@ public class ClassDecompile {
      * @return 反编译输出的字符串
      * @throws Exception 异常
      */
+    @SuppressWarnings("Duplicates")
     public static String decompile(String className) throws Exception {
         //实现类
         Class<?> c = Class.forName(className);
@@ -135,7 +135,7 @@ public class ClassDecompile {
                     methodModifier = methodModifier.replace(" abstract", "");
                 }
                 sb.append(methodModifier).append(" ");
-            }           
+            }
             //添加返回值类型
             sb.append(method.getReturnType().getSimpleName()).append(" ");
             //添加方法名
@@ -157,7 +157,7 @@ public class ClassDecompile {
                     sb.append("p").append(count + 1);
 
                     //如果是最后一个参数
-                    if (count == cs.length - 1) {       
+                    if (count == cs.length - 1) {
                         //不加逗号换行结束
                         sb.append(") {}\n\n");
                     } else {
@@ -167,7 +167,7 @@ public class ClassDecompile {
                     //计数器+1
                     count++;
                 }
-            }            
+            }
         }
 
         //删除最后一个换行符

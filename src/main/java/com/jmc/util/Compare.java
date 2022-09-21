@@ -7,7 +7,6 @@ import com.jmc.array.Array;
  * @since 1.0
  * @author Jmc
  */
-@SuppressWarnings("unused")
 public class Compare {
 
     private Compare() {}

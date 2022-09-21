@@ -8,7 +8,6 @@ import com.jmc.lang.Strs;
  * @since 1.0
  * @author Jmc
  */
-@SuppressWarnings("unused")
 public class Binary {
 
     private Binary() {}

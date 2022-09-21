@@ -5,7 +5,6 @@ package com.jmc.net;
  * @since 1.6
  * @author Jmc
  */
-@SuppressWarnings("unused")
 public interface HttpStatus {
     /**
      * 成功返回网页

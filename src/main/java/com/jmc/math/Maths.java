@@ -10,7 +10,6 @@ import java.util.List;
  * @since 1.0
  * @author Jmc
  */
-@SuppressWarnings("unused")
 public class Maths {
 
     private Maths() {}

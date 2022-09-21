@@ -5,7 +5,6 @@ package com.jmc.lang;
  * @since 1.0
  * @author Jmc
  */
-@SuppressWarnings("unused")
 public class Outs {
 
     private Outs() {}

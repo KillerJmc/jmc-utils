@@ -11,7 +11,6 @@ import java.util.Stack;
  * @author Jmc
  * @param <T> 具有运算符重载的类型
  */
-@SuppressWarnings("unused")
 public interface Operator<T> {
     /**
      * 表达式运算（只支持二元运算）
@@ -50,7 +49,7 @@ public interface Operator<T> {
      * @param <T> 具有运算符重载的类
      * @return 表达式结果布尔值
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     static <T extends Operator<T>> boolean cmp(String exp, T... args) {
         exp = placeholder2argsIdx(exp, args);
 

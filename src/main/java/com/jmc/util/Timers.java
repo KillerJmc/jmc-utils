@@ -7,7 +7,6 @@ import com.jmc.lang.Tries;
  * @since 1.0
  * @author Jmc
  */
-@SuppressWarnings("unused")
 public class Timers {
 
     private Timers() {}

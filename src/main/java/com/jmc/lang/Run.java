@@ -1,5 +1,5 @@
 package com.jmc.lang;
- 
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
  * @since 1.0
  * @author Jmc
  */
-@SuppressWarnings("unused")
 public class Run {
 
 	private Run() {}

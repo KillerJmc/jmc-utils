@@ -1,5 +1,6 @@
 package com.jmc.lang;
 
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
@@ -8,7 +9,6 @@ import java.util.function.Consumer;
  * @since 1.0
  * @author Jmc
  */
-@SuppressWarnings("unused")
 public class Tries {
 
     private Tries() {}
@@ -39,6 +39,20 @@ public class Tries {
         }
     }
 
+    /**
+     * 执行需要被try包含的代码块并处理异常
+     * @param r 代码块
+     * @return 异常对象
+     * @since 2.4
+     */
+    public static Optional<Throwable> tryReturnsE(RunnableThrowsE r) {
+        try {
+            r.run();
+        } catch (Throwable e) {
+            return Optional.of(e);
+        }
+        return Optional.empty();
+    }
 
     /**
      * 可抛出异常的代码块接口

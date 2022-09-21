@@ -7,7 +7,6 @@ import java.util.Random;
  * @since 1.0
  * @author Jmc
  */
-@SuppressWarnings("unused")
 public class Rand {
     /**
      * 随机数类

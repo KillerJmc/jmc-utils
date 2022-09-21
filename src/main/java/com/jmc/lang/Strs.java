@@ -8,7 +8,6 @@ import java.util.List;
  * @since 1.0
  * @author Jmc
  */
-@SuppressWarnings("unused")
 public class Strs {
 
     private Strs() {}
@@ -261,6 +260,60 @@ public class Strs {
         for (String s : strs) if (src.endsWith(s)) return true;
 
         return false;
+    }
+
+    /**
+     * 用多个分隔符分割字符串
+     * @param src 字符串
+     * @param splits 1个或多个分隔符
+     * @return 分割后字符串列表
+     * @since 2.4
+     */
+    public static List<String> orSplit(String src, String... splits) {
+        var res = new ArrayList<String>();
+
+        /*
+            例子：11uu22ttt33uuu44vvv55, 其中tt,uu和vvv是分隔符
+            第一次循环：left = 0,  right = 2,   splitLen = 2(uu),  res = [11]
+            第二次循环：left = 4,  right = 6,   splitLen = 2(tt),  res = [11, 22]
+            第三次循环：left = 8,  right = 11,  splitLen = 2(uu),  res = [11, 22, t33]
+            第四次循环：left = 13, right = 16,  splitLen = 3(vvv), res = [11, 22, t33, u44]
+            第五次循环：left = 19, right = 无限, splitLen = -1, res = [11, 22, t33, u44, 55]
+         */
+
+        // 左边边界
+        int left = 0;
+        while (true) {
+            // 右边边界
+            int right = Integer.MAX_VALUE;
+            // 右边边界右边的分隔符长度
+            int splitLen = -1;
+
+            // 找出最小右边边界
+            for (var split : splits) {
+                int startIdx;
+                if ((startIdx = src.indexOf(split, left)) != -1) {
+                    if (startIdx < right) {
+                        right = startIdx;
+                        splitLen = split.length();
+                    }
+                }
+            }
+
+            // 如果不存在右边边界，说明后面没有分隔符了，把后面全部放进去后结束循环
+            if (right == Integer.MAX_VALUE) {
+                res.add(src.substring(left));
+                break;
+            }
+
+            // 添加结果子串
+            res.add(src.substring(left, right));
+
+            // 更新左边边界
+            left = right + splitLen;
+        }
+
+        return res;
     }
 
     /**

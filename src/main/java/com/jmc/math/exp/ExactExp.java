@@ -15,7 +15,6 @@ import java.util.Stack;
  * @since 1.0
  * @author Jmc
  */
-@SuppressWarnings("unused")
 public class ExactExp {
 
     private ExactExp() {}

@@ -14,7 +14,6 @@ import java.util.function.Function;
  * @since 2.0
  * @author Jmc
  */
-@SuppressWarnings("unused")
 public class ExpUtils {
 
     private ExpUtils() {}

@@ -4,13 +4,14 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
+
 /**
  * 统一返回数据实体类型
  * @since 1.6
  * @author Jmc
  * @param <T> 返回数据类型
  */
-@SuppressWarnings("unused")
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class R<T> {
@@ -29,7 +30,10 @@ public class R<T> {
      */
     private T data;
 
-    private R() {}
+    /**
+     * Spring Json转化类的包名
+     */
+    private static final String SPRING_JSON_CONVERTER_PACKAGE_NAME = "org.springframework.http.converter.json";
 
     /**
      * 数据类的构造器
@@ -151,15 +155,40 @@ public class R<T> {
     }
 
     /**
+     * 判断Spring是否正在进行Json转换
+     * @return 结果布尔值
+     * @since 2.4
+     */
+    private boolean isSpringJsonConverting() {
+        return Arrays.stream(Thread.currentThread().getStackTrace())
+                .anyMatch(stack -> stack.getClassName().contains(SPRING_JSON_CONVERTER_PACKAGE_NAME));
+    }
+
+    /**
      * 检查请求是否成功并获取返回数据
      * @return 返回数据
-     * @since 2.2
+     * @since 2.4
      */
-    public T get() {
-        // 如果请求失败直接抛出异常，并打印错误信息
-        if (failed()) {
-            throw new RuntimeException("Request failed: " + this.message);
+    public T getData() throws Exception {
+        // 如果是Spring正在进行Json转换，不检查请求是否成功，直接返回数据
+        if (isSpringJsonConverting()) {
+            return getDataUnchecked();
         }
-        return this.data;
+
+        // 如果是用户在调用，请求失败直接抛出异常，并打印错误信息
+        if (failed()) {
+            throw new Exception("Request failed: " + this.message);
+        }
+
+        return data;
+    }
+
+    /**
+     * 不检查请求是否成功直接获取返回数据
+     * @return 返回数据
+     * @since 2.4
+     */
+    public T getDataUnchecked() {
+        return data;
     }
 }

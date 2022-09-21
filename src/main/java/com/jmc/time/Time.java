@@ -13,7 +13,6 @@ import java.time.temporal.ChronoField;
  * @since 1.0
  * @author Jmc
  */
-@SuppressWarnings("unused")
 public class Time {
 
     private Time() {}

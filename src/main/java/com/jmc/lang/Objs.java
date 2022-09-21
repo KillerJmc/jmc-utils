@@ -8,7 +8,6 @@ import java.util.Map;
  * @since 1.0
  * @author Jmc
  */
-@SuppressWarnings("unused")
 public class Objs {
 
 	private Objs() {}
