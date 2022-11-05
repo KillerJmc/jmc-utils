@@ -1,6 +1,9 @@
 package com.jmc.test.net;
 
+import com.jmc.lang.Objs;
+import com.jmc.lang.Outs;
 import com.jmc.lang.Tries;
+import com.jmc.lang.ref.Func;
 import com.jmc.net.HttpStatus;
 import com.jmc.net.R;
 import org.junit.Assert;
@@ -8,7 +11,7 @@ import org.junit.Test;
 
 public class RTest {
     @Test
-    public void okTest() throws Exception {
+    public void okTest() {
         // 用于网络流（直接返回给前端）
         var r = R.ok()
                 .msg("一切正常")
@@ -23,7 +26,7 @@ public class RTest {
     }
 
     @Test
-    public void okWithData() throws Exception {
+    public void okWithData() {
         // 请求成功
         var r = R.ok("成功");
         // 打印包含数据
@@ -77,7 +80,54 @@ public class RTest {
         }
 
         // 继续处理数据
-        var data = r.getDataUnchecked();
+        var data = r.getData();
         Assert.assertNotNull(data);
+    }
+
+    private record Student(String name, String password) {}
+
+    @Test
+    public void streamTest() {
+        var testRegister = Func.of((Student s) -> {
+            // 调用注册方法
+            var res = register(s);
+            if (res.failed()) {
+                System.err.println(res.getMessage());
+            } else {
+                System.out.println(res.getData());
+            }
+            Outs.newLine();
+        });
+
+        // 测试不同的注册请求
+        testRegister.invoke(new Student("", ""));
+        testRegister.invoke(new Student("Jmc", "123"));
+        testRegister.invoke(new Student("Lucy", "123?"));
+        testRegister.invoke(new Student("Lucy", "123"));
+    }
+
+    private R<Student> register(Student s) {
+        return R.stream()
+                .check(() -> checkEmpty(s))                             // 检查学生姓名和密码是否为空
+                .check(() -> existName(s.name))                         // 学生姓名是否重复
+                .check(s.password.endsWith("?"), "密码非法")     // 检查密码
+                .exec(() -> insert(s))                                  // 没问题就插入学生对象
+                .build(s);                                              // 返回结果数据
+    }
+
+    private void checkEmpty(Student s) throws Exception {
+        if (Objs.nullOrEmpty(s.name, s.password)) {
+            throw new Exception("姓名或密码为空");
+        }
+    }
+
+    private void existName(String name) throws Exception {
+        if (name.equals("Jmc")) {
+            throw new Exception("姓名重复");
+        }
+    }
+
+    private void insert(Student s) {
+        System.out.println("insert: 插入学生记录 -> " + s);
     }
 }
