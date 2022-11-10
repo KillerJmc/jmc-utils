@@ -156,9 +156,9 @@ public class R<T> {
      * @return 数据类构造器
      */
     public static RBuilder forbidden() {
-        var RBuilder = new RBuilder();
-        RBuilder.code = HttpStatus.FORBIDDEN;
-        return RBuilder;
+        var rBuilder = new RBuilder();
+        rBuilder.code = HttpStatus.FORBIDDEN;
+        return rBuilder;
     }
 
     /**

@@ -85,7 +85,9 @@ public class Binary {
         }
 
         // Long, Integer的最小值的二进制字符串放入parse方法会报错，所以特殊处理
-        if (binaryString.equals(toString(Long.MIN_VALUE, true))) return Long.MIN_VALUE;
+        if (binaryString.equals(toString(Long.MIN_VALUE, true))) {
+            return Long.MIN_VALUE;
+        }
 
         // Long, Integer的parse方法参数必须为原码形式
         // 如果是负数的补码形式就先完全取反后加一获得其正数再加负号
@@ -106,7 +108,9 @@ public class Binary {
             throw new IllegalArgumentException("二进制字符串不合法！");
         }
 
-        if (binaryString.equals(toString(Integer.MIN_VALUE, true))) return Integer.MIN_VALUE;
+        if (binaryString.equals(toString(Integer.MIN_VALUE, true))) {
+            return Integer.MIN_VALUE;
+        }
 
         return !isTrueForm && binaryString.length() == Integer.SIZE && binaryString.charAt(0) == '1' ?
                 -(Integer.parseInt(Strs.swap(binaryString, "0", "1"), 2) + 1) :
@@ -125,7 +129,9 @@ public class Binary {
             throw new IllegalArgumentException("二进制字符串不合法！");
         }
 
-        if (binaryString.equals(toString(Byte.MIN_VALUE, true))) return Byte.MIN_VALUE;
+        if (binaryString.equals(toString(Byte.MIN_VALUE, true))) {
+            return Byte.MIN_VALUE;
+        }
 
         return !isTrueForm && binaryString.length() == Byte.SIZE && binaryString.charAt(0) == '1' ?
             (byte) -(toInt(Strs.swap(binaryString, "0", "1"), true) + 1):

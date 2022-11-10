@@ -132,7 +132,7 @@ public class ExpUtils {
             }
 
             // 如果当前运算符优先级不大于栈顶运算符且栈顶不是左括号
-            while (!stack.isEmpty() && !stack.peek().equals("(") && !(priority.get(s) > priority.get(stack.peek()))) {
+            while (!stack.isEmpty() && !"(".equals(stack.peek()) && !(priority.get(s) > priority.get(stack.peek()))) {
                 // 不断出栈
                 res.add(stack.pop());
             }

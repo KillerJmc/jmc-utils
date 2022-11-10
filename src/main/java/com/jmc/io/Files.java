@@ -3,6 +3,7 @@ package com.jmc.io;
 import com.jmc.lang.Objs;
 import com.jmc.lang.Strs;
 import com.jmc.lang.Tries;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.io.*;
@@ -237,7 +238,7 @@ public class Files
 			pool.shutdown();
 
 			// 等待执行完成
-			Tries.tryThis(() -> { while (!pool.awaitTermination(1, TimeUnit.DAYS)); });
+			Tries.tryThis(() -> { while (!pool.awaitTermination(1, TimeUnit.DAYS)) {} });
         }
 
 		// 统计时间
@@ -700,7 +701,7 @@ public class Files
         pool.shutdown();
 
 		// 等待执行完成
-		Tries.tryThis(() -> { while (!pool.awaitTermination(1, TimeUnit.DAYS)); });
+		Tries.tryThis(() -> { while (!pool.awaitTermination(1, TimeUnit.DAYS)) {} });
 
         //关闭流
 		Tries.tryThis(zip::close);
@@ -1014,7 +1015,9 @@ public class Files
 			temp.add(src);
 			while (!temp.isEmpty()){
 				var list = temp.remove(0).listFiles();
-				if (list == null) return null;
+				if (list == null) {
+					return null;
+				}
 
 				for (File f : list) {
 					if (f.isDirectory()){
@@ -1107,7 +1110,9 @@ public class Files
 	public static void mkdirs(File f) {
 		Objs.throwsIfNullOrEmpty("文件对象不能为空！", f);
 
-		if (f.exists()) return;
+		if (f.exists()) {
+			return;
+		}
 
 		if (!f.mkdirs()) {
 			throw new RuntimeException("创建多级目录失败！");
@@ -1167,11 +1172,15 @@ public class Files
 		Objs.throwsIfNullOrEmpty("文件夹对象和后缀不能为空", dirFile, suffix);
 
 		File[] fs = dirFile.listFiles(File::isFile);
-		if (fs == null) return;
+		if (fs == null) {
+			return;
+		}
 
 		Arrays.sort(fs, Comparator.comparingLong(File::lastModified));
 
-		for (int i = 0; i < fs.length; i++) rename(fs[i], (i + 1) + suffix);
+		for (int i = 0; i < fs.length; i++) {
+			rename(fs[i], (i + 1) + suffix);
+		}
 	}
 
 	/**
@@ -1230,13 +1239,19 @@ public class Files
 		new Object() {
 			void loop(File src) {
 				File[] fs = src.listFiles();
-				if (fs == null) return;
+				if (fs == null) {
+					return;
+				}
 
 				for (File f : fs) {
 					if (f.isFile()) {
-						if (filter.accept(f)) fileList.add(f);
+						if (filter.accept(f)) {
+							fileList.add(f);
+						}
 					} else {
-						if (filter.accept(f)) dirList.add(f);
+						if (filter.accept(f)) {
+							dirList.add(f);
+						}
 						loop(f);
 					}
 				}
@@ -1307,13 +1322,17 @@ public class Files
 
 		while (!temp.isEmpty()) {
 			var list = temp.remove(0).listFiles();
-			if (list == null) return null;
+			if (list == null) {
+				return null;
+			}
 
 			for (File f : list) {
 				if (f.isDirectory()){
 					temp.add(f);
 				} else {
-					if (f.getName().contains(content)) return f;
+					if (f.getName().contains(content)) {
+						return f;
+					}
 				}
 			}
 		}
@@ -1348,10 +1367,14 @@ public class Files
 		var fileList = map.files();
 
 		sb.append("文件夹：\n");
-		for (File d : dirList) sb.append(d.getAbsolutePath()).append("\n");
+		for (File d : dirList) {
+			sb.append(d.getAbsolutePath()).append("\n");
+		}
 
 		sb.append("\n文件：\n");
-		for (File f : fileList) sb.append(f.getAbsolutePath()).append("\n");
+		for (File f : fileList) {
+			sb.append(f.getAbsolutePath()).append("\n");
+		}
 
 		long endTime = System.currentTimeMillis();
 		sb.append("\n共搜索到\n").append(dirList.size()).append("个文件夹\n")
@@ -1378,7 +1401,7 @@ public class Files
 	 * @param orContains 文件名称内包含内容
 	 */
 	public static void findCopies(String dirPath, String desPath, String... orContains) {
-		findDo(fileList -> { for (File f : fileList) copy(f, desPath); },
+		findDo(fileList -> { for (File f : fileList) { copy(f, desPath); } },
 				dirPath, orContains);
 	}
 
@@ -1399,7 +1422,7 @@ public class Files
 	 * @param orContains 文件名称内包含内容
 	 */
 	public static void findMoves(String dirPath, final String desPath, String... orContains) {
-		findDo(fileList -> { for (File f : fileList) move(f, desPath); },
+		findDo(fileList -> { for (File f : fileList) { move(f, desPath); } },
 				dirPath, orContains);
 	}
 
@@ -1420,7 +1443,7 @@ public class Files
 	 * @param oldChars 旧文件的名称
 	 */
 	public static void findRenames(String dirPath, String newChar, String... oldChars) {
-		findDo(fileList -> { for (File f : fileList) rename(f, Strs.orReplace(f.getName(), newChar, oldChars)); },
+		findDo(fileList -> { for (File f : fileList) { rename(f, Strs.orReplace(f.getName(), newChar, oldChars)); } },
 				dirPath, oldChars);
 	}
 
@@ -1570,6 +1593,7 @@ public class Files
 	/**
 	 * 文件树
 	 */
+	@EqualsAndHashCode
 	public static class FileTree {
 		/**
 		 * 当前文件/文件夹

@@ -201,7 +201,9 @@ public class Strs {
     public static String orReplace(String src, String newStr, String... oldStrs) {
         Objs.throwsIfNullOrEmpty(src, newStr);
 
-        for (String oldChar : oldStrs) src = src.replace(oldChar, newStr);
+        for (String oldChar : oldStrs) {
+            src = src.replace(oldChar, newStr);
+        }
 
         return src;
     }
@@ -215,7 +217,11 @@ public class Strs {
     public static boolean orEquals(String src, String... strs) {
         Objs.throwsIfNullOrEmpty(src);
 
-        for (String s : strs) if (src.equals(s)) return true;
+        for (String s : strs) {
+            if (src.equals(s)) {
+                return true;
+            }
+        }
 
         return false;
     }
@@ -229,7 +235,11 @@ public class Strs {
     public static boolean orContains(String src, String... contains) {
         Objs.throwsIfNullOrEmpty(src);
 
-        for (String s : contains) if (src.contains(s)) return true;
+        for (String s : contains) {
+            if (src.contains(s)) {
+                return true;
+            }
+        }
 
         return false;
     }
@@ -243,7 +253,11 @@ public class Strs {
     public static boolean orStartsWith(String src, String... strs) {
         Objs.throwsIfNullOrEmpty(src);
 
-        for (String s : strs) if (src.startsWith(s)) return true;
+        for (String s : strs) {
+            if (src.startsWith(s)) {
+                return true;
+            }
+        }
 
         return false;
     }
@@ -257,7 +271,11 @@ public class Strs {
     public static boolean orEndsWith(String src, String... strs) {
         Objs.throwsIfNullOrEmpty(src);
 
-        for (String s : strs) if (src.endsWith(s)) return true;
+        for (String s : strs) {
+            if (src.endsWith(s)) {
+                return true;
+            }
+        }
 
         return false;
     }

@@ -27,8 +27,9 @@ public abstract class Func<R> {
      * @param assertSize 需要参数个数
      */
     private static void checkParams(int realSize, int assertSize) {
-        if (realSize != assertSize)
+        if (realSize != assertSize) {
             throw new IllegalArgumentException("调用参数个数不匹配，需要%d个，实际提供了%d个".formatted(assertSize, realSize));
+        }
     }
 
     /**

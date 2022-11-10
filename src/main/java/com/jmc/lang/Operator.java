@@ -96,7 +96,7 @@ public interface Operator<T> {
             // 如果是布尔值
             if (a instanceof Boolean b1 && b instanceof Boolean b2) {
                 // 计算并存入布尔值
-                stack.push(s.equals("&&") ? b1 && b2 : b1 || b2);
+                stack.push("&&".equals(s) ? b1 && b2 : b1 || b2);
             }
         }
 
