@@ -1,6 +1,7 @@
 package com.jmc.net;
 
 import com.jmc.lang.Tries;
+import com.jmc.lang.ref.Pointer;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
+import java.util.concurrent.Callable;
 
 /**
  * 统一返回数据实体类型
@@ -282,10 +283,17 @@ public class R<T> {
          * @param dataSupplier 返回数据提供函数
          * @return R实例
          */
-        public <T> R<T> build(Supplier<T> dataSupplier) {
+        public <T> R<T> build(Callable<T> dataSupplier) {
             return invokeAndGetErrorMsg()
                     .<R<T>>map(R::error)
-                    .orElseGet(() -> R.ok(dataSupplier.get()));
+                    .orElseGet(() -> {
+                        // 创建错误信息字符串指针
+                        var errorMsgPtr = Pointer.<String>empty();
+                        // 执行返回数据构建方法，如果遇到异常把错误信息绑定到上述指针中
+                        var res = Tries.tryReturnsT(dataSupplier, e -> errorMsgPtr.reset(e.getMessage()));
+                        // 如果错误信息字符串指针为空就返回正确数据的R实例，否则返回错误信息的R实例
+                        return errorMsgPtr.get() == null ? R.ok(res) : R.error(errorMsgPtr.get());
+                    });
         }
 
         /**

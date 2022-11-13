@@ -2,6 +2,7 @@ package com.jmc.test.net;
 
 import com.jmc.lang.Objs;
 import com.jmc.lang.Outs;
+import com.jmc.lang.Threads;
 import com.jmc.lang.Tries;
 import com.jmc.lang.ref.Func;
 import com.jmc.net.HttpStatus;
@@ -92,9 +93,11 @@ public class RTest {
             // 调用注册方法
             var res = register(s);
             if (res.failed()) {
-                System.err.println(res.getMessage());
+                System.err.println("error: " + res.getMessage());
+                // 防止System.out和System.err混用导致顺序错乱
+                Threads.sleep(1);
             } else {
-                System.out.println(res.getData());
+                System.out.println("success: " + res.getData());
             }
             Outs.newLine();
         });
@@ -104,15 +107,21 @@ public class RTest {
         testRegister.invoke(new Student("Jmc", "123"));
         testRegister.invoke(new Student("Lucy", "123?"));
         testRegister.invoke(new Student("Lucy", "123"));
+        testRegister.invoke(new Student("Jenny", "123"));
     }
 
-    private R<Student> register(Student s) {
+    private R<String> register(Student s) {
         return R.stream()
-                .check(() -> checkEmpty(s))                             // 检查学生姓名和密码是否为空
-                .check(() -> existName(s.name))                         // 学生姓名是否重复
-                .check(s.password.endsWith("?"), "密码非法")     // 检查密码
-                .exec(() -> insert(s))                                  // 没问题就插入学生对象
-                .build(s);                                              // 返回结果数据
+                // 检查学生姓名和密码是否为空
+                .check(() -> checkEmpty(s))
+                // 学生姓名是否重复
+                .check(() -> existName(s.name))
+                // 检查密码是否非法
+                .check(s.password.endsWith("?"), "密码非法")
+                // 执行插入学生对象操作
+                .exec(() -> insert(s))
+                // 返回结果数据
+                .build(() -> getResult(s));
     }
 
     private void checkEmpty(Student s) throws Exception {
@@ -129,5 +138,12 @@ public class RTest {
 
     private void insert(Student s) {
         System.out.println("insert: 插入学生记录 -> " + s);
+    }
+
+    private String getResult(Student s) throws Exception {
+        if ("Lucy".equals(s.name)) {
+            throw new Exception("获取结果出错：名字不能为Lucy（莫须有罪名，模拟构建结果出错情况）");
+        }
+        return "注册成功，姓名为：" + s.name;
     }
 }
