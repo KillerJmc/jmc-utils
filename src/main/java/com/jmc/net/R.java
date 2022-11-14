@@ -289,8 +289,13 @@ public class R<T> {
                     .orElseGet(() -> {
                         // 创建错误信息字符串指针
                         var errorMsgPtr = Pointer.<String>empty();
-                        // 执行返回数据构建方法，如果遇到异常把错误信息绑定到上述指针中
-                        var res = Tries.tryReturnsT(dataSupplier, e -> errorMsgPtr.reset(e.getMessage()));
+                        // 执行返回数据构建方法
+                        var res = Tries.tryReturnsT(dataSupplier, e -> {
+                            // 遇到异常就打印堆栈信息
+                            e.printStackTrace();
+                            // 把错误信息绑定到上述指针中
+                            errorMsgPtr.reset(e.getMessage());
+                        });
                         // 如果错误信息字符串指针为空就返回正确数据的R实例，否则返回错误信息的R实例
                         return errorMsgPtr.get() == null ? R.ok(res) : R.error(errorMsgPtr.get());
                     });
@@ -302,9 +307,12 @@ public class R<T> {
          */
         private Optional<String> invokeAndGetErrorMsg() {
             for (var operation : OPERATIONS) {
-                var errorMsg = Tries.tryReturnsE(operation).map(Throwable::getMessage);
-                if (errorMsg.isPresent()) {
-                    return errorMsg;
+                var throwable = Tries.tryReturnsE(operation);
+                if (throwable.isPresent()) {
+                    // 打印错误堆栈信息
+                    throwable.get().printStackTrace();
+                    // 返回错误信息
+                    return throwable.map(Throwable::getMessage);
                 }
             }
             return Optional.empty();

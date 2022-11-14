@@ -93,11 +93,11 @@ public class RTest {
             // 调用注册方法
             var res = register(s);
             if (res.failed()) {
-                System.err.println("error: " + res.getMessage());
+                System.err.println("前端返回错误信息: " + res.getMessage());
                 // 防止System.out和System.err混用导致顺序错乱
                 Threads.sleep(1);
             } else {
-                System.out.println("success: " + res.getData());
+                System.out.println("前端返回成功数据: " + res.getData());
             }
             Outs.newLine();
         });
