@@ -2,6 +2,10 @@ package com.jmc.lang.reflect;
 
 import com.jmc.lang.Strs;
 import com.jmc.lang.Tries;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -11,7 +15,10 @@ import java.net.URL;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.jar.JarFile;
+import java.util.stream.Stream;
 
 /**
  * 反射增强类
@@ -33,17 +40,159 @@ public class Reflects {
             throw new NullPointerException("待检查的Class为空！");
         }
 
-        // 获取Class对应的jar/class路径
-        var jarOrClassPath = Optional.of(c.getProtectionDomain())
-                .map(ProtectionDomain::getCodeSource) // 可能为空
-                .map(CodeSource::getLocation)
+        // 获取Class对应的类路径
+        var classPath = getClassPath(c)
                 .map(URL::getPath)
                 .orElse("");
 
         // 不能反射本模块的Class
-        if (jarOrClassPath.contains("jmc-utils")) {
+        if (classPath.contains("jmc-utils")) {
             throw new RuntimeException(new IllegalAccessException("你不能反射jmc-utils模块中的类！"));
         }
+    }
+
+    /**
+     * 判断类是否在jar包中
+     * @param c 指定的类
+     * @return 类是否在jar包中
+     * @since 2.6
+     */
+    public static boolean isClassInJar(Class<?> c) {
+        return getClassPath(c)
+                .map(URL::getProtocol)
+                .map("jar"::equals)
+                .orElseThrow(() -> new RuntimeException("找不到类加载路径"));
+    }
+
+    /**
+     * 获取指定类的类加载路径
+     * @param c 指定的类
+     * @return 类加载路径
+     * @since 2.6
+     */
+    public static Optional<URL> getClassPath(Class<?> c) {
+        return Optional.of(c)
+                .map(Class::getProtectionDomain)
+                .map(ProtectionDomain::getCodeSource)
+                .map(CodeSource::getLocation)
+                .map(classPath -> {
+                    // 类加载路径
+                    var classPathStr = classPath.getPath();
+
+                    // 如果对应的是jar路径
+                    if (classPathStr.endsWith(".jar")) {
+                        // 返回标准的java jar URL
+                        return Tries.tryReturnsT(() ->
+                                // 替换 /D:/xxx.jar -> jar:file:///D:/xxx.jar!/
+                                new URL("jar:file://%s!/".formatted(classPathStr)
+                        ));
+                    }
+                    // 否则直接返回类路径
+                    return classPath;
+                });
+    }
+
+    /**
+     * URL信息类
+     * @since 2.6
+     */
+    @AllArgsConstructor(staticName = "of", access = AccessLevel.PRIVATE)
+    @Getter
+    @ToString
+    public static class URLInfo {
+        /**
+         * URL对象
+         */
+        private URL url;
+
+        /**
+         * 文件/文件夹名称
+         */
+        private String name;
+
+        /**
+         * 是否为文件
+         */
+        private boolean isFile;
+    }
+
+    /**
+     * 获取类路径下指定路径的一级文件/文件夹的URL信息列表
+     * @param c 指定的类
+     * @param path 指定的路径
+     * @return 一级文件/文件夹的URL信息对象列表
+     * @since 2.6
+     */
+    public static List<URLInfo> listResources(Class<?> c, String path) {
+        // 获取类加载路径
+        var classPath = getClassPath(c).orElseThrow(() -> new RuntimeException("找不到类加载路径"));
+
+        // 处理jar路径
+        if ("jar".equals(classPath.getProtocol())) {
+            // 处理得到jar文件路径（jar:file:///path!/ -> path）
+            var jarFilePath = Strs.subExclusive(classPath.toString(), "jar:file:///", "!/");
+
+            // 读取jar文件
+            try (var jarFile = new JarFile(jarFilePath)) {
+                // 将用户给出的路径去掉开头的 /（如果有），如/a/b -> a/b
+                path = path.startsWith("/") ? path.substring(1) : path;
+
+                // 给用户的路径末尾加上 /（如果没有），a/b -> a/b/
+                var rootPath = path.endsWith("/") ? path : path + "/";
+
+                // 遍历jar文件中的entry
+                return jarFile.stream()
+                        // 去掉根目录本身
+                        .filter(entry -> !entry.getName().equals(rootPath))
+                        // 选择根目录下的所有文件/文件夹
+                        .filter(entry -> entry.getName().startsWith(rootPath))
+                        // 选择根目录下的一级文件/文件夹
+                        .filter(entry -> {
+                            // 获取entry相对根目录的路径，如rootPath/b/c -> b/c
+                            var relativePath = Strs.subExclusive(entry.getName(), rootPath);
+                            // 如果没有找到/或者找到的第一个/为最后一个字符，说明是一级文件/文件夹。如a.txt和b/
+                            return !relativePath.contains("/") || relativePath.indexOf("/") == relativePath.length() - 1;
+                        })
+                        .map(entry -> {
+                            // entry名称
+                            var entryName = entry.getName();
+
+                            // 通过拼接类路径和文件/文件夹名来构建URL
+                            var url = Tries.tryReturnsT(() -> new URL(classPath, entryName));
+                            // 获取文件/文件夹名
+                            var name = entry.isDirectory() ? Strs.subExclusive(entryName, rootPath, "/")
+                                    : Strs.subExclusive(entryName, rootPath);
+                            // 获取是否为文件的标识
+                            var isFile = !entry.isDirectory();
+
+                            // 返回构建的URL信息对象
+                            return URLInfo.of(url, name, isFile);
+                        })
+                        .toList();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // 处理普通类路径
+        // 通过File类的listFiles方法获取目录文件列表
+        return Optional.ofNullable(new File(classPath.getPath() + File.separator + path).listFiles())
+                // 转化为Stream
+                .map(Arrays::stream)
+                // 将文件列表流化为URL信息列表流
+                .map(stream -> stream.map(file -> {
+                    // 通过加上”file:///“前缀将文件地址转化为URL
+                    var url = Tries.tryReturnsT(() -> new URL("file:///" + file.getAbsolutePath()));
+                    // 获取文件名
+                    var name = file.getName();
+                    // 获取是否为文件的标识
+                    var isFile = file.isFile();
+
+                    // 返回构建的URL信息对象
+                    return URLInfo.of(url, name, isFile);
+                }))
+                .map(Stream::toList)
+                .orElse(List.of());
     }
 
     /**

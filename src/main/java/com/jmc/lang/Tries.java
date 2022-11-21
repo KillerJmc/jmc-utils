@@ -115,6 +115,7 @@ public class Tries {
      * @param <T> 被消耗的对象
      * @since 1.5
      */
+    @FunctionalInterface
     public interface ConsumerThrowsE<T> {
         /**
          * 消耗方法
