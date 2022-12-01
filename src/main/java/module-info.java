@@ -1,4 +1,3 @@
-
 /**
  * jmc.utils module
  * @since 1.9

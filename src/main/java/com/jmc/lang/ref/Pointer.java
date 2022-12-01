@@ -30,6 +30,7 @@ public class Pointer<T> {
 
     /**
      * 获得一个具有类型的空指针
+     * @param <T> 初始值类型
      * @return 具有类型的空指针
      * @since 2.3
      */

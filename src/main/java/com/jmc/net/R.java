@@ -92,6 +92,7 @@ public class R<T> {
         /**
          * 通过包装数据构造数据类的对象
          * @param data 包装数据
+         * @param <T> 返回数据类型
          * @return 数据类的实例对象
          */
         public <T> R<T> data(T data) {
@@ -121,6 +122,7 @@ public class R<T> {
     /**
      * 返回包含数据，状态为成功的数据类
      * @param data 返回数据
+     * @param <T> 返回数据类型
      * @return 数据类
      * @since 2.3
      */
@@ -143,6 +145,7 @@ public class R<T> {
     /**
      * 返回包含错误信息，状态为错误的数据类
      * @param errorMsg 错误信息
+     * @param <T> 返回数据类型
      * @return 数据类
      * @since 2.3
      */
@@ -270,6 +273,7 @@ public class R<T> {
         /**
          * 构建带返回数据的R实例
          * @param data 返回数据
+         * @param <T> 返回数据类型
          * @return R实例
          */
         public <T> R<T> build(T data) {
@@ -281,6 +285,7 @@ public class R<T> {
         /**
          * 构建带返回数据的R实例
          * @param dataSupplier 返回数据提供函数
+         * @param <T> 返回数据类型
          * @return R实例
          */
         public <T> R<T> build(Callable<T> dataSupplier) {

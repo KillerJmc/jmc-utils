@@ -12,7 +12,7 @@ public class ObjsTest {
     public void throwTest() {
         try {
             // 空对象，无信息提示
-            Objs.throwsIfNullOrEmpty(null);
+            Objs.throwsIfNullOrEmpty((Object) null);
         } catch (Exception e) {
             e.printStackTrace();
         }

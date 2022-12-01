@@ -8,16 +8,27 @@
 
 ## 用法
 
++ Gradle:
+
+1. 添加仓库
+   ```groovy
+   maven { url "https://killerjmc.github.io/jmc-utils/repo" }
+   ```
+
+2. 添加依赖
+   ```groovy
+   implementation "com.jmc:jmc-utils:latestVersion"
+   ```
+
+
 + Maven: 
 
 1. 添加仓库
     ```xml
-    <repositories>
-        <repository>
-            <id>jmc-utils-repo</id>
-            <url>https://killerjmc.github.io/jmc-utils/repo/maven</url>
-        </repository>
-    </repositories>
+    <repository>
+        <id>jmc-utils-repo</id>
+        <url>https://killerjmc.github.io/jmc-utils/repo</url>
+    </repository>
     ```
 
 2. 添加依赖
@@ -25,9 +36,6 @@
     <dependency>
         <groupId>com.jmc</groupId>
         <artifactId>jmc-utils</artifactId>
-        <version>latest version</version>
+        <version>latest-version</version>
     </dependency>
     ```
-
-
-
