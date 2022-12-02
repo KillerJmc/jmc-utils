@@ -4,7 +4,9 @@ plugins {
 }
 
 group "com.jmc"
-version "2.6.1"
+version "2.6.2"
+
+sourceCompatibility = "16"
 
 repositories {
     mavenCentral()
@@ -30,7 +32,7 @@ javadoc {
 
 publishing {
     publications {
-        main(MavenPublication) {
+        release(MavenPublication) {
             from components.java
         }
     }
