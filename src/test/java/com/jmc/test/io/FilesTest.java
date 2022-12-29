@@ -121,6 +121,10 @@ public class FilesTest {
 
         var path = getFilePath("a.txt");
         Files.out("666", path);
+
+        // 获取文件编码
+        System.out.println(Files.getEncoding(path).orElseThrow());
+
         // 设置文件编码
         Files.setEncoding(path, StandardCharsets.UTF_8, StandardCharsets.ISO_8859_1);
         System.out.println(Files.read(path));

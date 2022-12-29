@@ -9,6 +9,7 @@ import lombok.Getter;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -112,6 +113,8 @@ import java.util.zip.ZipOutputStream;
  *   2021.11.24    添加exists, createFile和delete(String...)方法
  *   2021.11.25    添加lines方法
  *   2022.3.5      当文件树展开文件夹失败时，改为打印错误日志而不是直接抛出异常
+ *   2022.12.29    1. 添加getEncoding系列方法来查询文件编码
+ *                 2. 添加setEncoding(file, newEncoding)方法来简化设置文件编码的调用
  * </pre>
  * @since 1.0
  * @author Jmc
@@ -1140,12 +1143,116 @@ public class Files
 	}
 
 	/**
+	 * 获取文件的编码字符集
+	 * @param f 文件对象
+	 * @return 编码字符集
+	 * @since 2.7
+	 */
+	public static Optional<Charset> getEncoding(File f) {
+		Objs.throwsIfNullOrEmpty("文件对象不能为空！", f);
+
+		if (!f.exists()) {
+			throw new RuntimeException("文件不存在！");
+		}
+
+		if (f.isDirectory()) {
+			throw new RuntimeException("非法参数：传入文件夹路径");
+		}
+
+		// 找到的文件编码
+		Charset encoding;
+
+		// 判断有bom的文件
+		try (var in = new FileInputStream(f)) {
+			// 获取文件前两个字节（bom）
+			var bom = (in.read() << 8) + in.read();
+
+			encoding = switch (bom) {
+				case 0xefbb -> StandardCharsets.UTF_8;
+				case 0xfeff -> StandardCharsets.UTF_16BE;
+				case 0xfffe -> StandardCharsets.UTF_16LE;
+				default -> null;
+			};
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		// 判断无bom的文件
+		if (encoding == null) {
+			var bytes = readToBytes(f);
+			// 尝试用utf-8解码为字符串并编码为gbk字节数组
+			var utf8Read2GbkBytes = new String(bytes, StandardCharsets.UTF_8)
+					.getBytes(Charset.forName("GBK"));
+
+			// 尝试使用gbk解码为字符串并编码回utf-8字节数组
+			var desGbkRead2Utf8Bytes = new String(utf8Read2GbkBytes, Charset.forName("GBK"))
+					.getBytes(StandardCharsets.UTF_8);
+
+			// 尝试用gbk解码为字符串并编码为utf-8字节数组
+			var gbkRead2Utf8Bytes = new String(bytes, Charset.forName("GBK"))
+					.getBytes(StandardCharsets.UTF_8);
+
+			// 尝试使用utf-8解码为字符串并编码回gbk字节数组
+			var desUtf8ReadGbkBytes = new String(gbkRead2Utf8Bytes, StandardCharsets.UTF_8)
+					.getBytes(Charset.forName("GBK"));
+
+			// 如果经过中间转换后仍和原bytes相同，就找到了字符集
+			if (Arrays.equals(bytes, desGbkRead2Utf8Bytes)) {
+				encoding = StandardCharsets.UTF_8;
+			} else if (Arrays.equals(bytes, desUtf8ReadGbkBytes)) {
+				encoding = Charset.forName("GBK");
+			}
+		}
+
+		return Optional.ofNullable(encoding);
+	}
+
+	/**
+	 * 获取文件的编码字符集
+	 * @param filePath 文件路径
+	 * @return 编码字符集
+	 * @since 2.7
+	 */
+	public static Optional<Charset> getEncoding(String filePath) {
+		return getEncoding(new File(filePath));
+	}
+
+	/**
+	 * 设置文件编码（自动识别原编码）
+	 * @param src 源文件
+	 * @param newCharset 新编码
+	 * @since 2.7
+	 */
+	public static void setEncoding(File src, Charset newCharset) {
+		var oldCharset = getEncoding(src)
+				.orElseThrow(() -> new RuntimeException("无法识别文件编码！"));
+
+		setEncoding(src, oldCharset, newCharset);
+	}
+
+	/**
+	 * 设置文件编码（自动识别原编码）
+	 * @param path 源文件路径
+	 * @param newCharset 新编码名称
+	 * @since 2.7
+	 */
+	public static void setEncoding(String path, Charset newCharset) {
+		File src = new File(path);
+		setEncoding(src, newCharset);
+	}
+
+	/**
 	 * 设置文件编码
 	 * @param src 源文件
 	 * @param oldCharset 旧编码
 	 * @param newCharset 新编码
 	 */
 	public static void setEncoding(File src, Charset oldCharset, Charset newCharset) {
+		// 如果新旧编码相同就直接返回
+		if (oldCharset.equals(newCharset)) {
+			return;
+		}
+
 		byte[] srcBytes = readToBytes(src);
 		byte[] bs = new String(srcBytes, oldCharset)
 				.getBytes(newCharset);
