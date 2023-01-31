@@ -11,9 +11,23 @@ import java.util.List;
 
 public class ReflectsTest {
     @Test
-    public void objTest() {
+    public void instanceTest() {
+        // 构建对象
+        var sb = Reflects.newInstance(StringBuilder.class, "ABC");
+
+        // 调用append方法
+        Reflects.invokeMethod(sb, "append", "DEF");
+        // 调用toString方法
+        String res = Reflects.invokeMethod(sb, "toString");
+
+        Assert.assertEquals("ABCDEF", res);
+    }
+
+    @Test
+    public void serializeTest() {
         var bytes = Reflects.outObj("666");
-        System.out.println((String) Reflects.readObj(bytes));
+        String obj = Reflects.readObj(bytes);
+        Assert.assertEquals("666", obj);
     }
 
     @Test
