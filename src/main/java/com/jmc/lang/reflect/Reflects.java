@@ -41,9 +41,7 @@ public class Reflects {
         }
 
         // 获取Class对应的类路径
-        var classPath = getClassPath(c)
-                .map(URL::getPath)
-                .orElse("");
+        var classPath = getClassPath(c).map(URL::getPath).orElse("");
 
         // 不能反射本模块的Class
         if (classPath.contains("jmc-utils")) {
@@ -60,7 +58,12 @@ public class Reflects {
      * @since 2.7
      */
     public static <T> T newInstance(Class<T> c, Object... args) {
-        var argTypes = Arrays.stream(args).map(Object::getClass).toArray(Class[]::new);
+        illegalAccessCheck(c);
+
+        var argTypes = Arrays.stream(args)
+                .map(Object::getClass)
+                .toArray(Class[]::new);
+
         return Tries.tryReturnsT(() ->
                 c.getDeclaredConstructor(argTypes).newInstance(args)
         );
