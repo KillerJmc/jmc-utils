@@ -49,6 +49,63 @@ public class Reflects {
         }
     }
 
+    // region info
+
+    /**
+     * 获取类中指定名称的成员变量
+     * @param c 类的Class对象
+     * @param fieldName 成员变量名称
+     * @return 指定的成员变量
+     * @since 1.5
+     */
+    public static Field getField(Class<?> c, String fieldName) {
+        illegalAccessCheck(c);
+
+        return Tries.tryReturnsT(() -> {
+            Field f = c.getDeclaredField(fieldName);
+            f.setAccessible(true);
+            return f;
+        }, e -> {
+            if (e instanceof InaccessibleObjectException) {
+                var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
+                // Unable to make field %s accessible: module %s does not "opens %s" to unnamed module @%s
+                throw new RuntimeException("获取静态字段失败，模块 %s 并不向你开放！".formatted(packageName));
+            } else {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    /**
+     * 获取指定的方法
+     * @param c 类的Class对象
+     * @param methodName 方法名称
+     * @param parameterTypes 参数类型
+     * @return 方法对象
+     * @since 1.5
+     */
+    public static Method getMethod(Class<?> c, String methodName, Class<?>... parameterTypes) {
+        illegalAccessCheck(c);
+
+        return Tries.tryReturnsT(() -> {
+            Method m = c.getDeclaredMethod(methodName, parameterTypes);
+            m.setAccessible(true);
+            return m;
+        }, e -> {
+            if (e instanceof InaccessibleObjectException) {
+                // Unable to make method %s accessible: module %s does not "opens %s" to unnamed module @%s
+                var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
+                throw new RuntimeException("获取静态方法失败，模块 %s 并不向你开放！".formatted(packageName));
+            } else {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    // endregion
+
+    // region invoke
+
     /**
      * 动态创建一个类实例
      * @param c 类的Class对象
@@ -70,6 +127,30 @@ public class Reflects {
     }
 
     /**
+     * 获取类中成员变量的值
+     * @param instance 类的实例
+     * @param fieldName 成员变量名称
+     * @return 成员变量的值
+     * @param <T> 类的类型
+     * @since 2.7
+     */
+    public static <T> T getFieldValue(Object instance, String fieldName) {
+        return (T) Tries.tryReturnsT(() -> getField(instance.getClass(), fieldName).get(instance));
+    }
+
+    /**
+     * 获取类中静态成员变量的值
+     * @param c 类的Class对象
+     * @param fieldName 静态成员变量名称
+     * @return 静态成员变量的值
+     * @param <T> 类的类型
+     * @since 2.7
+     */
+    public static <T> T getFieldValue(Class<?> c, String fieldName) {
+        return (T) Tries.tryReturnsT(() -> getField(c, fieldName).get(null));
+    }
+
+    /**
      * 执行指定的方法（不支持参数存在基本数据类型的方法）
      * @param instance 类的实例
      * @param methodName 方法名称
@@ -78,59 +159,8 @@ public class Reflects {
      * @return 方法返回值
      */
     public static <R> R invokeMethod(Object instance, String methodName, Object... args) {
-        return (R) Tries.tryReturnsT(() -> getMethod(instance, methodName,
+        return (R) Tries.tryReturnsT(() -> getMethod(instance.getClass(), methodName,
                 Arrays.stream(args).map(Object::getClass).toArray(Class[]::new)).invoke(instance, args));
-    }
-
-    /**
-     * 获取指定的方法
-     * @param instance 类的实例
-     * @param methodName 方法名称
-     * @param parameterTypes 参数类型
-     * @return 方法对象
-     */
-    public static Method getMethod(Object instance, String methodName, Class<?>... parameterTypes) {
-        illegalAccessCheck(instance.getClass());
-
-        return Tries.tryReturnsT(() -> {
-            Method m = instance.getClass().getDeclaredMethod(methodName, parameterTypes);
-            m.setAccessible(true);
-            return m;
-        }, e -> {
-            if (e instanceof InaccessibleObjectException) {
-                // Unable to make method %s accessible: module %s does not "opens %s" to unnamed module @%s
-                var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
-                throw new RuntimeException("获取方法失败，模块 %s 并不向你开放！".formatted(packageName));
-            } else {
-                e.printStackTrace();
-            }
-        });
-    }
-
-
-    /**
-     * 获取类中指定名称的成员变量
-     * @param instance 类的实例
-     * @param fieldName 成员变量名称
-     * @param <T> 成员变量类型
-     * @return 指定的成员变量
-     */
-    public static <T> T getField(Object instance, String fieldName) {
-        illegalAccessCheck(instance.getClass());
-
-        return (T) Tries.tryReturnsT(() -> {
-            Field f = instance.getClass().getDeclaredField(fieldName);
-            f.setAccessible(true);
-            return f.get(instance);
-        }, e -> {
-            if (e instanceof InaccessibleObjectException) {
-                var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
-                // Unable to make field %s accessible: module %s does not "opens %s" to unnamed module @%s
-                throw new RuntimeException("获取字段失败，模块 %s 并不向你开放！".formatted(packageName));
-            } else {
-                e.printStackTrace();
-            }
-        });
     }
 
     /**
@@ -142,62 +172,14 @@ public class Reflects {
      * @return 方法返回值
      * @since 1.5
      */
-    public static <R> R invokeStaticMethod(Class<?> c, String methodName, Object... args) {
-        return (R) Tries.tryReturnsT(() -> getStaticMethod(c, methodName,
+    public static <R> R invokeMethod(Class<?> c, String methodName, Object... args) {
+        return (R) Tries.tryReturnsT(() -> getMethod(c, methodName,
                 Arrays.stream(args).map(Object::getClass).toArray(Class[]::new)).invoke(null, args));
     }
 
-    /**
-     * 获取指定的静态方法
-     * @param c 类的Class对象
-     * @param methodName 方法名称
-     * @param parameterTypes 参数类型
-     * @return 方法对象
-     * @since 1.5
-     */
-    public static Method getStaticMethod(Class<?> c, String methodName, Class<?>... parameterTypes) {
-        illegalAccessCheck(c);
+    // endregion
 
-        return Tries.tryReturnsT(() -> {
-            Method m = c.getDeclaredMethod(methodName, parameterTypes);
-            m.setAccessible(true);
-            return m;
-        }, e -> {
-            if (e instanceof InaccessibleObjectException) {
-                // Unable to make method %s accessible: module %s does not "opens %s" to unnamed module @%s
-                var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
-                throw new RuntimeException("获取静态方法失败，模块 %s 并不向你开放！".formatted(packageName));
-            } else {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    /**
-     * 获取类中指定名称的静态成员变量
-     * @param c 类的Class对象
-     * @param fieldName 成员变量名称
-     * @param <T> 成员变量类型
-     * @return 指定的成员变量
-     * @since 1.5
-     */
-    public static <T> T getStaticField(Class<?> c, String fieldName) {
-        illegalAccessCheck(c);
-
-        return (T) Tries.tryReturnsT(() -> {
-            Field f = c.getDeclaredField(fieldName);
-            f.setAccessible(true);
-            return f.get(null);
-        }, e -> {
-            if (e instanceof InaccessibleObjectException) {
-                var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
-                // Unable to make field %s accessible: module %s does not "opens %s" to unnamed module @%s
-                throw new RuntimeException("获取静态字段失败，模块 %s 并不向你开放！".formatted(packageName));
-            } else {
-                e.printStackTrace();
-            }
-        });
-    }
+    // region serialization
 
     /**
      * 将一个对象实例写入byte数组
@@ -231,6 +213,10 @@ public class Reflects {
 
         return null;
     }
+
+    // endregion
+
+    // region classpath
 
     /**
      * 判断类是否在jar包中
@@ -375,4 +361,6 @@ public class Reflects {
                 .map(Stream::toList)
                 .orElse(List.of());
     }
+
+    // endregion
 }

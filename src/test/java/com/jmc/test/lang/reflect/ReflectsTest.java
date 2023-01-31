@@ -24,36 +24,36 @@ public class ReflectsTest {
     }
 
     @Test
-    public void serializeTest() {
-        var bytes = Reflects.outObj("666");
-        String obj = Reflects.readObj(bytes);
-        Assert.assertEquals("666", obj);
-    }
-
-    @Test
     public void invokeTest() {
         // 执行静态方法
-        List<?> l = Reflects.invokeStaticMethod(List.class, "of");
-        System.out.println(l);
+        List<?> l = Reflects.invokeMethod(List.class, "of");
+        Assert.assertEquals("[]", l.toString());
 
         var s = "     abc     ";
         // 执行成员方法
         String res = Reflects.invokeMethod(s, "trim");
-        System.out.println("|" + res + "|");
+        Assert.assertEquals("abc", res);
     }
 
     @Test
-    public void getFieldAndFailedTest() {
-        Tries.tryHandlesE(() -> Reflects.getStaticField(String.class, "COMPACT_STRINGS"),
+    public void moduleNotOpenTest() {
+        Tries.tryHandlesE(() -> Reflects.getFieldValue(String.class, "COMPACT_STRINGS"),
                 System.err::println);
-        Tries.tryHandlesE(() -> Reflects.getField("", "coder"),
+        Tries.tryHandlesE(() -> Reflects.getFieldValue("", "value"),
                 System.err::println);
     }
 
     @Test
     public void illegalAccessTest() {
-        Tries.tryHandlesE(() -> Reflects.getStaticMethod(Strs.class, "isNum"),
+        Tries.tryHandlesE(() -> Reflects.getMethod(Strs.class, "isNum"),
                 System.err::println);
+    }
+
+    @Test
+    public void serializeTest() {
+        var bytes = Reflects.outObj("666");
+        String obj = Reflects.readObj(bytes);
+        Assert.assertEquals("666", obj);
     }
 
     @Test
