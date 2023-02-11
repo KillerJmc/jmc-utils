@@ -4,21 +4,25 @@ plugins {
 }
 
 group "com.jmc"
-version "2.7.2"
-
+version "2.8.0"
 sourceCompatibility = "16"
 
 repositories {
     mavenCentral()
 }
 
-dependencies {
-    compileOnly "org.projectlombok:lombok:1.18.24"
-    annotationProcessor "org.projectlombok:lombok:1.18.24"
+ext {
+    lombokVersion = "1.18.24"
+    junitVersion = "4.13.2"
+}
 
-    testImplementation "junit:junit:4.13.2"
-    testCompileOnly "org.projectlombok:lombok:1.18.24"
-    testAnnotationProcessor "org.projectlombok:lombok:1.18.24"
+dependencies {
+    compileOnly "org.projectlombok:lombok:$lombokVersion"
+    annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+
+    testImplementation "junit:junit:$junitVersion"
+    testCompileOnly "org.projectlombok:lombok:$lombokVersion"
+    testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
 }
 
 java {

@@ -174,13 +174,13 @@ public class ExpUtils {
     /**
      * 构造一个表达式计算器
      * @param priority 二元运算符优先级
-     * @param supplier 字符串类型数字转化成表达式中数字类型的函数
+     * @param str2Number 表达式中字符串数字转化成目标类型数字的函数（比如字符串 -> Double，字符串 -> BigInteger）
      * @param calc 运算方法（调用时分别传入数字a，运算符opr，数字b）
      * @param <T> 表达式中数字类型
      * @return 表达式计算器
      */
     public static <T> Calculator<T> calculator(Map<String, Integer> priority,
-                                               Function<String, T> supplier,
+                                               Function<String, T> str2Number,
                                                Func.Object3<T, String, T, T> calc)
     {
         return infixExp -> {
@@ -191,7 +191,7 @@ public class ExpUtils {
             for (var s : suffix) {
                 // 如果是数字
                 if (Strs.isNum(s)) {
-                    stack.push(supplier.apply(s));
+                    stack.push(str2Number.apply(s));
                     continue;
                 }
 

@@ -192,206 +192,206 @@ public class OperatorTest {
         int value;
 
         @Override
-        public Int operatorPlus(Int other) {
+        public Int plus(Int other) {
             return new Int(this.value + other.value);
         }
 
         @Override
-        public Int operatorMinus(Int other) {
+        public Int minus(Int other) {
             return new Int(this.value - other.value);
         }
 
         @Override
-        public Int operatorTimes(Int other) {
+        public Int times(Int other) {
             return new Int(this.value * other.value);
         }
 
         @Override
-        public Int operatorDiv(Int other) {
+        public Int div(Int other) {
             return new Int(this.value / other.value);
         }
 
         @Override
-        public Int operatorMod(Int other) {
+        public Int mod(Int other) {
             return new Int(this.value % other.value);
         }
 
         @Override
-        public Int operatorPos() {
+        public Int unaryPlus() {
             return new Int(+this.value);
         }
 
         @Override
-        public Int operatorNeg() {
+        public Int unaryMinus() {
             return new Int(-this.value);
         }
 
         @Override
-        public Int operatorIncPre() {
+        public Int incPre() {
             this.value++;
             return this;
         }
 
         @Override
-        public Int operatorIncPost() {
+        public Int incPost() {
             return new Int(this.value++);
         }
 
         @Override
-        public Int operatorDecPre() {
+        public Int decPre() {
             this.value--;
             return this;
         }
 
         @Override
-        public Int operatorDecPost() {
+        public Int decPost() {
             return new Int(this.value--);
         }
 
         @Override
-        public Int operatorPlusEq(Int other) {
+        public Int plusAssign(Int other) {
             this.value += other.value;
             return this;
         }
 
         @Override
-        public Int operatorMinusEq(Int other) {
+        public Int minusAssign(Int other) {
             this.value -= other.value;
             return this;
         }
 
         @Override
-        public Int operatorTimesEq(Int other) {
+        public Int timesAssign(Int other) {
             this.value *= other.value;
             return this;
         }
 
         @Override
-        public Int operatorDivEq(Int other) {
+        public Int divAssign(Int other) {
             this.value /= other.value;
             return this;
         }
 
         @Override
-        public Int operatorModEq(Int other) {
+        public Int modAssign(Int other) {
             this.value %= other.value;
             return this;
         }
 
         @Override
-        public boolean operatorDoubleEq(Int other) {
+        public boolean eq(Int other) {
             return this.equals(other);
         }
 
         @Override
-        public boolean operatorNotEq(Int other) {
+        public boolean notEq(Int other) {
             return !this.equals(other);
         }
 
         @Override
-        public boolean operatorLT(Int other) {
+        public boolean lessThan(Int other) {
             return this.value < other.value;
         }
 
         @Override
-        public boolean operatorGT(Int other) {
+        public boolean greaterThan(Int other) {
             return this.value > other.value;
         }
 
         @Override
-        public boolean operatorLE(Int other) {
+        public boolean lessEq(Int other) {
             return this.value <= other.value;
         }
 
         @Override
-        public boolean operatorGE(Int other) {
+        public boolean greaterEq(Int other) {
             return this.value >= other.value;
         }
 
         @Override
-        public boolean operatorAnd(Int other) {
+        public boolean and(Int other) {
             return this.value > 0 && other.value > 0;
         }
 
         @Override
-        public boolean operatorOr(Int other) {
+        public boolean or(Int other) {
             return this.value > 0 || other.value > 0;
         }
 
         @Override
-        public boolean operatorNot() {
+        public boolean not() {
             return !(this.value > 0);
         }
 
         @Override
-        public Int operatorBitAnd(Int other) {
+        public Int bitAnd(Int other) {
             return new Int(this.value & other.value);
         }
 
         @Override
-        public Int operatorBitOr(Int other) {
+        public Int bitOr(Int other) {
             return new Int(this.value | other.value);
 
         }
 
         @Override
-        public Int operatorBitXor(Int other) {
+        public Int bitXor(Int other) {
             return new Int(this.value ^ other.value);
         }
 
         @Override
-        public Int operatorShl(Int other) {
+        public Int shl(Int other) {
             return new Int(this.value << other.value);
         }
 
         @Override
-        public Int operatorShr(Int other) {
+        public Int shr(Int other) {
             return new Int(this.value >> other.value);
         }
 
         @Override
-        public Int operatorUShr(Int other) {
+        public Int uShr(Int other) {
             return new Int(this.value >>> other.value);
         }
 
         @Override
-        public Int operatorBitAndEq(Int other) {
+        public Int bitAndAssign(Int other) {
             this.value &= other.value;
             return this;
         }
 
         @Override
-        public Int operatorBitOrEq(Int other) {
+        public Int bitOrAssign(Int other) {
             this.value |= other.value;
             return this;
         }
 
         @Override
-        public Int operatorBitXorEq(Int other) {
+        public Int bitXorAssign(Int other) {
             this.value ^= other.value;
             return this;
         }
 
         @Override
-        public Int operatorShlEq(Int other) {
+        public Int shlAssign(Int other) {
             this.value <<= other.value;
             return this;
         }
 
         @Override
-        public Int operatorShrEq(Int other) {
+        public Int shrAssign(Int other) {
             this.value >>= other.value;
             return this;
         }
 
         @Override
-        public Int operatorUShrEq(Int other) {
+        public Int uShrAssign(Int other) {
             this.value >>>= other.value;
             return this;
         }
 
         @Override
-        public Int operatorBitReverse() {
+        public Int bitReverse() {
             this.value = ~this.value;
             return this;
         }
