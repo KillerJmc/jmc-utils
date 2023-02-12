@@ -115,6 +115,8 @@ import java.util.zip.ZipOutputStream;
  *   2022.3.5      当文件树展开文件夹失败时，改为打印错误日志而不是直接抛出异常
  *   2022.12.29    1. 添加getEncoding系列方法来查询文件编码
  *                 2. 添加setEncoding(file, newEncoding)方法来简化设置文件编码的调用
+ *   2022.2.12     1. 添加list方法来列出一级目录的文件/文件夹
+ *                 2. 添加默认参数，更改重载方法次序！
  * </pre>
  * @since 1.0
  * @author Jmc
@@ -250,15 +252,6 @@ public class Files
     }
 
 	/**
-	 * 复制文件或文件夹
-	 * @param src 源文件
-	 * @param destPath 目标路径
-	 */
-	public static void copy(File src, String destPath) {
-		copy(src.getAbsolutePath(), destPath);
-	}
-
-	/**
 	 * 复制小文件
 	 * @param src 源文件
 	 * @param des 目标文件
@@ -324,6 +317,13 @@ public class Files
 	}
 
 	/**
+	 * 复制文件或文件夹
+	 * @param src 源文件
+	 * @param destPath 目标路径
+	 */
+	public static void copy(File src, String destPath) { copy(src.getAbsolutePath(), destPath); }
+
+	/**
 	 * 移动文件或文件夹
 	 * @param srcPath 源路径
 	 * @param desPath 目标路径
@@ -365,9 +365,7 @@ public class Files
 	 * @param src 文件或文件夹的File对象
 	 * @param desPath 目标路径
 	 */
-	public static void move(File src, String desPath) {
-		move(src.getAbsolutePath(), desPath);
-	}
+	public static void move(File src, String desPath) { move(src.getAbsolutePath(), desPath); }
 
 	/**
 	 * 重命名文件或文件夹
@@ -402,9 +400,7 @@ public class Files
 	 * @param src 源文件
 	 * @param newName 新名称
 	 */
-	public static void rename(File src, String newName) {
-		rename(src.getAbsolutePath(), newName);
-	}
+	public static void rename(File src, String newName) { rename(src.getAbsolutePath(), newName); }
 
 	/**
 	 * 删除文件或文件夹
@@ -462,9 +458,7 @@ public class Files
 	 * 删除文件或文件夹
 	 * @param src 源文件的File对象
 	 */
-	public static void delete(File src) {
-		delete(src.getAbsolutePath());
-	}
+	public static void delete(File src) { delete(src.getAbsolutePath()); }
 
 	/**
 	 * 删除多个文件或文件夹
@@ -500,20 +494,33 @@ public class Files
 	/**
 	 * 压缩文件或文件夹
 	 * @param srcPath 源路径
-	 * @param zipPath zip路径
-	 * @param storeMode 是否用储存式压缩
+	 * @param zipPath zip路径（可为空，默认是源路径）
+	 * @param storeMode 是否启用储存模式（可为空，默认是否）
 	 */
     @SuppressWarnings("resource")
-	public static void zip(String srcPath, String zipPath, boolean storeMode) {
-		Objs.throwsIfNullOrEmpty("源路径和zip路径不能为空", srcPath, zipPath);
+	public static void zip(String srcPath, String zipPath, Boolean storeMode) {
+		Objs.throwsIfNullOrEmpty("源路径不能为空", srcPath);
 
-        // 创建源文件
-        File src = new File(srcPath);
+		{
+			// 源文件
+			var src = new File(srcPath);
 
-        // 检查路径
-        if (!src.exists()) {
-            throw new RuntimeException("源文件不存在");
-        }
+			// zipPath默认是源路径
+			if (zipPath == null) {
+				zipPath = src.getParent() + "/" + src.getName() + ".zip";
+			}
+
+			// storeMode默认是false
+			storeMode = Optional.ofNullable(storeMode).orElse(false);
+		}
+
+		// 源文件
+		File src = new File(srcPath);
+
+		// 检查路径
+		if (!src.exists()) {
+			throw new RuntimeException("源文件不存在");
+		}
 
         // 创建目标zip文件
         File zip = new File(zipPath);
@@ -537,6 +544,8 @@ public class Files
         // 日志信息
         log(() -> "正在压缩 " + src.getName() + " 这个" + (src.isFile() ? "文件" : "文件夹"));
 
+		var finalStoreMode = storeMode;
+
         // 递归创建zip
 		new Object() {
 			void loop(File f, String root) {
@@ -550,7 +559,7 @@ public class Files
 					if (fs.length == 0) {
 						// 创建(放入)此文件夹
 						ZipEntry entry = new ZipEntry(root + "/");
-						if (storeMode) {
+						if (finalStoreMode) {
 							entry.setCrc(0);
 							entry.setSize(0);
 						}
@@ -570,7 +579,7 @@ public class Files
 					// 放入上文提到的完整路径
 					try {
 						ZipEntry entry = new ZipEntry(root);
-						if (storeMode) {
+						if (finalStoreMode) {
 							CRC32 crc = new CRC32();
 							var in = new FileInputStream(f);
 							byte[] b = new byte[8192];
@@ -606,46 +615,52 @@ public class Files
     }
 
 	/**
-	 * 压缩文件或文件夹
-	 * @param src 源文件
-	 * @param zipPath zip路径
-	 * @param storeMode 是否用储存式压缩
-	 */
-	public static void zip(File src, String zipPath, boolean storeMode) {
-		zip(src.getAbsolutePath(), zipPath, storeMode);
-	}
-
-	/**
 	 * 在本目录下创建压缩文件
 	 * @param srcPath 源路径
-	 * @param storeMode 是否用储存式压缩
+	 * @param storeMode 是否启用储存模式
 	 */
-	public static void zip(String srcPath, boolean storeMode) {
-        // 声明原路径
-        File src = new File(srcPath);
-        // zip生成路径为源路径
-        String zipPath = src.getParent() + "/" + src.getName() + ".zip";
-        // 开始创建
-        zip(srcPath, zipPath, storeMode);
-    }
+	public static void zip(String srcPath, Boolean storeMode) { zip(srcPath, null, storeMode); }
+
+	/**
+	 * 在本目录下创建压缩文件（非储存模式）
+	 * @param srcPath 源路径
+	 */
+	public static void zip(String srcPath) { zip(srcPath, null, null); }
+
+	/**
+	 * 压缩文件或文件夹
+	 * @param src 源文件
+	 * @param zipPath zip路径（可为空，默认是源路径）
+	 * @param storeMode 是否启用储存模式（可为空，默认是否）
+	 */
+	public static void zip(File src, String zipPath, Boolean storeMode) { zip(src.getAbsolutePath(), zipPath, storeMode); }
 
 	/**
 	 * 在本目录下创建压缩文件
 	 * @param src 源文件
-	 * @param storeMode 是否用储存式压缩
+	 * @param storeMode 是否启用储存模式
 	 */
-	public static void zip(File src, boolean storeMode) {
-		zip(src.getAbsolutePath(), storeMode);
-	}
+	public static void zip(File src, Boolean storeMode) { zip(src.getAbsolutePath(), storeMode); }
+
+	/**
+	 * 在本目录下创建压缩文件（非储存模式）
+	 * @param src 源文件
+	 */
+	public static void zip(File src) { zip(src.getAbsolutePath()); }
 
 	/**
 	 * 解压文件
 	 * @param zipPath zip路径
-	 * @param desPath 目标路径
+	 * @param desPath 目标路径（可为空，默认是zip所在目录）
 	 */
 	@SuppressWarnings("resource")
 	public static void unzip(String zipPath, String desPath) {
-		Objs.throwsIfNullOrEmpty("zip路径和目标路径不能为空", zipPath, desPath);
+		Objs.throwsIfNullOrEmpty("zip路径不能为空", zipPath);
+
+		{
+			// desPath默认为zip所在目录
+			desPath = Optional.ofNullable(desPath).orElse(new File(zipPath).getParent());
+		}
 
         // 创建源文件
         File src = new File(zipPath);
@@ -718,77 +733,57 @@ public class Files
 	 * @param zip zip文件
 	 * @param desPath 目标路径
 	 */
-	public static void unzip(File zip, String desPath) {
-		unzip(zip.getAbsolutePath(), desPath);
-	}
+	public static void unzip(File zip, String desPath) { unzip(zip.getAbsolutePath(), desPath); }
 
 	/**
 	 * 在本目录下解压文件
 	 * @param zipPath zip文件路径
 	 */
-	public static void unzip(String zipPath) {
-        // 声明原zip路径
-        File zip = new File(zipPath);
-        // zip父目录为解压目录
-        String desPath = zip.getParent();
-        // zip开始解压
-        unzip(zipPath, desPath);
-    }
+	public static void unzip(String zipPath) { unzip(zipPath, null); }
 
 	/**
 	 * 在本目录下解压文件
 	 * @param zip zip文件
 	 */
-	public static void unzip(File zip) {
-		unzip(zip.getAbsolutePath());
-	}
-
-	/**
-	 * 默认系统编码读取文件到字符串
-	 * @param path 源文件路径
-	 * @return 结果字符串
-	 */
-	public static String read(String path) {
-		return read(path, Charset.defaultCharset());
-	}
-
-	/**
-	 * 默认系统编码读取文件到字符串
-	 * @param src 源文件
-	 * @return 结果字符串
-	 */
-	public static String read(File src) {
-		return read(src, Charset.defaultCharset());
-	}
+	public static void unzip(File zip) { unzip(zip.getAbsolutePath()); }
 
 	/**
 	 * 读取文件到字符串
 	 * @param src 源文件
-	 * @param cs 文件编码
+	 * @param cs 文件编码（可为空，默认是系统编码）
 	 * @return 结果字符串
 	 */
 	public static String read(File src, Charset cs) {
+		{
+			// cs默认是系统编码
+			cs = Optional.ofNullable(cs).orElse(Charset.defaultCharset());
+		}
+
 		return new String(readToBytes(src), cs);
 	}
 
 	/**
+	 * 默认系统编码读取文件到字符串
+	 * @param src 源文件
+	 * @return 结果字符串
+	 */
+	public static String read(File src) { return read(src, null); }
+
+	/**
 	 * 读取文件到字符串
 	 * @param path 源文件路径
 	 * @param cs 文件编码
 	 * @return 结果字符串
 	 */
-	public static String read(String path, Charset cs) {
-		return new String(readToBytes(path), cs);
-	}
+	public static String read(String path, Charset cs) { return read(new File(path), cs); }
 
 	/**
-	 * 读取文件到byte数组
-	 * @param path 源路径
-	 * @return 结果数组
+	 * 默认系统编码读取文件到字符串
+	 * @param path 源文件路径
+	 * @return 结果字符串
 	 */
-	public static byte[] readToBytes(String path) {
-		return readToBytes(new File(path));
-	}
+	public static String read(String path) { return read(new File(path), null); }
+
 
 	/**
 	 * 读取文件到byte数组
@@ -812,41 +807,47 @@ public class Files
 	}
 
 	/**
-	 * 用默认系统编码读取文件中的所有行到字符串流
-	 * @param path 文件路径
-	 * @return 所有行集合
-	 * @since 1.8
+	 * 读取文件到byte数组
+	 * @param path 源路径
+	 * @return 结果数组
 	 */
-	public static Stream<String> lines(String path) {
-		return lines(path, Charset.defaultCharset());
+	public static byte[] readToBytes(String path) { return readToBytes(new File(path)); }
+
+	/**
+	 * 列出一个目录的一级文件/文件夹
+	 * @param dir 文件夹File对象
+	 * @return 结果列表
+	 * @since 2.9
+	 */
+	public static List<File> list(File dir) {
+		Objs.throwsIfNullOrEmpty(dir);
+
+		if (!dir.exists()) {
+			throw new RuntimeException("文件夹不存在：\"%s\"".formatted(dir.getAbsolutePath()));
+		}
+
+		if (dir.isFile()) {
+			throw new RuntimeException("不能传入文件的路径：\"%s\"".formatted(dir.getAbsolutePath()));
+		}
+
+		return Optional.ofNullable(dir.listFiles())
+				.map(Arrays::stream)
+				.map(Stream::toList)
+				.orElse(List.of());
 	}
 
 	/**
-	 * 用默认系统编码读取文件中的所有行到字符串流
-	 * @param src 文件对象
-	 * @return 所有行集合
-	 * @since 1.8
+	 * 列出一个目录的一级文件/文件夹
+	 * @param path 文件夹路径
+	 * @return 结果列表
+	 * @since 2.9
 	 */
-	public static Stream<String> lines(File src) {
-		return lines(src, Charset.defaultCharset());
-	}
+	public static List<File> list(String path) { return list(new File(path)); }
 
 	/**
 	 * 读取文件中的所有行到字符串流
-	 * @param path 文件路径
-	 * @param cs 文件编码
-	 * @return 所有行集合
-	 * @since 1.8
-	 */
-	public static Stream<String> lines(String path, Charset cs) {
-		Objs.throwsIfNullOrEmpty("文件路径不能为空", path);
-		return lines(new File(path), cs);
-	}
-
-	/**
-	 * 读取文件中的所有行到字符串流
 	 * @param src 文件对象
-	 * @param cs 文件编码
+	 * @param cs 文件编码（可为空，默认是系统编码）
 	 * @return 所有行集合
 	 * @since 1.8
 	 */
@@ -856,101 +857,43 @@ public class Files
 	}
 
 	/**
-	 * 用非追加模式和系统默认编码输出字符串到文件
-	 * @param s 字符串
-	 * @param desPath 目标文件路径
+	 * 用默认系统编码读取文件中的所有行到字符串流
+	 * @param src 文件对象
+	 * @return 所有行集合
+	 * @since 1.8
 	 */
-	public static void out(String s, String desPath) {
-		out(s, desPath, false);
-	}
+	public static Stream<String> lines(File src) { return lines(src, null); }
 
 	/**
-	 * 用非追加模式和系统默认编码输出字符串到文件
-	 * @param s 字符串
-	 * @param des 目标文件
+	 * 读取文件中的所有行到字符串流
+	 * @param path 文件路径
+	 * @param cs 文件编码（可为空，默认是系统编码）
+	 * @return 所有行集合
+	 * @since 1.8
 	 */
-	public static void out(String s, File des) {
-		out(s, des, false);
-	}
+	public static Stream<String> lines(String path, Charset cs) { return lines(new File(path), cs); }
 
 	/**
-	 * 用系统默认编码输出字符串到文件
-	 * @param s 字符串
-	 * @param desPath 目标文件路径
-	 * @param appendMode 是否用追加模式
+	 * 用默认系统编码读取文件中的所有行到字符串流
+	 * @param path 文件路径
+	 * @return 所有行集合
+	 * @since 1.8
 	 */
-	public static void out(String s, String desPath, boolean appendMode) {
-		out(s, desPath, Charset.defaultCharset(), appendMode);
-	}
-
-	/**
-	 * 用系统默认编码输出字符串到文件
-	 * @param s 字符串
-	 * @param des 目标文件
-	 * @param appendMode 是否用追加模式
-	 */
-	public static void out(String s, File des, boolean appendMode) {
-		out(s, des, Charset.defaultCharset(), appendMode);
-	}
-
-	/**
-	 * 输出字符串到文件
-	 * @param s 字符串
-	 * @param desPath 目标文件路径
-	 * @param desCharset 目标文件编码名称
-	 * @param appendMode 是否用追加模式
-	 */
-	public static void out(String s, String desPath, Charset desCharset, boolean appendMode) {
-		out(s.getBytes(desCharset), desPath, appendMode);
-	}
-
-	/**
-	 * 输出字符串到文件
-	 * @param s 字符串
-	 * @param des 目标文件
-	 * @param desCharset 目标文件编码名称
-	 * @param appendMode 是否用追加模式
-	 */
-	public static void out(String s, File des, Charset desCharset, boolean appendMode) {
-		out(s.getBytes(desCharset), des, appendMode);
-	}
-
-	/**
-	 * 用非追加模式把byte数组输出到文件
-	 * @param bs byte数组
-	 * @param desPath 目标文件路径
-	 */
-	public static void out(byte[] bs, String desPath) {
-		out(bs, desPath, false);
-	}
-
-	/**
-	 * 用非追加模式把byte数组输出到文件
-	 * @param bs byte数组
-	 * @param des 目标文件
-	 */
-	public static void out(byte[] bs, File des) {
-		out(bs, des, false);
-	}
-
-	/**
-	 * 把byte数组输出到文件
-	 * @param bs byte数组
-	 * @param desPath 目标文件路径
-	 * @param appendMode 是否为追加模式
-	 */
-	public static void out(byte[] bs, String desPath, boolean appendMode) {
-		out(bs, new File(desPath), appendMode);
-	}
+	public static Stream<String> lines(String path) { return lines(path, null); }
 
 	/**
 	 * 把byte数组输出到文件
 	 * @param bs byte数组
 	 * @param des 目标文件
-	 * @param appendMode 是否为追加模式
+	 * @param appendMode 是否为追加模式（可为空，默认否）
 	 */
-	public static void out(byte[] bs, File des, boolean appendMode) {
+	public static void out(byte[] bs, File des, Boolean appendMode) {
 		Objs.throwsIfNullOrEmpty("byte数组和目标文件不能为空", bs, des);
+
+		{
+			// appendMode默认为false
+			appendMode = Optional.ofNullable(appendMode).orElse(false);
+		}
 
 		// 创建父目录
 		mkdirs(des.getParentFile());
@@ -964,14 +907,84 @@ public class Files
 	}
 
 	/**
-	 * 输入流输出到文件
-	 * @param in 输入流
-	 * @param filePath 文件路径
+	 * 用非追加模式把byte数组输出到文件
+	 * @param bs byte数组
+	 * @param des 目标文件
+	 */
+	public static void out(byte[] bs, File des) { out(bs, des, null); }
+
+	/**
+	 * 把byte数组输出到文件
+	 * @param bs byte数组
+	 * @param desPath 目标文件路径
+	 * @param appendMode 是否为追加模式（可为空，默认否）
+	 */
+	public static void out(byte[] bs, String desPath, Boolean appendMode) { out(bs, new File(desPath), appendMode); }
+
+	/**
+	 * 用非追加模式把byte数组输出到文件
+	 * @param bs byte数组
+	 * @param desPath 目标文件路径
+	 */
+	public static void out(byte[] bs, String desPath) { out(bs, new File(desPath), null); }
+
+	/**
+	 * 输出字符串到文件
+	 * @param s 字符串
+	 * @param des 目标File文件对象
+	 * @param charset 目标文件编码（可为空，默认系统编码）
+	 * @param appendMode 是否用追加模式（可为空，默认否）
+	 */
+	public static void out(String s, File des, Charset charset, Boolean appendMode) {
+		{
+			// charset默认为系统编码
+			charset = Optional.ofNullable(charset).orElse(Charset.defaultCharset());
+
+			// appendMode默认为false
+			appendMode = Optional.ofNullable(appendMode).orElse(false);
+		}
+
+		out(s.getBytes(charset), des, appendMode);
+	}
+
+	/**
+	 * 用系统默认编码输出字符串到文件
+	 * @param s 字符串
+	 * @param des 目标文件
 	 * @param appendMode 是否用追加模式
 	 */
-	public static void out(InputStream in, String filePath, boolean appendMode) {
-		out(in, new File(filePath), appendMode);
-	}
+	public static void out(String s, File des, Boolean appendMode) { out(s, des, null, appendMode); }
+
+	/**
+	 * 用非追加模式和系统默认编码输出字符串到文件
+	 * @param s 字符串
+	 * @param des 目标文件
+	 */
+	public static void out(String s, File des) { out(s, des, null, null); }
+
+	/**
+	 * 输出字符串到文件
+	 * @param s 字符串
+	 * @param path 目标文件路径
+	 * @param charset 目标文件编码名称（可为空，默认系统编码）
+	 * @param appendMode 是否用追加模式（可为空，默认否）
+	 */
+	public static void out(String s, String path, Charset charset, Boolean appendMode) { out(s, new File(path), charset, appendMode); }
+
+	/**
+	 * 用系统默认编码输出字符串到文件
+	 * @param s 字符串
+	 * @param path 目标文件路径
+	 * @param appendMode 是否用追加模式
+	 */
+	public static void out(String s, String path, Boolean appendMode) { out(s, new File(path), null, appendMode); }
+
+	/**
+	 * 用非追加模式和系统默认编码输出字符串到文件
+	 * @param s 字符串
+	 * @param path 目标文件路径
+	 */
+	public static void out(String s, String path) { out(s, new File(path), null, null); }
 
 	/**
 	 * 输入流输出到文件
@@ -990,6 +1003,15 @@ public class Files
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * 输入流输出到文件
+	 * @param in 输入流
+	 * @param path 文件路径
+	 * @param appendMode 是否用追加模式
+	 */
+	public static void out(InputStream in, String path, boolean appendMode) { out(in, new File(path), appendMode); }
+
 
 	// endregion
 
@@ -1094,17 +1116,7 @@ public class Files
 	 * @param path 文件路径
 	 * @since 1.8
 	 */
-	public static void createFile(String path) {
-		createFile(new File(path));
-	}
-
-	/**
-	 * 创建多级目录
-	 * @param path 多级目录路径
-	 */
-	public static void mkdirs(String path) {
-		mkdirs(new File(path));
-	}
+	public static void createFile(String path) { createFile(new File(path)); }
 
 	/**
 	 * 创建多级目录
@@ -1123,6 +1135,12 @@ public class Files
 	}
 
 	/**
+	 * 创建多级目录
+	 * @param path 多级目录路径
+	 */
+	public static void mkdirs(String path) { mkdirs(new File(path)); }
+
+	/**
 	 * 判断文件/文件夹是否存在
 	 * @param f 文件/文件夹 File对象
 	 * @return 是否存在
@@ -1138,9 +1156,7 @@ public class Files
 	 * @return 是否存在
 	 * @since 1.8
 	 */
-	public static boolean exists(String path) {
-		return exists(new File(path));
-	}
+	public static boolean exists(String path) { return exists(new File(path)); }
 
 	/**
 	 * 获取文件的编码字符集
@@ -1213,9 +1229,7 @@ public class Files
 	 * @return 编码字符集
 	 * @since 2.7
 	 */
-	public static Optional<Charset> getEncoding(String filePath) {
-		return getEncoding(new File(filePath));
-	}
+	public static Optional<Charset> getEncoding(String filePath) { return getEncoding(new File(filePath)); }
 
 	/**
 	 * 设置文件编码（自动识别原编码）
@@ -1224,8 +1238,7 @@ public class Files
 	 * @since 2.7
 	 */
 	public static void setEncoding(File src, Charset newCharset) {
-		var oldCharset = getEncoding(src)
-				.orElseThrow(() -> new RuntimeException("无法识别文件编码！"));
+		var oldCharset = getEncoding(src).orElseThrow(() -> new RuntimeException("无法识别文件编码！"));
 
 		setEncoding(src, oldCharset, newCharset);
 	}
@@ -1236,10 +1249,7 @@ public class Files
 	 * @param newCharset 新编码名称
 	 * @since 2.7
 	 */
-	public static void setEncoding(String path, Charset newCharset) {
-		File src = new File(path);
-		setEncoding(src, newCharset);
-	}
+	public static void setEncoding(String path, Charset newCharset) { setEncoding(new File(path), newCharset); }
 
 	/**
 	 * 设置文件编码
@@ -1254,8 +1264,7 @@ public class Files
 		}
 
 		byte[] srcBytes = readToBytes(src);
-		byte[] bs = new String(srcBytes, oldCharset)
-				.getBytes(newCharset);
+		byte[] bs = new String(srcBytes, oldCharset).getBytes(newCharset);
 		out(bs, src);
 	}
 
@@ -1265,10 +1274,7 @@ public class Files
 	 * @param oldCharset 旧编码名称
 	 * @param newCharset 新编码名称
 	 */
-	public static void setEncoding(String path, Charset oldCharset, Charset newCharset) {
-		File src = new File(path);
-		setEncoding(src, oldCharset, newCharset);
-	}
+	public static void setEncoding(String path, Charset oldCharset, Charset newCharset) { setEncoding(new File(path), oldCharset, newCharset); }
 
 	/**
 	 * 按时间重命名
@@ -1295,9 +1301,7 @@ public class Files
 	 * @param dirPath 搜索文件夹路径
 	 * @param suffix 后缀（含小数点）
 	 */
-	public static void renameByTime(String dirPath, String suffix) {
-		renameByTime(new File(dirPath), suffix);
-	}
+	public static void renameByTime(String dirPath, String suffix) { renameByTime(new File(dirPath), suffix); }
 
 	// endregion
 
@@ -1309,18 +1313,6 @@ public class Files
 	 * @param dirs 结果文件夹列表
 	 */
 	public record FindResult(List<File> files, List<File> dirs) {}
-
-	/**
-	 * 搜索路径下符合要求的所有文件和文件夹
-	 * @param dirPath 搜索文件夹路径
-	 * @param contains 文件或文件夹名称中包含的内容
-	 * @return 含结果文件和文件夹的集合
-	 */
-	public static FindResult findAll(String dirPath, String... contains) {
-		FileFilter filter = f -> Strs.orContains(f.getName() ,
-				contains.length == 0 ? new String[] {""} : contains);
-		return Files.findAll(dirPath, filter);
-	}
 
 	/**
 	 * 搜索路径下符合要求的所有文件和文件夹
@@ -1369,6 +1361,18 @@ public class Files
 	}
 
 	/**
+	 * 搜索路径下符合要求的所有文件和文件夹
+	 * @param dirPath 搜索文件夹路径
+	 * @param contains 文件或文件夹名称中包含的内容
+	 * @return 含结果文件和文件夹的集合
+	 */
+	public static FindResult findAll(String dirPath, String... contains) {
+		FileFilter filter = f -> Strs.orContains(f.getName(),
+				contains.length == 0 ? new String[] {""} : contains);
+		return Files.findAll(dirPath, filter);
+	}
+
+	/**
 	 * 搜索路径下符合要求的所有文件
 	 * @param dirPath 搜索文件夹路径
 	 * @param filter 文件过滤器
@@ -1410,22 +1414,21 @@ public class Files
 
 	/**
 	 * 搜索单个文件
-	 * @param dirPath 搜索文件夹路径
-	 * @param content 文件名称包含内容
+	 * @param dir 搜索文件夹的File对象
+	 * @param contains 文件名称包含内容
 	 * @return 搜索结果
 	 */
-	public static File findAny(String dirPath, String content) {
-		File src = new File(dirPath);
-		if (!src.exists()) {
+	public static File findAny(File dir, String contains) {
+		if (!dir.exists()) {
 			throw new RuntimeException("路径不存在!");
 		}
 
-		if (src.isFile()) {
+		if (dir.isFile()) {
 			throw new RuntimeException("搜索父目录必须为文件夹！");
 		}
 
 		// 文件夹临时列表
-		var temp = new ArrayList<File>() {{ add(src); }};
+		var temp = new ArrayList<File>() {{ add(dir); }};
 
 		while (!temp.isEmpty()) {
 			var list = temp.remove(0).listFiles();
@@ -1437,7 +1440,7 @@ public class Files
 				if (f.isDirectory()){
 					temp.add(f);
 				} else {
-					if (f.getName().contains(content)) {
+					if (f.getName().contains(contains)) {
 						return f;
 					}
 				}
@@ -1449,25 +1452,23 @@ public class Files
 
 	/**
 	 * 搜索单个文件
-	 * @param dirFile 搜索文件夹的File对象
-	 * @param content 文件名称包含内容
+	 * @param dirPath 搜索文件夹路径
+	 * @param contains 文件名称包含内容
 	 * @return 搜索结果
 	 */
-	public static File findAny(File dirFile, String content) {
-		return findAny(dirFile.getAbsolutePath(), content);
-	}
+	public static File findAny(String dirPath, String contains) { return findAny(new File(dirPath), contains); }
 
 	/**
 	 * 搜索文件和文件夹并保存结果到字符串
 	 * @param dirPath 搜索文件夹路径
-	 * @param content 文件或文件夹包含内容
+	 * @param contains 文件或文件夹包含内容
 	 * @return 字符串形式的搜索结果
 	 */
-	public static String findInfo(String dirPath, String content) {
-		Objs.throwsIfNullOrEmpty("搜索内容不能为null", content);
+	public static String findInfo(String dirPath, String contains) {
+		Objs.throwsIfNullOrEmpty("搜索内容不能为null", contains);
 
 		long startTime = System.currentTimeMillis();
-		var map = Files.findAll(dirPath, content);
+		var map = Files.findAll(dirPath, contains);
 		var sb = new StringBuilder();
 
 		var dirList = map.dirs();
@@ -1493,13 +1494,11 @@ public class Files
 
 	/**
 	 * 搜索文件和文件夹并保存结果到字符串
-	 * @param dirFile 搜索文件夹的File对象
-	 * @param content 文件或文件夹名称包含内容
+	 * @param dir 搜索文件夹的File对象
+	 * @param contains 文件或文件夹名称包含内容
 	 * @return 字符串形式的搜索结果
 	 */
-	public static String findInfo(File dirFile, String content) {
-		return findInfo(dirFile.getAbsolutePath(), content);
-	}
+	public static String findInfo(File dir, String contains) { return findInfo(dir.getAbsolutePath(), contains); }
 
 	/**
 	 * 寻找并复制符合要求的文件
@@ -1508,18 +1507,17 @@ public class Files
 	 * @param orContains 文件名称内包含内容
 	 */
 	public static void findCopies(String dirPath, String desPath, String... orContains) {
-		findDo(fileList -> { for (File f : fileList) { copy(f, desPath); } },
-				dirPath, orContains);
+		findDo(fileList -> { for (File f : fileList) { copy(f, desPath); } }, dirPath, orContains);
 	}
 
 	/**
 	 * 寻找并复制符合要求的文件
-	 * @param dirFile 搜索文件夹的File对象
+	 * @param dir 搜索文件夹的File对象
 	 * @param desPath 目标路径
 	 * @param orContains 文件名称内包含内容
 	 */
-	public static void findCopies(File dirFile, String desPath, String... orContains) {
-		findCopies(dirFile.getAbsolutePath(), desPath, orContains);
+	public static void findCopies(File dir, String desPath, String... orContains) {
+		findCopies(dir.getAbsolutePath(), desPath, orContains);
 	}
 
 	/**
@@ -1529,18 +1527,17 @@ public class Files
 	 * @param orContains 文件名称内包含内容
 	 */
 	public static void findMoves(String dirPath, final String desPath, String... orContains) {
-		findDo(fileList -> { for (File f : fileList) { move(f, desPath); } },
-				dirPath, orContains);
+		findDo(fileList -> { for (File f : fileList) { move(f, desPath); } }, dirPath, orContains);
 	}
 
 	/**
 	 * 寻找并移动符合要求的文件
-	 * @param dirFile 搜索文件夹的File对象
+	 * @param dir 搜索文件夹的File对象
 	 * @param desPath 目标路径
 	 * @param orContains 文件名称内包含内容
 	 */
-	public static void findMoves(File dirFile, String desPath, String... orContains) {
-		findMoves(dirFile.getAbsolutePath(), desPath, orContains);
+	public static void findMoves(File dir, String desPath, String... orContains) {
+		findMoves(dir.getAbsolutePath(), desPath, orContains);
 	}
 
 	/**
@@ -1556,12 +1553,12 @@ public class Files
 
 	/**
 	 * 寻找并重命名符合要求的文件
-	 * @param dirFile 搜索文件夹的File对象
+	 * @param dir 搜索文件夹的File对象
 	 * @param newChar 新名称
 	 * @param oldChars 旧文件的名称
 	 */
-	public static void findRenames(File dirFile, String newChar, String... oldChars) {
-		findRenames(dirFile.getAbsolutePath(), newChar, oldChars);
+	public static void findRenames(File dir, String newChar, String... oldChars) {
+		findRenames(dir.getAbsolutePath(), newChar, oldChars);
 	}
 
 	/**
@@ -1581,11 +1578,11 @@ public class Files
 
 	/**
 	 * 寻找并删除符合要求的文件
-	 * @param dirFile 搜索文件夹的File对象
+	 * @param dir 搜索文件夹的File对象
 	 * @param orContains 文件名称内包含内容
 	 */
-	public static void findDels(File dirFile, String... orContains) {
-		findDels(dirFile.getAbsolutePath(), orContains);
+	public static void findDels(File dir, String... orContains) {
+		findDels(dir.getAbsolutePath(), orContains);
 	}
 
 	/**
@@ -1607,95 +1604,76 @@ public class Files
 	// region tree
 
 	/**
-	 * 普通树状图（搜索深度5层，文件夹最小大小为50MB）
-	 * @param dirPath 搜索文件夹路径
-	 * @return 文件树对象
-	 */
-	public static FileTree normalTree(String dirPath) {
-		File dirFile = new File(dirPath);
-		return normalTree(dirFile);
-	}
-
-	/**
-	 * 普通树状图（搜索深度5层，文件夹最小大小为50MB）
-	 * @param dirFile 搜索文件夹的File对象
-	 * @return 文件树对象
-	 */
-	public static FileTree normalTree(File dirFile) {
-		return tree(dirFile, 5, 50);
-	}
-
-	/**
-	 * 单层树状图（文件夹最小大小为50MB）
-	 * @param dirPath 搜索文件夹路径
-	 * @return 文件树对象
-	 */
-	public static FileTree singleTree(String dirPath) {
-		File dirFile = new File(dirPath);
-		return singleTree(dirFile);
-	}
-
-	/**
-	 * 单层树状图（文件夹最小大小为50MB）
-	 * @param dirFile 搜索文件夹的File对象
-	 * @return 文件树对象
-	 */
-	public static FileTree singleTree(File dirFile) {
-		return tree(dirFile, 1, 50);
-	}
-
-	/**
-	 * 完整树状图（层数，文件夹大小无限制）
-	 * @param dirPath 搜索文件夹路径
-	 * @return 文件树对象
-	 */
-	public static FileTree wholeTree(String dirPath) {
-		File dirFile = new File(dirPath);
-		return wholeTree(dirFile);
-	}
-
-	/**
-	 * 完整树状图（层数，文件夹大小无限制）
-	 * @param dirFile 搜索文件夹的File对象
-	 * @return 文件树对象
-	 */
-	public static FileTree wholeTree(File dirFile) {
-		return tree(dirFile, Integer.MAX_VALUE, 0);
-	}
-
-	/**
 	 * 树状图统计文件夹
-	 * @param dirPath 搜索文件夹路径
+	 * @param dir 统计文件夹的File对象
 	 * @param depth 搜索深度
 	 * @param MIN_MB_SIZE 结果中的文件夹最小多少MB
 	 * @return 文件树对象
 	 */
-	public static FileTree tree(String dirPath, int depth, double MIN_MB_SIZE) {
-		File dirFile = new File(dirPath);
-		return tree(dirFile, depth, MIN_MB_SIZE);
-	}
-
-	/**
-	 * 树状图统计文件夹
-	 * @param dirFile 统计文件夹的File对象
-	 * @param depth 搜索深度
-	 * @param MIN_MB_SIZE 结果中的文件夹最小多少MB
-	 * @return 文件树对象
-	 */
-	public static FileTree tree(File dirFile, int depth, double MIN_MB_SIZE) {
-		if (!dirFile.exists()) {
+	public static FileTree tree(File dir, int depth, double MIN_MB_SIZE) {
+		if (!dir.exists()) {
 			throw new RuntimeException("文件夹不存在");
 		}
 
-		if (dirFile.isFile()) {
+		if (dir.isFile()) {
 			throw new RuntimeException("统计的对象不能为文件！");
 		}
 
 		long MIN_LENGTH = (long) (MIN_MB_SIZE * 1024 * 1024);
 
-		return FileTree.getInstance(dirFile, depth, MIN_LENGTH);
+		return FileTree.getInstance(dir, depth, MIN_LENGTH);
 	}
 
+	/**
+	 * 树状图统计文件夹
+	 * @param dirPath 搜索文件夹路径
+	 * @param depth 搜索深度
+	 * @param MIN_MB_SIZE 结果中的文件夹最小多少MB
+	 * @return 文件树对象
+	 */
+	public static FileTree tree(String dirPath, int depth, double MIN_MB_SIZE) { return tree(new File(dirPath), depth, MIN_MB_SIZE); }
+
+	/**
+	 * 普通树状图（搜索深度5层，文件夹最小大小为50MB）
+	 * @param dir 搜索文件夹的File对象
+	 * @return 文件树对象
+	 */
+	public static FileTree normalTree(File dir) { return tree(dir, 5, 50); }
+
+	/**
+	 * 普通树状图（搜索深度5层，文件夹最小大小为50MB）
+	 * @param dirPath 搜索文件夹路径
+	 * @return 文件树对象
+	 */
+	public static FileTree normalTree(String dirPath) { return normalTree(new File(dirPath)); }
+
+	/**
+	 * 单层树状图（文件夹最小大小为50MB）
+	 * @param dir 搜索文件夹的File对象
+	 * @return 文件树对象
+	 */
+	public static FileTree singleTree(File dir) { return tree(dir, 1, 50); }
+
+	/**
+	 * 单层树状图（文件夹最小大小为50MB）
+	 * @param dirPath 搜索文件夹路径
+	 * @return 文件树对象
+	 */
+	public static FileTree singleTree(String dirPath) { return singleTree(new File(dirPath)); }
+
+	/**
+	 * 完整树状图（层数，文件夹大小无限制）
+	 * @param dir 搜索文件夹的File对象
+	 * @return 文件树对象
+	 */
+	public static FileTree wholeTree(File dir) { return tree(dir, Integer.MAX_VALUE, 0); }
+
+	/**
+	 * 完整树状图（层数，文件夹大小无限制）
+	 * @param dirPath 搜索文件夹路径
+	 * @return 文件树对象
+	 */
+	public static FileTree wholeTree(String dirPath) { return wholeTree(new File(dirPath)); }
 
 	/**
 	 * 文件树

@@ -1,11 +1,34 @@
 package com.jmc.test.array;
 
 import com.jmc.array.Array;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
 
 public class ArrayTest {
+    @Test
+    public void testSwap() {
+        int[] a = { 1, 2, 3, 4, 5 };
+        var arr = Array.of(a);
+
+        swap(arr, 1, 3);
+
+        // 交换后Array发生改变
+        Assert.assertEquals("[ 1, 4, 3, 2, 5 ]", arr.toString());
+
+        // 交换后原数组也会发生变化
+        Assert.assertEquals("[1, 4, 3, 2, 5]", Arrays.toString(a));
+    }
+
+    // 这个方法可以对任意类型的数组（特别指包括基本数据类型）进行swap操作！
+    @SuppressWarnings("all")
+    private <T> void swap(Array<T> arr, int idx1, int idx2) {
+        T t = arr.get(idx1);
+        arr.set(idx1, arr.get(idx2));
+        arr.set(idx2, t);
+    }
+
     @Test
     public void testPrint() {
         var arr = Array.of(1, 2, 3, 4, 5);
@@ -31,33 +54,5 @@ public class ArrayTest {
             System.out.print(arr.get(i) + ", ");
         }
         System.out.println("\b\b ]");
-    }
-
-    @Test
-    public void testSwap() {
-        int[] a = { 1, 2, 3, 4, 5 };
-        var arr = Array.of(a);
-
-        swap(arr, 1, 3);
-        printArray(arr);
-        // 交换后原数组也会发生变化
-        System.out.println(Arrays.toString(a));
-    }
-
-    @SuppressWarnings("all")
-    private <T> void swap(Array<T> arr, int idx1, int idx2) {
-        T t = arr.get(idx1);
-        arr.set(idx1, arr.get(idx2));
-        arr.set(idx2, t);
-    }
-
-    @Test
-    public void testBind() {
-        int[] a = { 1, 2, 3, 4, 5 };
-        var arr = Array.of(a);
-
-        int[] later = arr.toArray();
-        // 其实是指向同个数组
-        System.out.println(a == later);
     }
 }

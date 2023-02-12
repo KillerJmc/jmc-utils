@@ -162,4 +162,9 @@ public class FilesTest {
         // 输出普通文件树
         System.out.println(Files.normalTree("."));
     }
+
+    @Test
+    public void listTest() {
+        Files.list(".").forEach(System.out::println);
+    }
 }
