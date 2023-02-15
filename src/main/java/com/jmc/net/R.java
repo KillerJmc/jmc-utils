@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 
 /**
  * 统一返回数据实体类型
@@ -288,7 +287,7 @@ public class R<T> {
          * @param <T> 返回数据类型
          * @return R实例
          */
-        public <T> R<T> build(Callable<T> dataSupplier) {
+        public <T> R<T> build(Tries.ReturnedThrowable<T> dataSupplier) {
             return invokeAndGetErrorMsg()
                     .<R<T>>map(R::error)
                     .orElseGet(() -> {

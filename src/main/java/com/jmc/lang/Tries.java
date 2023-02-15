@@ -1,7 +1,6 @@
 package com.jmc.lang;
 
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 /**
@@ -66,12 +65,26 @@ public class Tries {
     }
 
     /**
+     * 可抛出异常的带返回值的代码块接口
+     * @param <T> 返回值类型
+     * @since 2.9
+     */
+    public interface ReturnedThrowable<T> {
+        /**
+         * 执行方法
+         * @return 方法的返回值
+         * @throws Throwable 抛出的异常
+         */
+        T call() throws Throwable;
+    }
+
+    /**
      * 执行需要被try包含的代码块并返回结果，直接打印异常
      * @param c 代码块
      * @param <T> 返回结果类型
      * @return 结果
      */
-    public static <T> T tryReturnsT(Callable<T> c) {
+    public static <T> T tryReturnsT(ReturnedThrowable<T> c) {
         try {
             return c.call();
         } catch (Throwable e) {
@@ -90,7 +103,7 @@ public class Tries {
      * @since 1.5
      */
     @SuppressWarnings("unchecked")
-    public static <T, E extends Throwable> T tryReturnsT(Callable<T> c, Consumer<E> exceptionHandler) {
+    public static <T, E extends Throwable> T tryReturnsT(ReturnedThrowable<T> c, Consumer<E> exceptionHandler) {
         try {
             return c.call();
         } catch (Throwable e) {
