@@ -121,9 +121,11 @@ public class Reflects {
                 .map(Object::getClass)
                 .toArray(Class[]::new);
 
-        return Tries.tryReturnsT(() ->
-                c.getDeclaredConstructor(argTypes).newInstance(args)
-        );
+        return Tries.tryReturnsT(() -> {
+            var ctor = c.getDeclaredConstructor(argTypes);
+            ctor.setAccessible(true);
+            return ctor.newInstance(args);
+        });
     }
 
     /**

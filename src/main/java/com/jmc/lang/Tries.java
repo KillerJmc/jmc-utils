@@ -13,6 +13,31 @@ public class Tries {
     private Tries() {}
 
     /**
+     * 可抛出异常的代码块接口
+     */
+    public interface RunnableThrowsE {
+        /**
+         * 执行方法
+         * @throws Throwable 抛出的异常
+         */
+        void run() throws Throwable;
+    }
+
+    /**
+     * 可抛出异常的带返回值的代码块接口
+     * @param <T> 返回值类型
+     * @since 2.9
+     */
+    public interface ReturnedThrowable<T> {
+        /**
+         * 执行方法
+         * @return 方法的返回值
+         * @throws Throwable 抛出的异常
+         */
+        T call() throws Throwable;
+    }
+
+    /**
      * 执行需要被try包含的代码块，直接打印异常
      * @param r 代码块
      */
@@ -51,31 +76,6 @@ public class Tries {
             return Optional.of(e);
         }
         return Optional.empty();
-    }
-
-    /**
-     * 可抛出异常的代码块接口
-     */
-    public interface RunnableThrowsE {
-        /**
-         * 执行方法
-         * @throws Throwable 抛出的异常
-         */
-        void run() throws Throwable;
-    }
-
-    /**
-     * 可抛出异常的带返回值的代码块接口
-     * @param <T> 返回值类型
-     * @since 2.9
-     */
-    public interface ReturnedThrowable<T> {
-        /**
-         * 执行方法
-         * @return 方法的返回值
-         * @throws Throwable 抛出的异常
-         */
-        T call() throws Throwable;
     }
 
     /**
