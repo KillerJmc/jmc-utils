@@ -4,9 +4,7 @@
 
 ## Description
 
-Providing a great number of utility classes to simplify the daily development.
-
-All test cases are in test classes in `src/test` folder.
+Providing a great number of utility classes to simplify the daily development. ([API Docs](https://killerjmc.github.io/jmc-utils/docs))
 
 | Feature                                                | Descripton                                                   |
 | :----------------------------------------------------- | :----------------------------------------------------------- |
