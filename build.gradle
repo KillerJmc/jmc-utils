@@ -1,10 +1,11 @@
 plugins {
     id "java"
     id "maven-publish"
+    id "io.freefair.aspectj.post-compile-weaving" version "6.6.2"
 }
 
 group "com.jmc"
-version "2.9.1"
+version "3.0.0"
 sourceCompatibility = "16"
 
 repositories {
@@ -12,17 +13,25 @@ repositories {
 }
 
 ext {
+    aspectjVersion = "1.9.19"
     lombokVersion = "1.18.24"
     junitVersion = "4.13.2"
 }
 
 dependencies {
+    implementation "org.aspectj:aspectjweaver:$aspectjVersion"
+
     compileOnly "org.projectlombok:lombok:$lombokVersion"
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"
 
     testImplementation "junit:junit:$junitVersion"
     testCompileOnly "org.projectlombok:lombok:$lombokVersion"
     testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
+}
+
+tasks.named("test") {
+    // 添加AspectJ LTW的VM参数
+    jvmArgs += ["--add-opens", "java.base/java.lang=ALL-UNNAMED"]
 }
 
 java {

@@ -7,6 +7,7 @@ import com.jmc.lang.reflect.Reflects;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.List;
 
 public class ReflectsTest {
@@ -54,6 +55,13 @@ public class ReflectsTest {
         var bytes = Reflects.outObj("666");
         String obj = Reflects.readObj(bytes);
         Assert.assertEquals("666", obj);
+    }
+
+    @Test
+    public void getJarPathTest() {
+        var jarPath = Reflects.getJarPath(Test.class);
+        var jarFile = new File(jarPath);
+        Assert.assertTrue(jarFile.exists() && jarFile.getName().endsWith(".jar"));
     }
 
     @Test

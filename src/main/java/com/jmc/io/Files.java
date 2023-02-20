@@ -1,5 +1,7 @@
 package com.jmc.io;
 
+import com.jmc.aop.DefaultArg;
+import com.jmc.aop.DefaultArgTransfer;
 import com.jmc.lang.Objs;
 import com.jmc.lang.Strs;
 import com.jmc.lang.Tries;
@@ -117,6 +119,7 @@ import java.util.zip.ZipOutputStream;
  *                 2. 添加setEncoding(file, newEncoding)方法来简化设置文件编码的调用
  *   2022.2.12     1. 添加list方法来列出一级目录的文件/文件夹
  *                 2. 添加默认参数，更改重载方法次序！
+ *   2022.2.18     使用默认参数特性（@DefaultArg）重写具有默认参数的方法！
  * </pre>
  * @since 1.0
  * @author Jmc
@@ -495,10 +498,10 @@ public class Files
 	 * 压缩文件或文件夹
 	 * @param srcPath 源路径
 	 * @param zipPath zip路径（可为空，默认是源路径）
-	 * @param storeMode 是否启用储存模式（可为空，默认是否）
+	 * @param storeMode 是否启用储存模式
 	 */
     @SuppressWarnings("resource")
-	public static void zip(String srcPath, String zipPath, Boolean storeMode) {
+	public static void zip(String srcPath, String zipPath, @DefaultArg("false") Boolean storeMode) {
 		Objs.throwsIfNullOrEmpty("源路径不能为空", srcPath);
 
 		{
@@ -509,9 +512,6 @@ public class Files
 			if (zipPath == null) {
 				zipPath = src.getParent() + "/" + src.getName() + ".zip";
 			}
-
-			// storeMode默认是false
-			storeMode = Optional.ofNullable(storeMode).orElse(false);
 		}
 
 		// 源文件
@@ -544,9 +544,7 @@ public class Files
         // 日志信息
         log(() -> "正在压缩 " + src.getName() + " 这个" + (src.isFile() ? "文件" : "文件夹"));
 
-		var finalStoreMode = storeMode;
-
-        // 递归创建zip
+		// 递归创建zip
 		new Object() {
 			void loop(File f, String root) {
 				// 若f是一个文件夹
@@ -559,7 +557,7 @@ public class Files
 					if (fs.length == 0) {
 						// 创建(放入)此文件夹
 						ZipEntry entry = new ZipEntry(root + "/");
-						if (finalStoreMode) {
+						if (storeMode) {
 							entry.setCrc(0);
 							entry.setSize(0);
 						}
@@ -579,7 +577,7 @@ public class Files
 					// 放入上文提到的完整路径
 					try {
 						ZipEntry entry = new ZipEntry(root);
-						if (finalStoreMode) {
+						if (storeMode) {
 							CRC32 crc = new CRC32();
 							var in = new FileInputStream(f);
 							byte[] b = new byte[8192];
@@ -748,22 +746,29 @@ public class Files
 	public static void unzip(File zip) { unzip(zip.getAbsolutePath()); }
 
 	/**
+	 * 将默认参数（字符串）转化为Charset对象的转换类
+	 * @since 3.0
+	 */
+	private static class StringToCharset extends DefaultArgTransfer<Charset> {
+		@Override
+		public Charset transfer(String defaultArg) {
+			return Charset.forName(defaultArg);
+		}
+	}
+
+	/**
 	 * 读取文件到字符串
 	 * @param src 源文件
-	 * @param cs 文件编码（可为空，默认是系统编码）
+	 * @param cs 文件编码
 	 * @return 结果字符串
 	 */
-	public static String read(File src, Charset cs) {
-		{
-			// cs默认是系统编码
-			cs = Optional.ofNullable(cs).orElse(Charset.defaultCharset());
-		}
-
+	public static String read(File src,
+							  @DefaultArg(value = "UTF-8", transferClass = StringToCharset.class) Charset cs) {
 		return new String(readToBytes(src), cs);
 	}
 
 	/**
-	 * 默认系统编码读取文件到字符串
+	 * 使用UTF-8编码读取文件到字符串
 	 * @param src 源文件
 	 * @return 结果字符串
 	 */
@@ -772,13 +777,13 @@ public class Files
 	/**
 	 * 读取文件到字符串
 	 * @param path 源文件路径
-	 * @param cs 文件编码
+	 * @param cs 文件编码（可为空，默认是UTF-8）
 	 * @return 结果字符串
 	 */
 	public static String read(String path, Charset cs) { return read(new File(path), cs); }
 
 	/**
-	 * 默认系统编码读取文件到字符串
+	 * 使用UTF-8编码读取文件到字符串
 	 * @param path 源文件路径
 	 * @return 结果字符串
 	 */
@@ -847,17 +852,18 @@ public class Files
 	/**
 	 * 读取文件中的所有行到字符串流
 	 * @param src 文件对象
-	 * @param cs 文件编码（可为空，默认是系统编码）
+	 * @param cs 文件编码
 	 * @return 所有行集合
 	 * @since 1.8
 	 */
-	public static Stream<String> lines(File src, Charset cs) {
+	public static Stream<String> lines(File src,
+									   @DefaultArg(value = "UTF-8", transferClass = StringToCharset.class) Charset cs) {
 		var content = read(src, cs);
 		return Arrays.stream(content.split("\n"));
 	}
 
 	/**
-	 * 用默认系统编码读取文件中的所有行到字符串流
+	 * 使用UTF-8编码读取文件中的所有行到字符串流
 	 * @param src 文件对象
 	 * @return 所有行集合
 	 * @since 1.8
@@ -867,14 +873,14 @@ public class Files
 	/**
 	 * 读取文件中的所有行到字符串流
 	 * @param path 文件路径
-	 * @param cs 文件编码（可为空，默认是系统编码）
+	 * @param cs 文件编码（可为空，默认是UTF-8编码）
 	 * @return 所有行集合
 	 * @since 1.8
 	 */
 	public static Stream<String> lines(String path, Charset cs) { return lines(new File(path), cs); }
 
 	/**
-	 * 用默认系统编码读取文件中的所有行到字符串流
+	 * 使用UTF-8编码读取文件中的所有行到字符串流
 	 * @param path 文件路径
 	 * @return 所有行集合
 	 * @since 1.8
@@ -885,15 +891,10 @@ public class Files
 	 * 把byte数组输出到文件
 	 * @param bs byte数组
 	 * @param des 目标文件
-	 * @param appendMode 是否为追加模式（可为空，默认否）
+	 * @param appendMode 是否为追加模式
 	 */
-	public static void out(byte[] bs, File des, Boolean appendMode) {
+	public static void out(byte[] bs, File des, @DefaultArg("false") Boolean appendMode) {
 		Objs.throwsIfNullOrEmpty("byte数组和目标文件不能为空", bs, des);
-
-		{
-			// appendMode默认为false
-			appendMode = Optional.ofNullable(appendMode).orElse(false);
-		}
 
 		// 创建父目录
 		mkdirs(des.getParentFile());
@@ -932,23 +933,18 @@ public class Files
 	 * 输出字符串到文件
 	 * @param s 字符串
 	 * @param des 目标File文件对象
-	 * @param charset 目标文件编码（可为空，默认系统编码）
-	 * @param appendMode 是否用追加模式（可为空，默认否）
+	 * @param charset 目标文件编码
+	 * @param appendMode 是否用追加模式
 	 */
-	public static void out(String s, File des, Charset charset, Boolean appendMode) {
-		{
-			// charset默认为系统编码
-			charset = Optional.ofNullable(charset).orElse(Charset.defaultCharset());
-
-			// appendMode默认为false
-			appendMode = Optional.ofNullable(appendMode).orElse(false);
-		}
-
+	public static void out(String s,
+						   File des,
+						   @DefaultArg(value = "UTF-8", transferClass = StringToCharset.class) Charset charset,
+						   @DefaultArg("false") Boolean appendMode) {
 		out(s.getBytes(charset), des, appendMode);
 	}
 
 	/**
-	 * 用系统默认编码输出字符串到文件
+	 * 使用UTF-8编码输出字符串到文件
 	 * @param s 字符串
 	 * @param des 目标文件
 	 * @param appendMode 是否用追加模式
@@ -956,7 +952,7 @@ public class Files
 	public static void out(String s, File des, Boolean appendMode) { out(s, des, null, appendMode); }
 
 	/**
-	 * 用非追加模式和系统默认编码输出字符串到文件
+	 * 使用非追加模式和UTF-8编码输出字符串到文件
 	 * @param s 字符串
 	 * @param des 目标文件
 	 */
@@ -966,13 +962,13 @@ public class Files
 	 * 输出字符串到文件
 	 * @param s 字符串
 	 * @param path 目标文件路径
-	 * @param charset 目标文件编码名称（可为空，默认系统编码）
+	 * @param charset 目标文件编码名称（可为空，默认UTF-8编码）
 	 * @param appendMode 是否用追加模式（可为空，默认否）
 	 */
 	public static void out(String s, String path, Charset charset, Boolean appendMode) { out(s, new File(path), charset, appendMode); }
 
 	/**
-	 * 用系统默认编码输出字符串到文件
+	 * 使用UTF-8编码输出字符串到文件
 	 * @param s 字符串
 	 * @param path 目标文件路径
 	 * @param appendMode 是否用追加模式
@@ -980,7 +976,7 @@ public class Files
 	public static void out(String s, String path, Boolean appendMode) { out(s, new File(path), null, appendMode); }
 
 	/**
-	 * 用非追加模式和系统默认编码输出字符串到文件
+	 * 使用非追加模式和UTF-8编码输出字符串到文件
 	 * @param s 字符串
 	 * @param path 目标文件路径
 	 */

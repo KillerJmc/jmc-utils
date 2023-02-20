@@ -234,6 +234,24 @@ public class Reflects {
     }
 
     /**
+     * 获取jar的绝对路径
+     * @param jarClass jar中的任意一个Class
+     * @return jar的绝对路径
+     * @since 3.0
+     */
+    public static String getJarPath(Class<?> jarClass) {
+        if (!isClassInJar(jarClass)) {
+            throw new RuntimeException("类 " + jarClass.getName() + " 并不在jar中！");
+        }
+
+        // 类加载路径 file:///path/xxx.jar!/
+        var classPath = getClassPath(jarClass).orElseThrow().getPath();
+
+        // 提取path/xxx.jar
+        return Strs.subExclusive(classPath, "file:///", "!/");
+    }
+
+    /**
      * 获取指定类的类加载路径
      * @param c 类的Class对象
      * @return 类加载路径
