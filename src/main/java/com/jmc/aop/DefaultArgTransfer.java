@@ -4,6 +4,20 @@ package com.jmc.aop;
  * 默认参数转换类 <br>
  * 用于将默认参数（字符串类型）转换成对应参数类型 <br>
  * 使用时需要继承该类并重写transfer方法
+ * @apiNote <pre>{@code
+ * // 复杂类型需要指定转换类
+ * static String getCharsetName(@DefaultArg(value = "UTF-8", transferClass = StringToCharset.class) Charset c) {
+ *     return c.displayName();
+ * }
+ *
+ * // 转化类
+ * static class StringToCharset extends DefaultArgTransfer<Charset> {
+ *     @Override
+ *     public Charset transfer(String defaultArg) {
+ *         return Charset.forName(defaultArg);
+ *     }
+ * }
+ * }</pre>
  * @since 3.0
  * @author Jmc
  */

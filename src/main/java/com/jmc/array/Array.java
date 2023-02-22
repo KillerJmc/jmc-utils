@@ -14,6 +14,20 @@ import java.util.Iterator;
  *   仅在获取（包括遍历）和设置值时对基本数据类型进行包装。
  *   基本类型数组访问速度慢10倍左右，对象数组访问速度不变。
  * </b></pre>
+ * @apiNote <pre>{@code
+ * <T> void swap(Array<T> arr, int idx1, int idx2) {
+ *     T t = arr.get(idx1);
+ *     arr.set(idx1, arr.get(idx2));
+ *     arr.set(idx2, t);
+ * }
+ *
+ * int[] a = { 1, 2, 3, 4, 5 };
+ * var arr = Array.of(a);
+ *
+ * // 交换后原数组a和通用数组arr都是：[ 1, 4, 3, 2, 5 ]
+ * swap(arr, 1, 3);
+ *
+ * }</pre>
  * @since 1.1
  * @author Jmc
  * @param <T> 数组元素类型

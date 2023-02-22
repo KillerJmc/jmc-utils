@@ -1,6 +1,6 @@
 /**
- * jmc.utils module
- * @since 1.9
+ * jmc.utils模块 <br>
+ * 提供大量的工具类，简化日常开发。
  */
 module jmc.utils {
     requires java.logging;

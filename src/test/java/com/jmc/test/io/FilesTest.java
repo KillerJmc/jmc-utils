@@ -27,10 +27,11 @@ public class FilesTest {
         Files.out("hello!", path, true);
 
         // 把文件内容读取到字符串
-        System.out.println(Files.read(path));
+        Assert.assertEquals("hello!hello!", Files.read(path));
 
         // 删除文件
         Files.delete(path);
+        Assert.assertFalse(Files.exists(path));
     }
 
     @Test
@@ -48,10 +49,11 @@ public class FilesTest {
         var path = getFilePath("a.txt");
         Files.out(s, path);
 
-        Files.lines(path)
-                .forEach(t -> System.out.printf("->%s<-\n", t));
+        var res = Files.lines(path).toArray(String[]::new);
+        Assert.assertArrayEquals(s.split("\n"), res);
 
         Files.delete(path);
+        Assert.assertFalse(Files.exists(path));
     }
 
     @Test
@@ -61,13 +63,14 @@ public class FilesTest {
 
         Files.out("hello", path);
 
-        // 把 test/a.txt 复制到 .
-        Files.copy(path, getFilePath(""));
+        // 把 ./test/a.txt 复制到 .
+        Files.copy(path, getFilePath("."));
 
-        // 查看结果
-        System.out.println(Files.read(getFilePath("a.txt")));
+        Assert.assertEquals("hello", Files.read(getFilePath("a.txt")));
 
         Files.delete(getFilePath("a.txt"), getFilePath("test"));
+        Assert.assertFalse(Files.exists("a.txt"));
+        Assert.assertFalse(Files.exists("test"));
     }
 
     @Test
@@ -93,6 +96,8 @@ public class FilesTest {
         Assert.assertTrue(Files.exists(getFilePath("b.txt")));
 
         Files.delete(getFilePath("b.txt"), getFilePath("test"));
+        Assert.assertFalse(Files.exists("b.txt"));
+        Assert.assertFalse(Files.exists("test"));
     }
 
     @Test
@@ -106,9 +111,11 @@ public class FilesTest {
 
         var zipPath = getFilePath("a.txt.zip");
         Files.unzip(zipPath);
-        System.out.println(Files.read(path));
+        Assert.assertEquals("666", Files.read(path));
 
         Files.delete(path, zipPath);
+        Assert.assertFalse(Files.exists(path));
+        Assert.assertFalse(Files.exists(zipPath));
     }
 
     @Test
@@ -117,19 +124,25 @@ public class FilesTest {
         System.out.println(Files.fileInfo("."));
 
         // 把字节长度变为人类可读的长度
-        System.out.println(Files.lengthFormatter(100000));
+        Assert.assertEquals("97.66KB", Files.lengthFormatter(100000));
+        Assert.assertEquals("123B", Files.lengthFormatter(123));
+        Assert.assertEquals("2KB", Files.lengthFormatter(2048));
 
         var path = getFilePath("a.txt");
         Files.out("666", path);
 
         // 获取文件编码
-        System.out.println(Files.getEncoding(path).orElseThrow());
+        var encoding = Files.getEncoding(path).orElseThrow();
+        Assert.assertEquals(encoding, StandardCharsets.UTF_8);
 
         // 设置文件编码
-        Files.setEncoding(path, StandardCharsets.UTF_8, StandardCharsets.ISO_8859_1);
-        System.out.println(Files.read(path));
+        Files.setEncoding(path, StandardCharsets.UTF_16);
+        Assert.assertEquals(StandardCharsets.UTF_16BE, Files.getEncoding(path).orElseThrow());
+
+        Assert.assertEquals("666", Files.read(path, StandardCharsets.UTF_16));
 
         Files.delete(path);
+        Assert.assertFalse(Files.exists(path));
     }
 
     @Test

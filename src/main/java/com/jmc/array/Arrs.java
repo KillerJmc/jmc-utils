@@ -20,6 +20,12 @@ public class Arrs {
      * @param len 数组长度
      * @param <T> 指定的类型
      * @return 初始化完的数组
+     * @apiNote <pre>{@code
+     * // 初始化一个ArrayList数组
+     * var a = Arrs.newInstance(ArrayList.class, 6);
+     * // 每个元素都已经初始化完成，可直接使用
+     * a[0].add(1);
+     * }</pre>
      */
     @SuppressWarnings("unchecked")
     public static <T> T[] newInstance(Class<T> c, int len) {
@@ -40,6 +46,10 @@ public class Arrs {
      * @param max 最大值
      * @param n 生成个数
      * @return 生成结果的数组
+     * @apiNote <pre>{@code
+     * // 生成不含重复元素的随机数组（一共10个元素，每个元素范围是[1, 10]）
+     * var a = Arrs.getDiffRandArr(1, 10, 10);
+     * }</pre>
      */
     public static int[] getDiffRandArr(int min, int max, int n) {
         // 如果参数不合法就返回
@@ -82,6 +92,10 @@ public class Arrs {
      * @param max 最大值
      * @param n 数组长度
      * @return 结果数组
+     * @apiNote <pre>{@code
+     * // 生成随机数组（一共10个元素，每个元素范围是[1, 10]）
+     * var a = Arrs.getRandArr(1, 10, 10);
+     * }</pre>
      */
     public static int[] getRandArr(int min, int max, int n) {
         // 如果参数不合法就返回
@@ -105,7 +119,16 @@ public class Arrs {
      * @param idx1 第一个元素对应的下标
      * @param idx2 第二个元素对应的下标
      * @param <T> 数组元素类型
+     * @apiNote <pre>{@code
+     * int[] a = {1, 2, 3, 4, 5};
+     * var arr = Array.of(a);
+     *
+     * // 用于对通用数组元素的交换
+     * // 交换下标1和下标3的元素
+     * Arrs.swap(arr, 1, 3);
+     * }</pre>
      * @since 1.1
+     * @see Array
      */
     public static <T> void swap(Array<T> a, int idx1, int idx2) {
         T tmp = a.get(idx1);
