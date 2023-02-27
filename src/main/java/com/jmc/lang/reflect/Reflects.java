@@ -56,6 +56,14 @@ public class Reflects {
      * @param c 类的Class对象
      * @param fieldName 成员变量名称
      * @return 指定的成员变量
+     * @apiNote <pre>{@code
+     * class Student {
+     *     private String name;
+     * }
+     *
+     * // 获取Student类的name属性
+     * Field nameField = Reflects.getField(Student.class, "name");
+     * }</pre>
      * @since 1.5
      */
     public static Field getField(Class<?> c, String fieldName) {
@@ -82,6 +90,16 @@ public class Reflects {
      * @param methodName 方法名称
      * @param parameterTypes 参数类型
      * @return 方法对象
+     * @apiNote <pre>{@code
+     * class Student {
+     *     private Long id;
+     *     private String name;
+     *     void print(Long id, String name) {}
+     * }
+     *
+     * // 获取Student类的print方法（需要指定方法名称和所有参数类型）
+     * Method printMethod = Reflects.getMethod(Student.class, "print", Long.class, String.class);
+     * }</pre>
      * @since 1.5
      */
     public static Method getMethod(Class<?> c, String methodName, Class<?>... parameterTypes) {
@@ -112,6 +130,10 @@ public class Reflects {
      * @param args 类的构造器参数
      * @return 构建的类实例
      * @param <T> 类对象的类型
+     * @apiNote <pre>{@code
+     * // 创建一个StringBuilder对象实例（需要传入构造器参数）
+     * var instance = Reflects.newInstance(StringBuilder.class, "ABC");
+     * }</pre>
      * @since 2.7
      */
     public static <T> T newInstance(Class<T> c, Object... args) {
@@ -134,6 +156,18 @@ public class Reflects {
      * @param fieldName 成员变量名称
      * @return 成员变量的值
      * @param <T> 类的类型
+     * @apiNote <pre>{@code
+     * class Student {
+     *     private Long id;
+     *     public Student(Long id) { this.id = id; }
+     * }
+     *
+     * // 创建对象
+     * var stu = new Student(3);
+     *
+     * // 获取其成员变量id的值（需要指定变量类型Long）
+     * Long idValue = Reflects.getFieldValue(stu, "id");
+     * }</pre>
      * @since 2.7
      */
     public static <T> T getFieldValue(Object instance, String fieldName) {
@@ -146,6 +180,14 @@ public class Reflects {
      * @param fieldName 静态成员变量名称
      * @return 静态成员变量的值
      * @param <T> 类的类型
+     * @apiNote <pre>{@code
+     * class Student {
+     *     private static final Long id = 3;
+     * }
+     *
+     * // 获取其静态变量id的值（需要指定变量类型Long）
+     * Long idValue = Reflects.getFieldValue(Student.class, "id");
+     * }</pre>
      * @since 2.7
      */
     public static <T> T getFieldValue(Class<?> c, String fieldName) {
@@ -159,6 +201,23 @@ public class Reflects {
      * @param args 方法参数
      * @param <R> 返回值类型
      * @return 方法返回值
+     * @apiNote <pre>{@code
+     * class Student {
+     *     private Long id;
+     *     private String name;
+     *     String setName(String name) {
+     *         var oldName = this.name;
+     *         this.name = name;
+     *         return oldName;
+     *     }
+     * }
+     *
+     * // 创建对象
+     * var stu = new Student(1, "Jmc");
+     *
+     * // 执行setName方法（需要传入参数）并获取返回值（需要指定返回值类型String）
+     * String oldName = Reflects.invokeMethod(stu, "setName", "Lucy");
+     * }</pre>
      */
     public static <R> R invokeMethod(Object instance, String methodName, Object... args) {
         return (R) Tries.tryReturnsT(() -> getMethod(instance.getClass(), methodName,
@@ -172,6 +231,16 @@ public class Reflects {
      * @param args 方法参数
      * @param <R> 返回值类型
      * @return 方法返回值
+     * @apiNote <pre>{@code
+     * class Student {
+     *     private Long id;
+     *     private String name;
+     *     static String info(Long id) { return ...; }
+     * }
+     *
+     * // 执行静态方法info（需要传入参数）并获取返回值（需要指定返回值类型String）
+     * String info = Reflects.invokeMethod(Student.class, "info", 3);
+     * }</pre>
      * @since 1.5
      */
     public static <R> R invokeMethod(Class<?> c, String methodName, Object... args) {
@@ -187,6 +256,10 @@ public class Reflects {
      * 将一个对象实例写入byte数组
      * @param o 对象实例
      * @return 结果byte数组
+     * @apiNote <pre>{@code
+     * // 将String对象序列化到byte数组
+     * byte[] bytes = Reflects.outObj("666");
+     * }</pre>
      */
     public static byte[] outObj(Object o) {
         var out = new ByteArrayOutputStream();
@@ -205,6 +278,10 @@ public class Reflects {
      * @param bs byte数组
      * @param <T> 对象类型
      * @return 读取的对象
+     * @apiNote <pre>{@code
+     * // 从byte数组（bytes）读取String对象（需要指定对象类型String）
+     * String obj = Reflects.readObj(bytes);
+     * }</pre>
      */
     public static <T> T readObj(byte[] bs) {
         try (var in = new ObjectInputStream(new ByteArrayInputStream(bs))) {
@@ -224,6 +301,11 @@ public class Reflects {
      * 判断类是否在jar包中
      * @param c 类的Class对象
      * @return 类是否在jar包中
+     * @apiNote <pre>{@code
+     * class Student {}
+     * // 判断Student类是否在jar中
+     * boolean res = Reflects.isClassInJar(Student.class);
+     * }</pre>
      * @since 2.6
      */
     public static boolean isClassInJar(Class<?> c) {
@@ -237,6 +319,11 @@ public class Reflects {
      * 获取jar的绝对路径
      * @param jarClass jar中的任意一个Class
      * @return jar的绝对路径
+     * @apiNote <pre>{@code
+     * class Student {}
+     * // 获取Student类的jar的系统绝对路径
+     * String path = Reflects.getJarPath(Student.class);
+     * }</pre>
      * @since 3.0
      */
     public static String getJarPath(Class<?> jarClass) {
@@ -256,6 +343,11 @@ public class Reflects {
      * @param c 类的Class对象
      * @return 类加载路径
      * @since 2.6
+     * @apiNote <pre>{@code
+     * class Student {}
+     * // 获取Student类的类加载路径
+     * URL url = Reflects.getClassPath(Student.class).orElseThrow();
+     * }</pre>
      */
     public static Optional<URL> getClassPath(Class<?> c) {
         return Optional.of(c)
@@ -308,6 +400,19 @@ public class Reflects {
      * @param c 类的Class对象
      * @param path 指定的路径
      * @return 一级文件/文件夹的URL信息对象列表
+     * @apiNote <pre>{@code
+     * // 获取Reflect类路径的/com/jmc文件夹下的一级文件和文件夹
+     * // 这个方法对jar、非jar都适用
+     * Reflects.listResources(Reflects.class, "/com/jmc")
+     *         .forEach(urlInfo -> {
+     *             // 获取文件/文件夹url
+     *             URL url = urlInfo.getUrl();
+     *             // 获取文件/文件夹名称
+     *             String name = urlInfo.getName();
+     *             // 是否为文件
+     *             boolean isFile = urlInfo.isFile();
+     *         });
+     * }</pre>
      * @since 2.6
      */
     public static List<URLInfo> listResources(Class<?> c, String path) {

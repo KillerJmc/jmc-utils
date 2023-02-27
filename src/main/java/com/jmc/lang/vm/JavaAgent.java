@@ -16,6 +16,10 @@ public class JavaAgent {
      * 加载Java Agent到指定的JVM
      * @param pid 虚拟机进程id
      * @param agentJarPath Java Agent的jar路径
+     * @apiNote <pre>{@code
+     * // 加载agent.jar到pid为23333的JVM中
+     * JavaAgent.load("23333", "/path/to/agent.jar");
+     * }</pre>
      */
     public static void load(String pid, String agentJarPath) {
         if (!Files.exists(agentJarPath)) {
@@ -43,6 +47,10 @@ public class JavaAgent {
     /**
      * 加载Java Agent到当前JVM
      * @param agentJarPath Java Agent的jar路径
+     * @apiNote <pre>{@code
+     * // 加载agent.jar到当前的JVM中
+     * JavaAgent.loadToSelf("/path/to/agent.jar");
+     * }</pre>
      */
     public static void loadToSelf(String agentJarPath) {
         // 是否为Windows平台

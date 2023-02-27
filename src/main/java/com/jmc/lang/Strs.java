@@ -16,6 +16,16 @@ public class Strs {
      * 判断一个字符串是否由数字构成（正数，负数或小数）
      * @param src 字符串
      * @return 判断结果
+     * @apiNote <pre>{@code
+     * // 判断是否是数字（true）
+     * var isNum = Strs.isNum("123");
+     * // true
+     * isNum = Strs.isNum("12.34");
+     * // true
+     * isNum = Strs.isNum("-234.789");
+     * // false
+     * isNum = Strs.isNum("123aa45");
+     * }</pre>
      * @since 2.0
      */
     public static boolean isNum(String src) {
@@ -95,9 +105,35 @@ public class Strs {
      * 获取字符串的子串
      * @param src 原字符串
      * @param start 开始的子串（不包含）
+     * @param end 结束的子串（不包含）
      * @param fromIdx 从哪个下标开始查找
      * @return 结果子串
      * @since 1.7
+     * @apiNote <pre>{@code
+     * var s = "zxxx123yyy"
+     * // 获取s中xxx和yyy之间的字串，从下标1开始匹配（结果：123）
+     * var res = Strs.subExclusive(s, "xxx", "yyy", 1);
+     * }</pre>
+     */
+    public static String subExclusive(String src, String start, String end, int fromIdx) {
+        var startIdx = src.indexOf(start, fromIdx);
+
+        var endIdx = src.indexOf(end, startIdx + start.length());
+        return startIdx == -1 || endIdx == -1 ? src : src.substring(startIdx + start.length(), endIdx);
+    }
+
+    /**
+     * 获取字符串的子串
+     * @param src 原字符串
+     * @param start 开始的子串（不包含）
+     * @param fromIdx 从哪个下标开始查找
+     * @return 结果子串
+     * @since 1.7
+     * @apiNote <pre>{@code
+     * var s = "zxxx123"
+     * // 获取s中xxx之后的字串，从下标1开始匹配（结果：123）
+     * var res = Strs.subExclusive(s, "xxx", 1);
+     * }</pre>
      */
     public static String subExclusive(String src, String start, int fromIdx) {
         var startIdx = src.indexOf(start, fromIdx);
@@ -108,60 +144,31 @@ public class Strs {
      * 获取字符串的子串
      * @param src 原字符串
      * @param start 开始的子串（不包含）
-     * @return 结果子串
-     */
-    public static String subExclusive(String src, String start) {
-        return subExclusive(src, start, 0);
-    }
-
-    /**
-     * 获取字符串的子串
-     * @param src 原字符串
-     * @param start 开始的子串（不包含）
-     * @param end 结束的子串（不包含）
-     * @param fromIdx 从哪个下标开始查找
-     * @return 结果子串
-     * @since 1.7
-     */
-    public static String subExclusive(String src, String start, String end, int fromIdx) {
-        var startIdx = src.indexOf(start, fromIdx);
-        var endIdx = src.indexOf(end, startIdx + start.length());
-        return startIdx == -1 || endIdx == -1 ? src : src.substring(startIdx + start.length(), endIdx);
-    }
-
-    /**
-     * 获取字符串的子串
-     * @param src 原字符串
-     * @param start 开始的子串（不包含）
      * @param end 结束的子串（不包含）
      * @return 结果子串
+     * @apiNote <pre>{@code
+     * var s = "xxx123yyy"
+     * // 获取s中xxx和yyy之间的子串（结果：123）
+     * var res = Strs.subExclusive(s, "xxx", "yyy");
+     * }</pre>
      */
     public static String subExclusive(String src, String start, String end) {
         return subExclusive(src, start, end, 0);
     }
 
-
     /**
      * 获取字符串的子串
      * @param src 原字符串
-     * @param start 开始的子串（包含）
-     * @param fromIdx 从哪个下标开始查找
+     * @param start 开始的子串（不包含）
      * @return 结果子串
-     * @since 1.7
+     * @apiNote <pre>{@code
+     * var s = "xxx123"
+     * // 获取s中xxx后面的子串
+     * var res = Strs.subExclusive(s, "xxx");
+     * }</pre>
      */
-    public static String subInclusive(String src, String start, int fromIdx) {
-        var startIdx = src.indexOf(start, fromIdx);
-        return startIdx == -1 ? src : src.substring(startIdx);
-    }
-
-    /**
-     * 获取字符串的子串
-     * @param src 原字符串
-     * @param start 开始的子串（包含）
-     * @return 结果子串
-     */
-    public static String subInclusive(String src, String start) {
-        return subInclusive(src, start, 0);
+    public static String subExclusive(String src, String start) {
+        return subExclusive(src, start, 0);
     }
 
     /**
@@ -184,11 +191,34 @@ public class Strs {
      * 获取字符串的子串
      * @param src 原字符串
      * @param start 开始的子串（包含）
+     * @param fromIdx 从哪个下标开始查找
+     * @return 结果子串
+     * @since 1.7
+     */
+    public static String subInclusive(String src, String start, int fromIdx) {
+        var startIdx = src.indexOf(start, fromIdx);
+        return startIdx == -1 ? src : src.substring(startIdx);
+    }
+
+    /**
+     * 获取字符串的子串
+     * @param src 原字符串
+     * @param start 开始的子串（包含）
      * @param end 结束的子串（包含）
      * @return 结果子串
      */
     public static String subInclusive(String src, String start, String end) {
         return subInclusive(src, start, end, 0);
+    }
+
+    /**
+     * 获取字符串的子串
+     * @param src 原字符串
+     * @param start 开始的子串（包含）
+     * @return 结果子串
+     */
+    public static String subInclusive(String src, String start) {
+        return subInclusive(src, start, 0);
     }
 
     /**

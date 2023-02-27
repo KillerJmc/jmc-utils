@@ -7,6 +7,61 @@ import java.util.Stack;
 
 /**
  * 运算符重载
+ * @apiNote <pre>{@code
+ * // 书写一个Int类，重载加法，减法和大于运算符
+ * class Int implements Operator<Int> {
+ *     int value;
+ *
+ *     public Int(int value) { this.value = value; }
+ *
+ *     @Override
+ *     public Int plus(Int other) {
+ *         return new Int(this.value + other.value);
+ *     }
+ *
+ *     @Override
+ *     public Int minus(Int other) {
+ *         return new Int(this.value - other.value);
+ *     }
+ *
+ *     @Override
+ *     public boolean greaterThan(Int other) {
+ *         return this.value > other.value;
+ *     }
+ *
+ *     public int getValue() {
+ *         return this.value;
+ *     }
+ * }
+ *
+ * Int a = new Int(3), b = new Int(4);
+ *
+ * // 二元运算
+ * // c = a + b
+ * Int c = Operator.calc(a, "+", b);
+ * Assert.assertEquals(7, c.getValue());
+ *
+ * // 二元运算
+ * // c = a - b
+ * c = Operator.calc(a, "-", b);
+ * Assert.assertEquals(-1, c.getValue());
+ *
+ * // 二元表达式运算
+ * // c = a + (b - a)
+ * c = Operator.calc("? + (? - ?)", a, b, a);
+ * Assert.assertEquals(4, c.getValue());
+ *
+ * // 布尔值运算
+ * // flag = a > b
+ * boolean flag = Operator.cmp(a, ">", b);
+ * Assert.assertFalse(flag);
+ *
+ * // 布尔表达式运算
+ * // flag = b > a && b - a > a
+ * flag = Operator.cmp("? > ? && ? - ? > ?", b, a, b, a, a);
+ * Assert.assertFalse(flag);
+ *
+ * }</pre>
  * @since 2.0
  * @author Jmc
  * @param <T> 具有运算符重载的类型
@@ -358,6 +413,14 @@ public interface Operator<T> {
      * @param args 参数
      * @param <T> 具有运算符重载的类
      * @return 表达式运算结果
+     * @apiNote <pre>{@code
+     * class Int implements Operator<Int> { ... }
+     * Int a = new Int(3), b = new Int(4);
+     *
+     * // 二元表达式运算
+     * // c = a + (b - a)
+     * c = Operator.calc("? + (? - ?)", a, b, a);
+     * }</pre>
      */
     @SafeVarargs
     static <T extends Operator<T>> T calc(String exp, T... args) {
@@ -389,6 +452,14 @@ public interface Operator<T> {
      * @param b 元素b
      * @param <T> 具有运算符重载的类
      * @return a opr b
+     * @apiNote <pre>{@code
+     * class Int implements Operator<Int> { ... }
+     * Int a = new Int(3), b = new Int(4);
+     *
+     * // 二元运算
+     * // c = a + b
+     * Int c = Operator.calc(a, "+", b);
+     * }</pre>
      */
     static <T extends Operator<T>> T calc(T a, String opr, T b) {
         return switch (opr) {
@@ -424,6 +495,14 @@ public interface Operator<T> {
      * @param a 元素a
      * @param <T> 具有运算符重载的类
      * @return opr a
+     * @apiNote <pre>{@code
+     * class Int implements Operator<Int> { ... }
+     * Int a = new Int(3);
+     *
+     * // 一元前置运算
+     * // c = -a
+     * Int c = Operator.calc("-", a);
+     * }</pre>
      */
     static <T extends Operator<T>> T calc(String opr, T a) {
         return switch (opr) {
@@ -442,6 +521,14 @@ public interface Operator<T> {
      * @param a 元素a
      * @param <T> 具有运算符重载的类
      * @return a opr
+     * @apiNote <pre>{@code
+     * class Int implements Operator<Int> { ... }
+     * Int a = new Int(3);
+     *
+     * // 一元后置运算
+     * // c = a++
+     * Int c = Operator.calc(a, "++");
+     * }</pre>
      */
     static <T extends Operator<T>> T calc(T a, String opr) {
         return switch (opr) {
@@ -488,6 +575,14 @@ public interface Operator<T> {
      * @param args 参数
      * @param <T> 具有运算符重载的类
      * @return 表达式结果布尔值
+     * @apiNote <pre>{@code
+     * class Int implements Operator<Int> { ... }
+     * Int a = new Int(3), b = new Int(4);
+     *
+     * // 布尔表达式运算
+     * // flag = b > a && b - a > a
+     * boolean flag = Operator.cmp("? > ? && ? - ? > ?", b, a, b, a, a);
+     * }</pre>
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     static <T extends Operator<T>> boolean cmp(String exp, T... args) {
@@ -551,6 +646,14 @@ public interface Operator<T> {
      * @param b 元素b
      * @param <T> 具有运算符重载的类
      * @return a opr b
+     * @apiNote <pre>{@code
+     * class Int implements Operator<Int> { ... }
+     * Int a = new Int(3), b = new Int(4);
+     *
+     * // 二元布尔运算
+     * // flag = a > b
+     * boolean flag = Operator.cmp(a, ">", b);
+     * }</pre>
      */
     static <T extends Operator<T>> boolean cmp(T a, String opr, T b) {
         return switch (opr) {
@@ -572,6 +675,14 @@ public interface Operator<T> {
      * @param a 元素a
      * @param <T> 具有运算符重载的类
      * @return opr a
+     * @apiNote <pre>{@code
+     * class Int implements Operator<Int> { ... }
+     * Int a = new Int(3), b = new Int(4);
+     *
+     * // 一元前置布尔运算
+     * // flag = !a
+     * boolean flag = Operator.cmp("!", a);
+     * }</pre>
      */
     static <T extends Operator<T>> boolean cmp(String opr, T a) {
         if ("!".equals(opr)) {

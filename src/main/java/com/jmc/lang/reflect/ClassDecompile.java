@@ -16,15 +16,15 @@ public class ClassDecompile {
 
     /**
      * 反编译类
-     * @param className Class名称
+     * @param c Class
      * @return 反编译输出的字符串
-     * @throws Exception 异常
+     * @apiNote <pre>{@code
+     * // 反编译String类
+     * String res = ClassDecompile.decompile(String.class);
+     * }</pre>
      */
     @SuppressWarnings("Duplicates")
-    public static String decompile(String className) throws Exception {
-        //实现类
-        Class<?> c = Class.forName(className);
-
+    public static String decompile(Class<?> c) {
         //实现接口数组,参数数组,构造方法数组和方法数组
         Class<?>[] ins = c.getInterfaces();
         Field[] fs = c.getDeclaredFields();
@@ -180,11 +180,15 @@ public class ClassDecompile {
 
     /**
      * 反编译类
-     * @param c 被反编译的类
+     * @param className 被反编译的类的类名
      * @return 反编译输出的字符串
      * @throws Exception 异常
+     * @apiNote <pre>{@code
+     * // 反编译String类
+     * String res = ClassDecompile.decompile("java.lang.String");
+     * }</pre>
      */
-    public static String decompile(Class<?> c) throws Exception {
-        return decompile(c.getName());
+    public static String decompile(String className) throws Exception {
+        return decompile(Class.forName(className));
     }
 }

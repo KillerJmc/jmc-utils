@@ -16,6 +16,10 @@ public class Run {
 	 * 同步执行控制台命令
 	 * @param command 命令字符串
 	 * @return 执行结果
+	 * @apiNote <pre>{@code
+	 * // 执行命令并将结果放进字符串
+	 * var res = Run.execToStr("cmd /c echo 777");
+	 * }</pre>
 	 */
 	public static String execToStr(String command) {
 		var proc = Tries.tryReturnsT(() -> Runtime.getRuntime().exec(command));
@@ -51,6 +55,10 @@ public class Run {
 	/**
 	 * 同步执行控制台命令并打印结果到控制台
 	 * @param command 命令字符串
+	 * @apiNote <pre>{@code
+     * // 执行命令并打印结果
+	 * Run.exec("cmd /c echo 666");
+	 * }</pre>
 	 */
 	public static void exec(String command) {
 		var proc = Tries.tryReturnsT(() -> Runtime.getRuntime().exec(command));

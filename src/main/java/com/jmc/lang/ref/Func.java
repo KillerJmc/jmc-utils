@@ -5,6 +5,42 @@ package com.jmc.lang.ref;
  * 可将方法作为参数传入另一个方法以便调用，且支持直接传入lambda <br>
  * （参数均必须小于等于7个，支持传入基本数据类型）<br>
  * 提供了of和bind方法
+ * @apiNote <pre>{@code
+ * // add方法
+ * public int add(int a, int b) {
+ *     return a + b;
+ * }
+ *
+ * // 执行指定add方法
+ * // 这里的泛型Integer指的是方法返回值类型
+ * public void invokeAdd(Func<Integer> addFunc, int a, int b) {
+ *     // 执行函数指针并获取返回值
+ *     int res = addFunc.invoke(a, b);
+ *     System.out.println(res);
+ * }
+ *
+ * public void test() {
+ *     // 绑定一个方法作为函数指针
+ *     var addFunc = Func.of(this::add);
+ *     // 将函数指针传入方法
+ *     invokeAdd(addFunc, 2, 3);
+ *
+ *     // 绑定一个方法和参数作为函数指针
+ *     var bindFunc = Func.bind(this::add, 3, 4);
+ *     // 执行这个函数指针并指定返回值（7）
+ *     int res2 = bindFunc.invoke();
+ *
+ *     // 绑定一个lambda作为函数指针
+ *     var lambdaFunc = Func.of((String a, String b) -> a + b);
+ *     // 执行这个函数指针并指定返回值（"12"）
+ *     String res3 = lambdaFunc.invoke("1", "2");
+ *
+ *     // 绑定一个纯基本数据类型的lambda作为函数指针（需要补充泛型）
+ *     var numberLambdaFunc = Func.<Long>of((a, b) -> a - b);
+ *     // 执行这个函数指针并获取返回值（3）
+ *     long res4 = numberLambdaFunc.invoke(7L, 4L);
+ * }
+ * }</pre>
  * @since 1.0
  * @author Jmc
  * @param <R> 返回值类型
