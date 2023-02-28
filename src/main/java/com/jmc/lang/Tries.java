@@ -38,8 +38,12 @@ public class Tries {
     }
 
     /**
-     * 执行需要被try包含的代码块，直接打印异常
+     * 执行需要被try包含的代码块，直接抛出运行时异常
      * @param r 代码块
+     * @apiNote <pre>{@code
+     * // 让当前线程睡眠3ms，并直接抛出运行时异常（无需捕获）
+     * Tries.tryThis(() -> Thread.sleep(3));
+     * }</pre>
      */
     public static void tryThis(RunnableThrowsE r) {
         try {
@@ -53,6 +57,10 @@ public class Tries {
      * 执行需要被try包含的代码块并处理异常
      * @param r 代码块
      * @param exceptionHandler 异常处理器
+     * @apiNote <pre>{@code
+     * // 让当前线程睡眠3ms，并处理异常（进行打印）
+     * Tries.tryHandlesE(() -> Thread.sleep(3), Throwable::printStackTrace);
+     * }</pre>
      * @since 1.5
      */
     public static void tryHandlesE(RunnableThrowsE r, Consumer<Throwable> exceptionHandler) {
@@ -64,9 +72,15 @@ public class Tries {
     }
 
     /**
-     * 执行需要被try包含的代码块并处理异常
+     * 执行需要被try包含的代码块并返回异常
      * @param r 代码块
      * @return 异常对象
+     * @apiNote <pre>{@code
+     * // 让当前线程睡眠3ms，并返回异常
+     * var optionalE = Tries.tryHandlesE(() -> Thread.sleep(3));
+     * // 处理异常（进行打印）
+     * optionalE.ifPresent(Throwable::printStackTrace);
+     * }</pre>
      * @since 2.4
      */
     public static Optional<Throwable> tryReturnsE(RunnableThrowsE r) {
@@ -79,10 +93,14 @@ public class Tries {
     }
 
     /**
-     * 执行需要被try包含的代码块并返回结果，直接打印异常
+     * 执行需要被try包含的代码块并返回结果，直接抛出运行时异常
      * @param c 代码块
      * @param <T> 返回结果类型
      * @return 结果
+     * @apiNote <pre>{@code
+     * // 获取String的Class对象，直接抛出运行时异常（无需捕获）
+     * var class = Tries.tryReturnsT(() -> Class.forName("java.lang.String"));
+     * }</pre>
      */
     public static <T> T tryReturnsT(ReturnedThrowable<T> c) {
         try {
@@ -100,6 +118,13 @@ public class Tries {
      * @param <T> 返回结果类型
      * @param <E> 异常类型
      * @return 结果
+     * @apiNote <pre>{@code
+     * // 获取String的Class对象，如果有异常直接打印出来
+     * var class = Tries.tryReturnsT(
+     *         () -> Class.forName("java.lang.String"),
+     *         Throwable::printStackTrace
+     * );
+     * }</pre>
      * @since 1.5
      */
     @SuppressWarnings("unchecked")
@@ -113,10 +138,19 @@ public class Tries {
     }
 
     /**
-     * 把抛出异常的Consumer转化为普通的Consumer，并直接抛出异常
+     * 把抛出异常的Consumer转化为普通的Consumer，并直接抛出运行时异常
      * @param c 抛出异常的Consumer
      * @param <T> 被消耗的对象
      * @return 普通的Consumer
+     * @apiNote <pre>{@code
+     * // 定义3个线程，启动并阻塞等待结束
+     * Stream.generate(() -> (Runnable) () -> System.out.println(666))
+     *       .limit(3)
+     *       .map(Thread::new)
+     *       .peek(Thread::start)
+     *       // 简写抛出Stream中的异常
+     *       .forEach(Tries.throwsE(Thread::join));
+     * }</pre>
      * @since 1.5
      */
     public static <T> Consumer<T> throwsE(ConsumerThrowsE<T> c) {

@@ -17,6 +17,10 @@ public class Binary {
      * @param x 长整数
      * @param toTrueForm 是否转换成原码形式
      * @return 结果字符串
+     * @apiNote <pre>{@code
+     * // 将-9转成二进制字符串（原码形式）
+     * var res = Binary.toString(-9L, true);
+     * }</pre>
      */
     public static String toString(long x, boolean toTrueForm) {
         // 求补码
@@ -40,6 +44,10 @@ public class Binary {
      * @param x 整数
      * @param toTrueForm 是否转换成原码形式
      * @return 结果字符串
+     * @apiNote <pre>{@code
+     * // 将-9转成二进制字符串（原码形式）
+     * var res = Binary.toString(-9, true);
+     * }</pre>
      */
     public static String toString(int x, boolean toTrueForm) {
         // 原理同 toString(long x, boolean toTrueForm)
@@ -57,6 +65,10 @@ public class Binary {
      * @param x 字节类型（byte）
      * @param toTrueForm 是否转换成原码形式
      * @return 结果字符串
+     * @apiNote <pre>{@code
+     * // 将-9转成二进制字符串（原码形式）
+     * var res = Binary.toString(-9, true);
+     * }</pre>
      */
     public static String toString(byte x, boolean toTrueForm) {
         // 原理同 toString(long x, boolean toTrueForm)
@@ -77,6 +89,10 @@ public class Binary {
      * @param binaryString 二进制字符串
      * @param isTrueForm 是否是原码形式
      * @return 结果长整数
+     * @apiNote <pre>{@code
+     * // 将原码形式二进制字符串101010转成long
+     * var res = Binary.toLong("101010", true);
+     * }</pre>
      */
     public static long toLong(String binaryString, boolean isTrueForm) {
         // 检查参数合法性
@@ -101,6 +117,10 @@ public class Binary {
      * @param binaryString 二进制字符串
      * @param isTrueForm 是否是原码形式
      * @return 结果整数
+     * @apiNote <pre>{@code
+     * // 将原码形式二进制字符串101010转成int
+     * var res = Binary.toInt("101010", true);
+     * }</pre>
      */
     public static int toInt(String binaryString, boolean isTrueForm) {
         // 原理同 toLong(String binaryString, boolean isTrueForm)
@@ -122,6 +142,10 @@ public class Binary {
      * @param binaryString 二进制字符串
      * @param isTrueForm 是否是原码形式
      * @return 结果字节
+     * @apiNote <pre>{@code
+     * // 将原码形式二进制字符串101010转成byte
+     * var res = Binary.toByte("101010", true);
+     * }</pre>
      */
     public static byte toByte(String binaryString, boolean isTrueForm) {
         // 原理同 toLong(String binaryString, boolean isTrueForm)

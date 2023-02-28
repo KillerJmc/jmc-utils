@@ -18,6 +18,10 @@ public class Maths {
      * 埃式筛法计算质数，时间复杂度O(N * loglogN)
      * @param max 最大值（若也为质数，结果中也会包括）
      * @return 结果集合
+     * @apiNote <pre>{@code
+     * // 获取100以内所有质数，放到集合中
+     * var res = Maths.getPrimes(100);
+     * }</pre>
      */
     public static List<Integer> getPrimes(int max) {
         var res = new ArrayList<Integer>();
@@ -51,6 +55,10 @@ public class Maths {
      * 判断是否是质数，时间复杂度O(sqrt(N))
      * @param probablePrime 被判断的数
      * @return 该数是否为质数
+     * @apiNote <pre>{@code
+     * // 判断23是否为质数
+     * Assert.assertTrue(Maths.isPrime(23));
+     * }</pre>
      */
     public static boolean isPrime(long probablePrime) {
         int firstPrime = 2;
@@ -91,6 +99,10 @@ public class Maths {
      * 计算阶乘
      * @param n 底数
      * @return 计算结果
+     * @apiNote <pre>{@code
+     * // 计算100的阶乘
+     * BigInteger res = Maths.factorial(100);
+     * }</pre>
      */
     public static BigInteger factorial(int n) {
         if (n == 0 || n == 1) {
@@ -118,17 +130,23 @@ public class Maths {
     }
 
     /**
-     * 计算阶乘近似值
+     * 计算阶乘近似值并返回科学计数结果字符串
      * @param n 底数
-     * @return 阶乘近似结果的字符串
+     * @return 阶乘近似的科学计数结果字符串
+     * @apiNote <pre>{@code
+     * // 估算100的阶乘（结果：9 * 10 ^ 157）
+     * String res = Maths.approxFactorial(100);
+     * }</pre>
      */
     public static String approxFactorial(int n) {
         double d = 1;
         long pow = factorialLength(n) - 1;
 
+        // 精确计算阶乘结果的第一位
         while (n > 1) {
             d = d * n--;
 
+            // 防止溢出，始终保持结果为只有个位数的double类型
             d /= d >= 10000000000L        ?        10000000000L        :
                  d >= 1000000000          ?        1000000000          :
                  d >= 100000000           ?        100000000           :

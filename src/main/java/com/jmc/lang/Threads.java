@@ -14,6 +14,10 @@ public class Threads {
     /**
      * 线程以毫秒为单位睡眠一段时间，直接抛出中断异常
      * @param millis 休眠毫秒值
+     * @apiNote <pre>{@code
+     * // 让当前线程睡眠3ms
+     * Threads.sleep(3);
+     * }</pre>
      */
     public static void sleep(long millis) {
         Tries.tryThis(() -> Thread.sleep(millis));
@@ -23,6 +27,10 @@ public class Threads {
      * 线程以特定时间单位休眠一段时间，直接抛出中断异常
      * @param unit 时间单位
      * @param timeout 休眠时间
+     * @apiNote <pre>{@code
+     * // 让当前线程睡眠3分钟
+     * Threads.sleep(TimeUnit.MINUTES, 3);
+     * }</pre>
      */
     public static void sleep(TimeUnit unit, long timeout) {
         Tries.tryThis(() -> unit.sleep(timeout));

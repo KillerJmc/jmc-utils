@@ -76,6 +76,16 @@ public class ExactExp {
      * 将表达式的计算结果转换为精度16的BigDecimal
      * @param infixExp 表达式
      * @return 精度为16的BigDecimal
+     * @apiNote <pre>{@code
+     * // 计算表达式"1 + √(5 + 20) + √4 + 2"（结果：10）
+     * BigDecimal res = ExactExp.getResult("1 + (√(5 + 20)) + (√4) + 2");
+     *
+     * // n! ~ √(2πn) * (n/e)^n
+     * var exp = "√(2 * %.16f * %d) * (%d / %.16f) ^ %d"
+     *         .formatted(Math.PI, n, n, Math.E, n);
+     * // 计算n!近似表达式的结果
+     * res = ExactExp.getResult(exp);
+     * }</pre>
      */
     public static BigDecimal getResult(String infixExp) {
         BigDecimal result = getResult(infixExp, 16);
@@ -87,8 +97,12 @@ public class ExactExp {
     /**
      * 将表达式的计算结果转换为指定精度的BigDecimal
      * @param infixExp 中缀表达式
-     * @param scale 精度
+     * @param scale 精度（保留小数位数）
      * @return 指定精度的BigDecimal
+     * @apiNote <pre>{@code
+     * // 计算表达式"√3"，保留5位小数（结果：1.73205）
+     * BigDecimal res = ExactExp.getResult("√3", 5);
+     * }</pre>
      */
     public static BigDecimal getResult(String infixExp, int scale) {
         var suffixExp = ExpUtils.suffix(infixExp, PRIORITY);

@@ -163,7 +163,7 @@ public class Strs {
      * @return 结果子串
      * @apiNote <pre>{@code
      * var s = "xxx123"
-     * // 获取s中xxx后面的子串
+     * // 获取s中xxx后面的子串（结果：123）
      * var res = Strs.subExclusive(s, "xxx");
      * }</pre>
      */
@@ -178,6 +178,11 @@ public class Strs {
      * @param end 结束的子串（包含）
      * @param fromIdx 从哪个下标开始查找
      * @return 结果子串
+     * @apiNote <pre>{@code
+     * var s = "zx123y"
+     * // 获取s中x和y之间的字串（包括x和y），从下标1开始匹配（结果：x123y）
+     * var res = Strs.subInclusive(s, "x", "y", 1);
+     * }</pre>
      * @since 1.7
      */
     public static String subInclusive(String src, String start, String end, int fromIdx) {
@@ -193,6 +198,11 @@ public class Strs {
      * @param start 开始的子串（包含）
      * @param fromIdx 从哪个下标开始查找
      * @return 结果子串
+     * @apiNote <pre>{@code
+     * var s = "zxxx123"
+     * // 获取s中xxx之后的字串（包括xxx），从下标1开始匹配（结果：xxx123）
+     * var res = Strs.subInclusive(s, "xxx", 1);
+     * }</pre>
      * @since 1.7
      */
     public static String subInclusive(String src, String start, int fromIdx) {
@@ -206,6 +216,11 @@ public class Strs {
      * @param start 开始的子串（包含）
      * @param end 结束的子串（包含）
      * @return 结果子串
+     * @apiNote <pre>{@code
+     * var s = "x12y3z"
+     * // 获取s中x和y之间的子串（包括x和y）（结果：x12y）
+     * var res = Strs.subInclusive(s, "x", "y");
+     * }</pre>
      */
     public static String subInclusive(String src, String start, String end) {
         return subInclusive(src, start, end, 0);
@@ -216,6 +231,11 @@ public class Strs {
      * @param src 原字符串
      * @param start 开始的子串（包含）
      * @return 结果子串
+     * @apiNote <pre>{@code
+     * var s = "xxy123"
+     * // 获取s中y后面的子串（包括y）（结果：y123）
+     * var res = Strs.subInclusive(s, "y");
+     * }</pre>
      */
     public static String subInclusive(String src, String start) {
         return subInclusive(src, start, 0);
@@ -227,6 +247,11 @@ public class Strs {
      * @param newStr 新子串
      * @param oldStrs 旧子串
      * @return 结果字符串
+     * @apiNote <pre>{@code
+     * var s = "abccddeeff";
+     * // 将s字符串中的cc和ee替换成!（结果：aa!dd!ff）
+     * var res = Strs.orReplace(s, "!", "cc", "ee");
+     * }</pre>
      */
     public static String orReplace(String src, String newStr, String... oldStrs) {
         Objs.throwsIfNullOrEmpty(src, newStr);
@@ -243,6 +268,10 @@ public class Strs {
      * @param src 提供的字符串
      * @param strs 多个字符串
      * @return 是否存在相等
+     * @apiNote <pre>{@code
+     * // 判断字符串"abc"是否与"a"或"b"或"abc"完全相等（结果：true）
+     * var flag = Strs.orEquals("abc", "a", "b", "abc");
+     * }</pre>
      */
     public static boolean orEquals(String src, String... strs) {
         Objs.throwsIfNullOrEmpty(src);
@@ -261,6 +290,10 @@ public class Strs {
      * @param src 字符串
      * @param contains 提供的子串
      * @return 是否包含任意子串
+     * @apiNote <pre>{@code
+     * // 判断字符串"aabbccdddee"是否包含"ff"或"cc"（结果：true）
+     * var flag = Strs.orContains("aabbccdddee", "ff", "cc");
+     * }</pre>
      */
     public static boolean orContains(String src, String... contains) {
         Objs.throwsIfNullOrEmpty(src);
@@ -279,6 +312,10 @@ public class Strs {
      * @param src 字符串
      * @param strs 提供的子串
      * @return 是否以提供的任意子串开始
+     * @apiNote <pre>{@code
+     * // 判断字符串"aabbccdddee"是否以"bb"或"dd"开始（结果：false）
+     * var flag = Strs.orStartsWith("aabbccdddee", "bb", "dd");
+     * }</pre>
      */
     public static boolean orStartsWith(String src, String... strs) {
         Objs.throwsIfNullOrEmpty(src);
@@ -297,6 +334,10 @@ public class Strs {
      * @param src 字符串
      * @param strs 提供的子串
      * @return 是否以提供的任意子串结束
+     * @apiNote <pre>{@code
+     * // 判断字符串"aabbccdddee"是否以"ff"或"ee"结束（结果：true）
+     * var flag = Strs.orEndsWith("aabbccdddee", "ff", "ee");
+     * }</pre>
      */
     public static boolean orEndsWith(String src, String... strs) {
         Objs.throwsIfNullOrEmpty(src);
@@ -315,6 +356,10 @@ public class Strs {
      * @param src 字符串
      * @param splits 1个或多个分隔符
      * @return 分割后字符串列表
+     * @apiNote <pre>{@code
+     * // 将字符串"a!c?d"使用"?"和"!"作为分隔符分割成多个字符串（结果：["a", "c", "d"]）
+     * var flag = Strs.orSplit("a!c?d", "?", "!");
+     * }</pre>
      * @since 2.4
      */
     public static List<String> orSplit(String src, String... splits) {
@@ -368,6 +413,10 @@ public class Strs {
      * 将字符串首字母大写
      * @param src 字符串
      * @return 结果字符串
+     * @apiNote <pre>{@code
+     * // 将字符串"jmc"首字母大写（结果：Jmc）
+     * var res = Strs.capitalize("jmc");
+     * }</pre>
      */
     public static String capitalize(String src) {
         return (src == null || src.length() == 0) ? src :
@@ -379,6 +428,14 @@ public class Strs {
      * @param src 原字符串
      * @param key 私钥
      * @return 结果字符串
+     * @apiNote <pre>{@code
+     * // 将字符串"abc"用私钥34进行异或获得密文（结果：C@A）
+     * var encrypt = Strs.xor("abc", 34);
+     *
+     * // 将密文再进行异或获得原文
+     * var decrypt = Strs.xor(encrypt, 34);
+     * Assert.assertEquals("abc", decrypt);
+     * }</pre>
      */
     public static String xor(String src, byte key) {
         byte[] bs = src.getBytes();
@@ -394,6 +451,11 @@ public class Strs {
      * @param subA 子串a
      * @param subB 子串b
      * @return 结果字符串
+     * @apiNote <pre>{@code
+     * var s = "a c a c";
+     * // 把字符串s中的a和c调换位置（结果是：c a c a）
+     * var res = Strs.swap(s, "a", "c");
+     * }</pre>
      */
     public static String swap(String src, String subA, String subB) {
         return subA.equals(subB) ? src :
@@ -409,6 +471,11 @@ public class Strs {
      * @param end 结束字符串
      * @param includesBoundary 是否包含边界（开始和结束字符串）
      * @return 结果列表
+     * @apiNote <pre>{@code
+     * var s = "<a><b><c>";
+     * // 收集所有以"<"开头，">"结尾的子串（不包括边界"<"和">"）（结果：["a", "b", "c"]）
+     * var res = Strs.collectAll(s, "<", ">", false);
+     * }</pre>
      */
     public static List<String> collectAll(String src, String start, String end, boolean includesBoundary) {
         StringBuilder sb = new StringBuilder(src);
@@ -436,6 +503,11 @@ public class Strs {
      * @param start 开始字符串
      * @param end 结束字符串
      * @return 结果字符串
+     * @apiNote <pre>{@code
+     * var s = "<a>?<b>!<c>";
+     * // 去除所有以<开头，>结尾的子串（结果："?!"）
+     * var res = Strs.removeAll(s, "<", ">");
+     * }</pre>
      */
     public static String removeAll(String src, String start, String end) {
         StringBuilder sb = new StringBuilder(src);

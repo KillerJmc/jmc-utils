@@ -14,6 +14,32 @@ import java.util.Optional;
 
 /**
  * 统一返回数据实体类型
+ * @apiNote <pre>{@code
+ * // 返回请求成功并携带数据666
+ * // 前端收到json：{ "code": 200, "message": null, "data": 666 }
+ * R<Integer> succeed = R.ok().data(666);
+ * // 上述情况的简写
+ * R<Integer> succeed2 = R.ok(666);
+ *
+ * // 返回请求失败并携带信息"Error"
+ * // 前端收到json：{ "code": 500, "message": "Error", "data": null }
+ * R<Void> error = R.error().message("Error").build();
+ * // 上述情况简写
+ * R<Void> error2 = R.error("Error");
+ *
+ * // 使用RStream进行灵活方法调用和返回数据（多用于MVC Controller)
+ * return R.stream()
+ *         // 检查方法（可写多个），如果传入布尔为false就将错误信息"学生姓名重复"返回，数据为空（检查学生姓名是否重复）
+ *         // 相当于布尔是false时返回R.error("学生姓名重复")
+ *         .check(existName(student.getName()), "学生姓名重复”)
+ *         // 执行方法（可写多个），该方法可抛出异常，无返回值。当抛出异常时将异常信息返回，数据为空（执行插入学生对象操作）
+ *         // 相当于抛出异常时返回R.error(e.getMessage())
+ *         .exec(() -> insert(s))
+ *         // 返回结果数据
+ *         // 相当于上述check、exec操作均成功时返回R.ok(getResult(s))
+ *         .build(() -> getResult(s));
+ *
+ * }</pre>
  * @since 1.6
  * @author Jmc
  * @param <T> 返回数据类型
@@ -177,6 +203,7 @@ public class R<T> {
     /**
      * 判断某次请求是否失败
      * @return 请求是否失败
+     * @see #getData()
      * @since 2.3
      */
     public boolean failed() {
@@ -187,6 +214,20 @@ public class R<T> {
      * 检查请求是否成功并获取返回数据 <br>
      * 如果请求失败就抛出异常信息
      * @return 返回数据
+     * @apiNote <pre>{@code
+     * R<String> r = ...;
+     *
+     * // 先检查请求是否失败
+     * if (r.failed()) {
+     *     // 处理失败情况
+     *     ...
+     * }
+     * // 获取返回数据
+     * var data = r.getData();
+     *
+     * // 或者不检查直接调用，当前端传来的R请求失败时处理异常（这里直接打印）
+     * data = Tries.tryReturnsT(r::getData, System.err::println);
+     * }</pre>
      * @since 2.5
      */
     public T getData() {

@@ -33,6 +33,10 @@ public class ExpUtils {
      * 把中缀表达式中的数字与运算符分离开（如果是一元运算符需要加括号）
      * @param infixExp 中缀表达式
      * @return 分离得到的字符串数组（中缀表达式）
+     * @apiNote <pre>{@code
+     * // 将中缀表达式数字和运算符分离开（结果：["(", "-1", "+", "2.5", ")", ">>", "366"]）
+     * var res = ExpUtils.splitInfix("(-1 + 2.5) >> 366");
+     * }</pre>
      */
     public static List<String> splitInfix(String infixExp) {
         // 去除表达式空格
@@ -96,6 +100,10 @@ public class ExpUtils {
      * @param splitInfix 中缀表达式分离数字和运算符后的集合
      * @param priority 二元运算符优先级（比如{(+, 1), (/, 2), (**, 2)}）
      * @return 后缀表达式
+     * @apiNote <pre>{@code
+     * // 将中缀表达式数字和运算符分离开（结果：["(", "-1", "+", "2.5", ")", ">>", "366"]）
+     * var res = ExpUtils.splitInfix("(-1 + 2.5) >> 366");
+     * }</pre>
      */
     public static List<String> suffix(List<String> splitInfix, Map<String, Integer> priority) {
         // 辅助栈
@@ -153,6 +161,11 @@ public class ExpUtils {
      * @param infixExp 中缀表达式
      * @param priority 运算符优先级（比如{(+, 1), (/, 2), (**, 2)}）
      * @return 后缀表达式
+     * @apiNote <pre>{@code
+     * // 将中缀表达式转化为后缀表达式，指定默认的运算符优先级（结果：["1", "2", "+", "5", "*"]）
+     * var res = ExpUtils.suffix("(1 + 2) * 5", ExpUtils.DEFAULT_PRIORITY);
+     *
+     * }</pre>
      */
     public static List<String> suffix(String infixExp, Map<String, Integer> priority) {
         return suffix(splitInfix(infixExp), priority);
@@ -178,6 +191,24 @@ public class ExpUtils {
      * @param calc 运算方法（调用时分别传入数字a，运算符opr，数字b）
      * @param <T> 表达式中数字类型
      * @return 表达式计算器
+     * @apiNote <pre>{@code
+     * // 构造一个Double类型的表达式计算器
+     * Calculator<Double> calculator = ExpUtils.calculator(
+     *         // 使用默认的运算符优先级
+     *         ExpUtils.DEFAULT_PRIORITY,
+     *         // 指定表达式数字转换函数：字符串转换Double
+     *         Double::valueOf,
+     *         // 指定运算方法（该方法传入实际的操作数a，b和运算符（字符串）opr）
+     *         (a, opr, b) -> switch (opr) {
+     *                 case "+" -> a + b;
+     *                 case "-" -> a - b;
+     *                 case "*" -> a * b;
+     *                 case "/" -> a / b;
+     *                 case "%" -> a % b;
+     *                 default -> throw new UnsupportedOperationException("operator" + opr);
+     *         }
+     * );
+     * }</pre>
      */
     public static <T> Calculator<T> calculator(Map<String, Integer> priority,
                                                Function<String, T> str2Number,
@@ -206,6 +237,12 @@ public class ExpUtils {
     /**
      * 默认的表达式计算器
      * @return 默认的表达式计算器
+     * @apiNote <pre>{@code
+     * // 获取一个默认的表达式计算器
+     * var calculator = ExpUtils.defaultCalculator();
+     * // 计算表达式（结果：12.0）
+     * Double res = calculator.calc("(1 + 2) * 4");
+     * }</pre>
      */
     public static Calculator<Double> defaultCalculator() {
         return ExpUtils.calculator(
