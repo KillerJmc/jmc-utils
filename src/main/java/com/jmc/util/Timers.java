@@ -15,6 +15,12 @@ public class Timers {
      * 秒计时器
      * @param r 代码块
      * @param name 计时模块名称
+     * @apiNote <pre>{@code
+     * // 执行一个代码块，命名为test，进行秒计时（打印：test耗时：0秒）
+     * Timers.secondTimer(() -> {
+     *     System.out.println("666")
+     * }, "test");
+     * }</pre>
      */
     public static void secondTimer(Tries.RunnableThrowsE r, String name) {
         printTimer(name, nano(r), 9);
@@ -23,6 +29,12 @@ public class Timers {
     /**
      * 秒计时器
      * @param r 代码块
+     * @apiNote <pre>{@code
+     * // 执行一个代码块，进行秒计时（打印：耗时：0秒）
+     * Timers.secondTimer(() -> {
+     *     System.out.println("666")
+     * });
+     * }</pre>
      */
     public static void secondTimer(Tries.RunnableThrowsE r) {
         secondTimer(r, "");
@@ -32,6 +44,12 @@ public class Timers {
      * 毫秒计时器
      * @param r 代码块
      * @param name 计时模块名称
+     * @apiNote <pre>{@code
+     * // 执行一个代码块，命名为test，进行毫秒计时（打印：test耗时：0毫秒）
+     * Timers.milliTimer(() -> {
+     *     System.out.println("666")
+     * }, "test");
+     * }</pre>
      */
     public static void milliTimer(Tries.RunnableThrowsE r, String name) {
         printTimer(name, nano(r), 6);
@@ -40,6 +58,12 @@ public class Timers {
     /**
      * 毫秒计时器
      * @param r 代码块
+     * @apiNote <pre>{@code
+     * // 执行一个代码块，命名为test，进行毫秒计时（打印：耗时：0毫秒）
+     * Timers.milliTimer(() -> {
+     *     System.out.println("666")
+     * });
+     * }</pre>
      */
     public static void milliTimer(Tries.RunnableThrowsE r) {
         milliTimer(r, "");
@@ -49,6 +73,12 @@ public class Timers {
      * 纳秒计时器
      * @param r 代码块
      * @param name 计时模块名称
+     * @apiNote <pre>{@code
+     * // 执行一个代码块，命名为test，进行纳秒计时（打印：test耗时：0纳秒）
+     * Timers.nanoTimer(() -> {
+     *     System.out.println("666")
+     * }, "test");
+     * }</pre>
      */
     public static void nanoTimer(Tries.RunnableThrowsE r, String name) {
         printTimer(name, nano(r), 1);
@@ -57,6 +87,12 @@ public class Timers {
     /**
      * 纳秒计时器
      * @param r 代码块
+     * @apiNote <pre>{@code
+     * // 执行一个代码块，进行纳秒计时（打印：耗时：0纳秒）
+     * Timers.nanoTimer(() -> {
+     *     System.out.println("666")
+     * });
+     * }</pre>
      */
     public static void nanoTimer(Tries.RunnableThrowsE r) {
         nanoTimer(r, "");
