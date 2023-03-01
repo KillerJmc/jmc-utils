@@ -27,11 +27,11 @@
         {
           "name": "jmc-utils-3.1.0.jar",
           "url": "jmc-utils-3.1.0.jar",
-          "size": 149886,
-          "sha512": "ca0a13813891cbb10f212e388ec1d59896e60f1e58ef1a02b4a095b1ea1742df02521739378aca22184d61eb13aa9f1db7441e938c8d0ae360ea64d212a43367",
-          "sha256": "55f61d5b0dc4a952d7db5baa4970cdb1c7e096a2a03fdadc08ff1d3e0e9002b3",
-          "sha1": "caf6a21a7823a7a92dfb14458670db207f74e60f",
-          "md5": "8826d69b12afccaecdf5bb0bf0540a30"
+          "size": 149540,
+          "sha512": "3df70ca88412b384e7e92f75a3aacf3133a1401c59b8fc0586784cb980f8451fc648d8ff1e64d7e3cd61faf705ec228360ab0301fc08090db366e34c9d310ee8",
+          "sha256": "60c798264f4889540cb420ad156dfcf2e98c5e12fd87eb9c90514a9b306b8540",
+          "sha1": "74b7233b93be123fb7a81d7276557be4bb215e94",
+          "md5": "551a3dbb11b108ddb5cac3d28dbb6e84"
         }
       ]
     },
@@ -47,6 +47,13 @@
       "dependencies": [
         {
           "group": "org.aspectj",
+          "module": "aspectjrt",
+          "version": {
+            "requires": "1.9.19"
+          }
+        },
+        {
+          "group": "org.aspectj",
           "module": "aspectjweaver",
           "version": {
             "requires": "1.9.19"
@@ -57,11 +64,11 @@
         {
           "name": "jmc-utils-3.1.0.jar",
           "url": "jmc-utils-3.1.0.jar",
-          "size": 149886,
-          "sha512": "ca0a13813891cbb10f212e388ec1d59896e60f1e58ef1a02b4a095b1ea1742df02521739378aca22184d61eb13aa9f1db7441e938c8d0ae360ea64d212a43367",
-          "sha256": "55f61d5b0dc4a952d7db5baa4970cdb1c7e096a2a03fdadc08ff1d3e0e9002b3",
-          "sha1": "caf6a21a7823a7a92dfb14458670db207f74e60f",
-          "md5": "8826d69b12afccaecdf5bb0bf0540a30"
+          "size": 149540,
+          "sha512": "3df70ca88412b384e7e92f75a3aacf3133a1401c59b8fc0586784cb980f8451fc648d8ff1e64d7e3cd61faf705ec228360ab0301fc08090db366e34c9d310ee8",
+          "sha256": "60c798264f4889540cb420ad156dfcf2e98c5e12fd87eb9c90514a9b306b8540",
+          "sha1": "74b7233b93be123fb7a81d7276557be4bb215e94",
+          "md5": "551a3dbb11b108ddb5cac3d28dbb6e84"
         }
       ]
     },
@@ -77,11 +84,11 @@
         {
           "name": "jmc-utils-3.1.0-sources.jar",
           "url": "jmc-utils-3.1.0-sources.jar",
-          "size": 62490,
-          "sha512": "ebce395d2eb30082ae791930b63dc98d9c0cac572ea0907a951607ab5e305396131b3b68a0dd487b819838c5e717c359ac9d4656a34d1d658209533717f376a3",
-          "sha256": "2f48b4d0aea956d7148ee0ff4357494f6488aefe59b74bb8a96a9ac8fbe1a94d",
-          "sha1": "f48233d3898c4b3893184331d0a42eecda7dd12b",
-          "md5": "ffd266d521dae29f697bfebf0eef4823"
+          "size": 62251,
+          "sha512": "cf3c8f1868b94f710d510f6430b6edfc890b27d2d169722bf8b82b68cf42d1ae402ca7da1669392e683e9e6963b85b7055727e501b3a5de6717ed739a93411d3",
+          "sha256": "988a5a47f76189e76de060b899aa1575cc68b2bff83a4239946caec97e1a2b7c",
+          "sha1": "46fe843c640b644939760c32aa12939075dd6f46",
+          "md5": "98e01dbade416f9d2971f4287af0a02c"
         }
       ]
     },
@@ -98,10 +105,10 @@
           "name": "jmc-utils-3.1.0-javadoc.jar",
           "url": "jmc-utils-3.1.0-javadoc.jar",
           "size": 359383,
-          "sha512": "3f69544f9bce6e9daabc7cf1b35a1dad88a9239722f975c570e4e7722f2b9b0a5f719c66911e3a2a2e449b485b27d547e55fb58a770c66385c168d2368be2770",
-          "sha256": "276aef96f8bdfa37ed7bc41558ec13fe89e17af62c6e2ef319d389a1ed76cb9e",
-          "sha1": "837f18130d4b4889b3d65bec6c3c8a87f1243a05",
-          "md5": "a851e938773131090f48976801bbe371"
+          "sha512": "7accb25ad8e570d0fb8bebaa84fc20940212dcf458cece013aea06055d0b51fb00baecab53954ad324cf018fdbf331d7f4ef747fbbab07f80a99e2ca8654dc5a",
+          "sha256": "4a7978724f266f3f048ef66f2dc96b2b10481de729aad45297fdfeca707b1129",
+          "sha1": "806462807ffc51877708365ce2796b0fb3fbe653",
+          "md5": "ba72253abc5696fd00bc27ee6298e2f8"
         }
       ]
     }

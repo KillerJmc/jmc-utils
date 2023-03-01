@@ -19,7 +19,8 @@ ext {
 }
 
 dependencies {
-    implementation "org.aspectj:aspectjweaver:$aspectjVersion"
+    implementation "org.aspectj:aspectjrt:$aspectjVersion"
+    runtimeOnly "org.aspectj:aspectjweaver:$aspectjVersion"
 
     compileOnly "org.projectlombok:lombok:$lombokVersion"
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"
