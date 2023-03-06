@@ -263,7 +263,7 @@ public class Reflects {
      * // 从classFileBytes字节数组中加载类名为com.jmc.Student的Class对象
      * Class<?> studentClass = Reflects.loadClass("com.jmc.Student", classFileBytes);
      * }</pre>
-     * @since 3.1
+     * @since 3.2
      */
     public static Class<?> loadClass(String className, byte[] classFileBytes) {
         Objs.throwsIfNullOrEmpty(classFileBytes, className);
@@ -294,10 +294,37 @@ public class Reflects {
      * // 从Student.class文件中加载类名为com.jmc.Student的Class对象
      * Class<?> studentClass = Reflects.loadClass("com.jmc.Student", "/path/to/Student.class");
      * }</pre>
-     * @since 3.1
+     * @since 3.2
      */
     public static Class<?> loadClass(String className, String classFilePath) {
         return loadClass(className, Files.readToBytes(classFilePath));
+    }
+
+    /**
+     * 从jar文件加载Class对象
+     * @param className 类名
+     * @param jarFilePath jar文件路径
+     * @return Class对象
+     * @apiNote <pre>{@code
+     * // 从test.jar文件中加载类名为com.jmc.Student的Class对象
+     * Class<?> studentClass = Reflects.loadClassInJar("com.jmc.Student", "/path/to/test.jar");
+     * }</pre>
+     * @since 3.2
+     */
+    public static Class<?> loadClassInJar(String className, String jarFilePath) {
+        var classFileRelativePath = className.replace(".", "/")
+                .concat(".class");
+
+        var classFileURL = Tries.tryReturnsT(() ->
+                new URL("jar:file:///%s!/%s".formatted(jarFilePath, classFileRelativePath))
+        );
+
+        try (var in = classFileURL.openStream()) {
+            var bs = in.readAllBytes();
+            return loadClass(className, bs);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // endregion

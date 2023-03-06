@@ -122,6 +122,7 @@ import java.util.zip.ZipOutputStream;
  *   2023.2.22     1. 将所有方法添加@apiNote以标注api示例代码
  *                 2. 删除findDO系列方法（findMoves，findDels等）
  *                 3. 添加必要的注释提高代码可读性
+ *   2023.3.6      添加getAbsolutePath方法来从相对路径获取绝对路径
  * </pre>
  * @since 1.0
  * @author Jmc
@@ -1398,6 +1399,25 @@ public class Files
 	 */
 	public static boolean exists(File f) {
 		return exists(f.getAbsolutePath());
+	}
+
+	/**
+	 * 从相对路径获取绝对路径
+	 * @param relativePath 相对路径
+	 * @return 绝对路径字符串
+	 * @apiNote <pre>{@code
+	 * // 获取a.txt的绝对路径
+	 * var absolutePath = Files.getAbsolutePath("./a.txt");
+	 * }</pre>
+	 * @since 3.2
+	 */
+	public static String getAbsolutePath(String relativePath) {
+		var f = new File(relativePath);
+		if (!f.exists()) {
+			throw new RuntimeException("路径不存在！");
+		}
+
+		return f.getAbsolutePath();
 	}
 
 	/**

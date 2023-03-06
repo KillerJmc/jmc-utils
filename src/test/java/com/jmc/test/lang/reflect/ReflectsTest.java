@@ -1,5 +1,6 @@
 package com.jmc.test.lang.reflect;
 
+import com.jmc.io.Files;
 import com.jmc.lang.Outs;
 import com.jmc.lang.Strs;
 import com.jmc.lang.Tries;
@@ -110,6 +111,13 @@ public class ReflectsTest {
         var classFilePath = "build/classes/java/test/com/jmc/test/lang/reflect/ReflectsTest.class";
         // 加载Class
         var c = Reflects.loadClass(className, classFilePath);
+        Assert.assertEquals(className, c.getName());
+
+        className = "com.jmc.io.Files";
+        var jarFilePath = Files.getAbsolutePath("repo/com/jmc/jmc-utils/1.0.0/jmc-utils-1.0.0.jar");
+        // 从jar文件加载Class
+        c = Reflects.loadClassInJar(className, jarFilePath);
+        System.out.println(c);
         Assert.assertEquals(className, c.getName());
     }
 }
