@@ -103,4 +103,13 @@ public class ReflectsTest {
         Reflects.listResources(Test.class, "/org/junit")
                 .forEach(System.out::println);
     }
+
+    @Test
+    public void loadClassTest() {
+        var className = "com.jmc.test.lang.reflect.ReflectsTest";
+        var classFilePath = "build/classes/java/test/com/jmc/test/lang/reflect/ReflectsTest.class";
+        // 加载Class
+        var c = Reflects.loadClass(className, classFilePath);
+        Assert.assertEquals(className, c.getName());
+    }
 }

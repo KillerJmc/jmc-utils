@@ -1,5 +1,7 @@
 package com.jmc.lang.reflect;
 
+import com.jmc.io.Files;
+import com.jmc.lang.Objs;
 import com.jmc.lang.Strs;
 import com.jmc.lang.Tries;
 import lombok.AccessLevel;
@@ -246,6 +248,56 @@ public class Reflects {
     public static <R> R invokeMethod(Class<?> c, String methodName, Object... args) {
         return (R) Tries.tryReturnsT(() -> getMethod(c, methodName,
                 Arrays.stream(args).map(Object::getClass).toArray(Class[]::new)).invoke(null, args));
+    }
+
+    // endregion
+
+    // region classloader
+
+    /**
+     * 从class文件加载Class对象
+     * @param className 类名
+     * @param classFileBytes class文件的byte数组
+     * @return Class对象
+     * @apiNote <pre>{@code
+     * // 从classFileBytes字节数组中加载类名为com.jmc.Student的Class对象
+     * Class<?> studentClass = Reflects.loadClass("com.jmc.Student", classFileBytes);
+     * }</pre>
+     * @since 3.1
+     */
+    public static Class<?> loadClass(String className, byte[] classFileBytes) {
+        Objs.throwsIfNullOrEmpty(classFileBytes, className);
+
+        var classLoader = new ClassLoader() {
+            @Override
+            public Class<?> loadClass(String name) throws ClassNotFoundException {
+                // 第一次调用从byte数组直接定义Class对象
+                if (name.equals(className)) {
+                    return defineClass(name, classFileBytes, 0, classFileBytes.length);
+                }
+
+                // 其他调用（由native方法调用，获取目标类的父类Class等）
+                // 直接通过默认委派机制获取
+                return super.loadClass(name);
+            }
+        };
+
+        return Tries.tryReturnsT(() -> classLoader.loadClass(className));
+    }
+
+    /**
+     * 从class文件加载Class对象
+     * @param className 类名
+     * @param classFilePath class文件路径
+     * @return Class对象
+     * @apiNote <pre>{@code
+     * // 从Student.class文件中加载类名为com.jmc.Student的Class对象
+     * Class<?> studentClass = Reflects.loadClass("com.jmc.Student", "/path/to/Student.class");
+     * }</pre>
+     * @since 3.1
+     */
+    public static Class<?> loadClass(String className, String classFilePath) {
+        return loadClass(className, Files.readToBytes(classFilePath));
     }
 
     // endregion
