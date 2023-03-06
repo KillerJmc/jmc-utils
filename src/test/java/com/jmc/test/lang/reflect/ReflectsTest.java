@@ -109,15 +109,16 @@ public class ReflectsTest {
     public void loadClassTest() {
         var className = "com.jmc.test.lang.reflect.ReflectsTest";
         var classFilePath = "build/classes/java/test/com/jmc/test/lang/reflect/ReflectsTest.class";
-        // 加载Class
+
+        // 从class文件路径加载Class
         var c = Reflects.loadClass(className, classFilePath);
         Assert.assertEquals(className, c.getName());
 
         className = "com.jmc.io.Files";
         var jarFilePath = Files.getAbsolutePath("repo/com/jmc/jmc-utils/1.0.0/jmc-utils-1.0.0.jar");
-        // 从jar文件加载Class
+
+        // 从jar文件路径加载Class
         c = Reflects.loadClassInJar(className, jarFilePath);
-        System.out.println(c);
         Assert.assertEquals(className, c.getName());
     }
 }

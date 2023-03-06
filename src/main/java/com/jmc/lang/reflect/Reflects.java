@@ -312,6 +312,8 @@ public class Reflects {
      * @since 3.2
      */
     public static Class<?> loadClassInJar(String className, String jarFilePath) {
+        Objs.throwsIfNullOrEmpty(className, jarFilePath);
+
         var classFileRelativePath = className.replace(".", "/")
                 .concat(".class");
 
