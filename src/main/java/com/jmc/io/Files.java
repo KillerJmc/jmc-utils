@@ -1987,8 +1987,9 @@ public class Files
 		/**
 		 * 子文件树列表默认的比较器
 		 */
+		@SuppressWarnings("all")
 		private static final Comparator<FileTree> DEFAULT_COMPARATOR =
-				Comparator.comparingLong(FileTree::getLength).reversed();
+				Comparator.<FileTree>comparingLong(FileTree::getLength).reversed();
 
 		private FileTree(File currFile) {
 			this.currFile = currFile;
