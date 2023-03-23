@@ -57,6 +57,28 @@ public class FilesTest {
     }
 
     @Test
+    public void createTempTest() {
+        // 创建临时文件a.txt
+        var filePath = Files.createTempFile("a.txt");
+        Assert.assertTrue(Files.exists(filePath));
+
+        // 输出文本到a.txt
+        Files.out("hello", filePath);
+        Assert.assertEquals("hello", Files.read(filePath));
+        Files.delete(filePath);
+
+        // 创建临时文件夹dir，并接收它的绝对路径
+        var dirPath = Files.createTempDir("dir");
+        Assert.assertTrue(Files.exists(dirPath));
+
+        // 在临时文件夹dir中放入文件
+        var txtPath = dirPath + "/b.txt";
+        Files.out("world", txtPath);
+        Assert.assertEquals("world", Files.read(txtPath));
+        Files.delete(dirPath);
+    }
+
+    @Test
     public void copyTest() {
         // 在./test文件夹中创建文件
         var path = getFilePath("test/a.txt");

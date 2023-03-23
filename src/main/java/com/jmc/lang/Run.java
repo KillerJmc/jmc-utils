@@ -86,4 +86,24 @@ public class Run {
 			e.printStackTrace();
 		}
     }
+
+	/**
+	 * 直接在控制台运行命令
+	 * @param command 命令字符串，不能存在双引号
+	 * @apiNote <pre>{@code
+	 * // 执行命令并打印结果
+	 * Run.execOnConsole("cmd /c echo 666");
+	 * }</pre>
+	 * @since 3.3
+	 */
+	public static void execOnConsole(String command) {
+		// 创建进程构造器，将输出流和错误流重定向到控制台
+		var processBuilder = new ProcessBuilder(command.split(" "))
+				.redirectOutput(ProcessBuilder.Redirect.INHERIT)
+				.redirectError(ProcessBuilder.Redirect.INHERIT);
+
+		// 启动进程并等待执行结束
+		var process = Tries.tryReturnsT(processBuilder::start);
+		Tries.tryThis(process::waitFor);
+	}
 }

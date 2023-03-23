@@ -123,6 +123,7 @@ import java.util.zip.ZipOutputStream;
  *                 2. 删除findDO系列方法（findMoves，findDels等）
  *                 3. 添加必要的注释提高代码可读性
  *   2023.3.6      添加getAbsolutePath方法来从相对路径获取绝对路径
+ *   2023.3.23     添加createTempFile和createTempDir方法来新建临时文件和文件夹
  * </pre>
  * @since 1.0
  * @author Jmc
@@ -1346,6 +1347,78 @@ public class Files
 	}
 
 	/**
+	 * 创建临时文件（名称是时间戳）
+	 * @return 临时文件的绝对路径
+	 * @since 3.3
+	 * @apiNote <pre>{@code
+	 * // 创建临时文件，并接收临时文件的绝对路径
+	 * var filePath = Files.createTempFile();
+	 * }</pre>
+	 */
+	public static String createTempFile() {
+		return createTempFile(String.valueOf(System.nanoTime()));
+	}
+
+	/**
+	 * 创建临时文件
+	 * @param fileName 文件名称
+	 * @return 临时文件的绝对路径
+	 * @since 3.3
+	 * @apiNote <pre>{@code
+	 * // 创建a.txt，并接收临时文件的绝对路径
+	 * var filePath = Files.createTempFile("a.txt");
+	 * }</pre>
+	 */
+	public static String createTempFile(String fileName) {
+		// 获取系统缓存目录
+		var tempDir = System.getProperty("java.io.tmpdir");
+
+		var filePath = tempDir + File.separator + fileName;
+		createFile(filePath);
+
+		return filePath;
+	}
+
+	/**
+	 * 创建临时文件夹（名称是时间戳）
+	 * @return 临时文件夹的绝对路径
+	 * @since 3.3
+	 * @apiNote <pre>{@code
+	 * // 创建临时文件夹，并接收它的绝对路径
+	 * var dirPath = Files.createTempDir();
+	 *
+	 * // 在临时文件夹中创建文件a.txt
+	 * Files.createFile(dirPath + "/a.txt");
+	 * }</pre>
+	 */
+	public static String createTempDir() {
+		return createTempDir(String.valueOf(System.nanoTime()));
+	}
+
+	/**
+	 * 创建临时文件夹
+	 * @param dirName 文件夹名称
+	 * @return 临时文件夹的绝对路径
+	 * @since 3.3
+	 * @apiNote <pre>{@code
+	 * // 创建临时文件夹dir，并接收它的绝对路径
+	 * var dirPath = Files.createTempDir("dir");
+	 *
+	 * // 在临时文件夹dir中创建文件a.txt
+	 * Files.createFile(dirPath + "/a.txt");
+	 * }</pre>
+	 */
+	public static String createTempDir(String dirName) {
+		// 获取系统缓存目录
+		var tempDir = System.getProperty("java.io.tmpdir");
+
+		var dirPath = tempDir + File.separator + dirName;
+		mkdirs(dirPath);
+
+		return dirPath;
+	}
+
+	/**
 	 * 创建多级目录
 	 * @param path 多级目录路径
 	 * @apiNote <pre>{@code
@@ -1987,9 +2060,8 @@ public class Files
 		/**
 		 * 子文件树列表默认的比较器
 		 */
-		@SuppressWarnings("all")
 		private static final Comparator<FileTree> DEFAULT_COMPARATOR =
-				Comparator.<FileTree>comparingLong(FileTree::getLength).reversed();
+				Comparator.comparingLong(FileTree::getLength).reversed();
 
 		private FileTree(File currFile) {
 			this.currFile = currFile;
