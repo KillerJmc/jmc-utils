@@ -1,6 +1,5 @@
 package com.jmc.lang;
 
-import com.jmc.io.Files;
 import lombok.AllArgsConstructor;
 
 /**
@@ -86,11 +85,11 @@ public class Outs {
         /**
          * 每种颜色对应的ANSI码
          */
-        private final String ANSI_CODE;
+        public final String ANSI_CODE;
     }
 
     /**
-     * 打印颜色字符串
+     * 打印颜色字符串（有换行）
      * @param s 指定的字符串
      * @param color 字体颜色
      * @since 3.3
@@ -116,18 +115,13 @@ public class Outs {
             return;
         }
 
-        // 创建临时文件，并将颜色字符串存入其中
-        var tempFilePath = Files.createTempFile();
-        Files.out(colorStr, tempFilePath);
-
-        // 构建打印颜色字符串的命令，具体逻辑是读取临时文件内容并打印到控制台
-        // 这样做的原因是Windows终端无法直接识别命令中的ESC(\033)
-        var printColorStrCmd = "cmd /c type " + tempFilePath;
-
-        // 执行打印命令，直接将输出结果重定向到控制台
-        Run.execOnConsole(printColorStrCmd);
-
-        // 删除临时文件
-        Files.delete(tempFilePath);
+        // 在java中直接打印ANSI颜色字符串在Windows CMD中会显示异常，因此执行时必须完全绕开java输出
+        Tries.tryThis(() -> new ProcessBuilder("cmd", "/c", "echo", colorStr)
+                // 将标准输出和错误输出都重定向到控制台，绕开java输出
+                .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                .redirectError(ProcessBuilder.Redirect.INHERIT)
+                .start()
+                .waitFor()
+        );
     }
 }

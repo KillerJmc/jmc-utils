@@ -19,11 +19,11 @@ public class OutsTest {
 
     @Test
     public void printColorStrTest() {
-        Outs.printColorStr("黑色", Outs.Color.BLACK);
-        Outs.printColorStr("红色", Outs.Color.RED);
-        Outs.printColorStr("绿色", Outs.Color.GREEN);
-        Outs.printColorStr("黄色", Outs.Color.YELLOW);
-        Outs.printColorStr("蓝色", Outs.Color.BLUE);
-        Outs.printColorStr("白色", Outs.Color.WHITE);
+        Outs.printColorStr("Black", Outs.Color.BLACK);
+        Outs.printColorStr("Red", Outs.Color.RED);
+        Outs.printColorStr("Green", Outs.Color.GREEN);
+        Outs.printColorStr("Yellow", Outs.Color.YELLOW);
+        Outs.printColorStr("Blue", Outs.Color.BLUE);
+        Outs.printColorStr("White", Outs.Color.WHITE);
     }
 }

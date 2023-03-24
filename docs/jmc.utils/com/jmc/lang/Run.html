@@ -102,14 +102,9 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">同步执行控制台命令并打印结果到控制台</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#execOnConsole(java.lang.String)" class="member-name-link">execOnConsole</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;command)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#execToStr(java.lang.String)" class="member-name-link">execToStr</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;command)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">直接在控制台运行命令</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#execToStr(java.lang.String)" class="member-name-link">execToStr</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;command)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">同步执行控制台命令</div>
 </div>
 </div>
@@ -142,7 +137,7 @@ loadScripts(document, 'script');</script>
 <dt>API Note:</dt>
 <dd><pre><code>
  // 执行命令并将结果放进字符串
- var res = Run.execToStr("cmd /c echo 777");
+ var res = Run.execToStr("cmd /c echo 你好");
  </code></pre></dd>
 </dl>
 </section>
@@ -158,25 +153,7 @@ loadScripts(document, 'script');</script>
 <dt>API Note:</dt>
 <dd><pre><code>
  // 执行命令并打印结果
- Run.exec("cmd /c echo 666");
- </code></pre></dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="execOnConsole(java.lang.String)">
-<h3>execOnConsole</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">execOnConsole</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;command)</span></div>
-<div class="block">直接在控制台运行命令</div>
-<dl class="notes">
-<dt>参数:</dt>
-<dd><code>command</code> - 命令字符串，不能存在双引号</dd>
-<dt>从以下版本开始:</dt>
-<dd>3.3</dd>
-<dt>API Note:</dt>
-<dd><pre><code>
- // 执行命令并打印结果
- Run.execOnConsole("cmd /c echo 666");
+ Run.exec("cmd /c echo 你好");
  </code></pre></dd>
 </dl>
 </section>

@@ -27,11 +27,11 @@
         {
           "name": "jmc-utils-3.3.0.jar",
           "url": "jmc-utils-3.3.0.jar",
-          "size": 153315,
-          "sha512": "620064cc88ad04f51440b7150d04d3c60df3a188de2fd779f3fa344ac623c1b9afd8a953a1c797f93e73cc604cacd7ef9b7a78faa402957287bd76a1c05573fd",
-          "sha256": "37399536b48728f19d589fbd9ab4a59c027f683670c03b4e27e1d3e90b8ae18f",
-          "sha1": "571b217121f751f4ef502fd3c78c1259fe4c9ce7",
-          "md5": "63f5da99366a092442ca64893d81f6cc"
+          "size": 153538,
+          "sha512": "fe565b8e85cabfe03de73b2003c3b8b7016ba931145e4c8109ddffee48c0e17f6c667540b0c186e5b5fa30eb7087a169f28c7dbfc9d9fb1d0cc60f2ef106aea1",
+          "sha256": "fa0ed268bf91180a615424ea10d2cd0f2fcc77bff69c3edfb3be703d8a4763df",
+          "sha1": "aca83a36a6dba7b4075fd08e0dace66d19c96aea",
+          "md5": "f9f524122e1d998527ae00e49a360b58"
         }
       ]
     },
@@ -64,11 +64,11 @@
         {
           "name": "jmc-utils-3.3.0.jar",
           "url": "jmc-utils-3.3.0.jar",
-          "size": 153315,
-          "sha512": "620064cc88ad04f51440b7150d04d3c60df3a188de2fd779f3fa344ac623c1b9afd8a953a1c797f93e73cc604cacd7ef9b7a78faa402957287bd76a1c05573fd",
-          "sha256": "37399536b48728f19d589fbd9ab4a59c027f683670c03b4e27e1d3e90b8ae18f",
-          "sha1": "571b217121f751f4ef502fd3c78c1259fe4c9ce7",
-          "md5": "63f5da99366a092442ca64893d81f6cc"
+          "size": 153538,
+          "sha512": "fe565b8e85cabfe03de73b2003c3b8b7016ba931145e4c8109ddffee48c0e17f6c667540b0c186e5b5fa30eb7087a169f28c7dbfc9d9fb1d0cc60f2ef106aea1",
+          "sha256": "fa0ed268bf91180a615424ea10d2cd0f2fcc77bff69c3edfb3be703d8a4763df",
+          "sha1": "aca83a36a6dba7b4075fd08e0dace66d19c96aea",
+          "md5": "f9f524122e1d998527ae00e49a360b58"
         }
       ]
     },
@@ -84,11 +84,11 @@
         {
           "name": "jmc-utils-3.3.0-sources.jar",
           "url": "jmc-utils-3.3.0-sources.jar",
-          "size": 64413,
-          "sha512": "9efca492d94638fe113fcfc490ee1ef67fbff6cbe96029213d5baff0cacebdd6b5cab85d2035641c06b48a8e332832781b032bdf82fe4a82041b6f08c8da81ed",
-          "sha256": "57a72e610a129a74896b5474a390b64936510102df38af591299949a2c52399e",
-          "sha1": "8a49c75242e792d50e7d8404c67534d5feca8f14",
-          "md5": "b390c55c12434dca05dd3016dbef9cfc"
+          "size": 64343,
+          "sha512": "0476f57e0f36bd2c276c0ae26761824d055b94da15dbce3ad7a6be01eaf669ebf004b2d924153564abfea821e80e7f2626d73364d58bfbccd59a2cc458a70bb5",
+          "sha256": "e18b0faef59ee093f6a92169e5d14e47896801b70fe663397d0e5ea8a1037bc2",
+          "sha1": "02e5d5b7c5c426a55f00b418a9b51e7b354432c8",
+          "md5": "a4d77358a568e00271ecb181340ce1ab"
         }
       ]
     },
@@ -104,11 +104,11 @@
         {
           "name": "jmc-utils-3.3.0-javadoc.jar",
           "url": "jmc-utils-3.3.0-javadoc.jar",
-          "size": 365995,
-          "sha512": "ee62842ae8910048191fc83ebafc90a1085f3f9808e675641c36d02561cc123eea94619d878afb2c6975fbb2ab60ef049a104ba2ae4a7480336b2ba907cc0f82",
-          "sha256": "cf92bfc60b1cee725225e49f463096047ceae94c321862a32bbbb2ada1988984",
-          "sha1": "c17bdb7ccdf1ad0eb42d3fbf7f055975fb0908d2",
-          "md5": "59508f0f59b4064bf7b6d1f912520420"
+          "size": 366086,
+          "sha512": "1aac7369a000eb105cdbb1d0c2156ca5ccb30c8f415855fa4625658a143aa56d978529dfbe07e08d2290cbd55aa1903c255e5efe30743a939f47d20e6d89ada0",
+          "sha256": "16e90ace029f78126f8edcfbcfd556791e55589d369bfc382af078cf0c6219c2",
+          "sha1": "0be3114d28307f0167cd7e9fadbbdd6c3a0361e6",
+          "md5": "990ce0ba56c76e43a849b1e775defe5b"
         }
       ]
     }

@@ -1,5 +1,6 @@
 package com.jmc.lang;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -18,36 +19,38 @@ public class Run {
 	 * @return 执行结果
 	 * @apiNote <pre>{@code
 	 * // 执行命令并将结果放进字符串
-	 * var res = Run.execToStr("cmd /c echo 777");
+	 * var res = Run.execToStr("cmd /c echo 你好");
 	 * }</pre>
 	 */
 	public static String execToStr(String command) {
-		var proc = Tries.tryReturnsT(() -> Runtime.getRuntime().exec(command));
-
+		// 存放执行结果
 		var res = new StringBuilder();
 
-		// 输出信息
-		try (var msgIn = new InputStreamReader(proc.getInputStream())) {
-			int i;
-			while ((i = msgIn.read()) != -1) {
-				res.append((char) i);
-			}
+		// 构建进程
+		var proc = Tries.tryReturnsT(() -> Runtime.getRuntime().exec(command));
+
+		// 判断系统是否为Windows
+		var isWindows = System.getProperty("os.name").contains("Windows");
+
+		// 设置输出信息编码
+		var encoding = isWindows ? "GBK" : "UTF-8";
+
+		// 获取正常信息
+		try (var msgIn = proc.getInputStream()) {
+			res.append(new String(msgIn.readAllBytes(), encoding));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// 获取错误信息
+		try (var errMsgIn = proc.getErrorStream()) {
+			res.append(new String(errMsgIn.readAllBytes(), encoding));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		// 等待程序执行结束
 		Tries.tryThis(proc::waitFor);
-
-		// 输出错误信息
-		try (var errMsgIn = new InputStreamReader(proc.getErrorStream())) {
-			int i;
-			while ((i = errMsgIn.read()) != -1) {
-				res.append((char) i);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
 		return res.toString();
 	}
@@ -57,17 +60,34 @@ public class Run {
 	 * @param command 命令字符串
 	 * @apiNote <pre>{@code
      * // 执行命令并打印结果
-	 * Run.exec("cmd /c echo 666");
+	 * Run.exec("cmd /c echo 你好");
 	 * }</pre>
 	 */
 	public static void exec(String command) {
+		// 构建进程
 		var proc = Tries.tryReturnsT(() -> Runtime.getRuntime().exec(command));
 
-		// 输出信息
-		try (var msgIn = new InputStreamReader(proc.getInputStream())) {
-			int i;
-			while ((i = msgIn.read()) != -1) {
-				System.out.print((char) i);
+		// 判断系统是否为Windows
+		var isWindows = System.getProperty("os.name").contains("Windows");
+
+		// 设置输出信息编码
+		var encoding = isWindows ? "GBK" : "UTF-8";
+
+		// 输出正常信息
+		try (var msgIn = new BufferedReader(new InputStreamReader(proc.getInputStream(), encoding))) {
+			String line;
+			while ((line = msgIn.readLine()) != null) {
+				System.out.println(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// 输出错误信息
+		try (var errMsgIn = new BufferedReader(new InputStreamReader(proc.getErrorStream(), encoding))) {
+			String line;
+			while ((line = errMsgIn.readLine()) != null) {
+				System.err.println(line);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -75,35 +95,5 @@ public class Run {
 
 		// 等待程序执行结束
 		Tries.tryThis(proc::waitFor);
-
-		// 输出错误信息
-		try (var errMsgIn = new InputStreamReader(proc.getErrorStream())) {
-			int i;
-			while ((i = errMsgIn.read()) != -1) {
-				System.err.print((char) i);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
     }
-
-	/**
-	 * 直接在控制台运行命令
-	 * @param command 命令字符串，不能存在双引号
-	 * @apiNote <pre>{@code
-	 * // 执行命令并打印结果
-	 * Run.execOnConsole("cmd /c echo 666");
-	 * }</pre>
-	 * @since 3.3
-	 */
-	public static void execOnConsole(String command) {
-		// 创建进程构造器，将输出流和错误流重定向到控制台
-		var processBuilder = new ProcessBuilder(command.split(" "))
-				.redirectOutput(ProcessBuilder.Redirect.INHERIT)
-				.redirectError(ProcessBuilder.Redirect.INHERIT);
-
-		// 启动进程并等待执行结束
-		var process = Tries.tryReturnsT(processBuilder::start);
-		Tries.tryThis(process::waitFor);
-	}
 }

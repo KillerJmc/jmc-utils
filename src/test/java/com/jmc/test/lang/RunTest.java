@@ -13,10 +13,4 @@ public class RunTest {
         var res = Run.execToStr("cmd /c echo 777");
         System.out.println(res);
     }
-
-    @Test
-    public void execOnConsoleTest() {
-        // 直接在命令行执行命令
-        Run.execOnConsole("cmd /c echo 666");
-    }
 }
