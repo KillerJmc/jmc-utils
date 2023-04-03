@@ -254,7 +254,11 @@ public class Strs {
      * }</pre>
      */
     public static String orReplace(String src, String newStr, String... oldStrs) {
-        Objs.throwsIfNullOrEmpty(src, newStr);
+        Objs.throwsIfNullOrEmpty(src);
+
+        if (newStr == null) {
+            newStr = "";
+        }
 
         for (String oldChar : oldStrs) {
             src = src.replace(oldChar, newStr);

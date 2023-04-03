@@ -43,7 +43,7 @@ public class Reflects {
         }
 
         // 获取Class对应的类路径
-        var classPath = getClassPath(c).map(URL::getPath).orElse("");
+        var classPath = getClassPathURL(c).map(URL::getPath).orElse("");
 
         // 不能反射本模块的Class
         if (classPath.contains("jmc-utils")) {
@@ -390,9 +390,12 @@ public class Reflects {
      * @since 2.6
      */
     public static boolean isClassInJar(Class<?> c) {
-        return getClassPath(c)
+        // jar的协议名称
+        var jarProtocolName = "jar";
+
+        return getClassPathURL(c)
                 .map(URL::getProtocol)
-                .map("jar"::equals)
+                .map(jarProtocolName::equals)
                 .orElseThrow(() -> new RuntimeException("找不到类加载路径"));
     }
 
@@ -408,29 +411,72 @@ public class Reflects {
      * @since 3.0
      */
     public static String getJarPath(Class<?> jarClass) {
+        // 如果类不在jar中就抛出异常
         if (!isClassInJar(jarClass)) {
             throw new RuntimeException("类 " + jarClass.getName() + " 并不在jar中！");
         }
 
-        // 类加载路径 file:///path/xxx.jar!/
-        var classPath = getClassPath(jarClass).orElseThrow().getPath();
+        // 类路径中要被移除的字符串（感叹号）
+        var removedSymbol = "!";
 
-        // 提取path/xxx.jar
-        return Strs.subExclusive(classPath, "file:///", "!/");
+        // 初始值 -> jar:file://path/to/xxx.jar!/
+        return Reflects.getClassPathURL(jarClass)
+                // 第一次去除协议 -> file://path/to/xxx.jar!/
+                .map(URL::getFile)
+                // 重新包装 -> file://path/to/xxx.jar!/
+                .map(path -> Tries.tryReturnsT(() -> new URL(path)))
+                // 第二次去除协议 -> /path/to/xxx.jar!/
+                .map(URL::getFile)
+                // 去除路径中的!符号 -> /path/to/xxx.jar/
+                .map(path -> path.replace(removedSymbol, ""))
+                // 去除Windows下可能的前驱字符（/D:/path/to/xxx.jar/ -> D:/path/to/xxx.jar/）
+                .map(File::new)
+                // 获取文件路径
+                .map(File::getAbsolutePath)
+                .orElseThrow();
     }
 
     /**
      * 获取指定类的类加载路径
      * @param c 类的Class对象
      * @return 类加载路径
+     * @since 3.4
+     * @apiNote <pre>{@code
+     * class Student {}
+     * // 获取Student类的类加载路径
+     * String classPath = Reflects.getClassPath(Student.class);
+     * }</pre>
+     */
+    public static String getClassPath(Class<?> c) {
+        // 如果类位于jar文件中
+        if (isClassInJar(c)) {
+            // jar文件的父路径就是类路径
+            return Files.getParentPath(getJarPath(c));
+        }
+
+        // 初始值 -> file://class/path/
+        return getClassPathURL(c)
+                // 去除协议 -> /class/path/
+                .map(URL::getPath)
+                // 去除Windows下可能的前驱字符（/D:/class/path/ -> D:/class/path/）
+                .map(File::new)
+                // 获取路径
+                .map(File::getAbsolutePath)
+                .orElseThrow(() -> new RuntimeException("找不到类路径"));
+    }
+
+    /**
+     * 获取指定类的类加载路径的URL
+     * @param c 类的Class对象
+     * @return 类加载路径
      * @since 2.6
      * @apiNote <pre>{@code
      * class Student {}
      * // 获取Student类的类加载路径
-     * URL url = Reflects.getClassPath(Student.class).orElseThrow();
+     * URL classPathUrl = Reflects.getClassPathURL(Student.class).orElseThrow();
      * }</pre>
      */
-    public static Optional<URL> getClassPath(Class<?> c) {
+    public static Optional<URL> getClassPathURL(Class<?> c) {
         return Optional.of(c)
                 .map(Class::getProtectionDomain)
                 .map(ProtectionDomain::getCodeSource)
@@ -498,7 +544,7 @@ public class Reflects {
      */
     public static List<URLInfo> listResources(Class<?> c, String path) {
         // 获取类加载路径
-        var classPath = getClassPath(c).orElseThrow(() -> new RuntimeException("找不到类加载路径"));
+        var classPath = getClassPathURL(c).orElseThrow(() -> new RuntimeException("找不到类加载路径"));
 
         // 处理jar路径
         if ("jar".equals(classPath.getProtocol())) {

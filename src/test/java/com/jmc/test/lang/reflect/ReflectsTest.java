@@ -74,19 +74,32 @@ public class ReflectsTest {
     @Test
     public void classPathTest() {
         // 内置类找不到类加载路径
-        Reflects.getClassPath(String.class).ifPresentOrElse(
+        Tries.tryHandlesE(() -> Reflects.getClassPath(String.class),
+                e -> System.out.println(e.getMessage()));
+
+        // 获取非在jar内的类路径
+        System.out.println(Reflects.getClassPath(this.getClass()));
+
+        // 获取在jar内的类路径
+        System.out.println(Reflects.getClassPath(Test.class));
+    }
+
+    @Test
+    public void classPathURLTest() {
+        // 内置类找不到类加载路径
+        Reflects.getClassPathURL(String.class).ifPresentOrElse(
                 System.out::println,
                 () -> System.err.println("找不到类路径")
         );
 
         // 获取非在jar内的类路径
-        Reflects.getClassPath(this.getClass()).ifPresentOrElse(
+        Reflects.getClassPathURL(this.getClass()).ifPresentOrElse(
                 System.out::println,
                 () -> { throw new RuntimeException("找不到类路径"); }
         );
 
         // 获取在jar内的类路径
-        Reflects.getClassPath(Test.class).ifPresentOrElse(
+        Reflects.getClassPathURL(Test.class).ifPresentOrElse(
                 System.out::println,
                 () -> { throw new RuntimeException("找不到类路径"); }
         );

@@ -124,6 +124,7 @@ import java.util.zip.ZipOutputStream;
  *                 3. 添加必要的注释提高代码可读性
  *   2023.3.6      添加getAbsolutePath方法来从相对路径获取绝对路径
  *   2023.3.23     添加createTempFile和createTempDir方法来新建临时文件和文件夹
+ *   2023.4.3      添加getParentPath方法来获取路径的父路径
  * </pre>
  * @since 1.0
  * @author Jmc
@@ -1475,6 +1476,20 @@ public class Files
 	}
 
 	/**
+	 * 获取指定路径的父路径
+	 * @param path 指定路径
+	 * @return 父路径
+	 * @apiNote <pre>{@code
+	 * // 获取a.txt的父路径
+	 * var parentPath = Files.getParentPath("/path/to/a.txt");
+	 * }</pre>
+	 * @since 3.4
+	 */
+	public static String getParentPath(String path) {
+		return new File(path).getParent();
+	}
+
+	/**
 	 * 从相对路径获取绝对路径
 	 * @param relativePath 相对路径
 	 * @return 绝对路径字符串
@@ -2061,7 +2076,7 @@ public class Files
 		 * 子文件树列表默认的比较器
 		 */
 		private static final Comparator<FileTree> DEFAULT_COMPARATOR =
-				Comparator.comparingLong(FileTree::getLength).reversed();
+				Comparator.<FileTree>comparingLong(fileTree -> fileTree.length).reversed();
 
 		private FileTree(File currFile) {
 			this.currFile = currFile;
