@@ -5,7 +5,7 @@ plugins {
 }
 
 group "com.jmc"
-version "3.4.0"
+version "3.4.1"
 sourceCompatibility = "16"
 
 repositories {
@@ -19,20 +19,16 @@ ext {
 }
 
 dependencies {
-    implementation "org.aspectj:aspectjrt:$aspectjVersion"
-    runtimeOnly "org.aspectj:aspectjweaver:$aspectjVersion"
-
+    implementation "org.aspectj:aspectjweaver:$aspectjVersion"
     compileOnly "org.projectlombok:lombok:$lombokVersion"
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"
 
     testImplementation "junit:junit:$junitVersion"
-    testCompileOnly "org.projectlombok:lombok:$lombokVersion"
-    testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
 }
 
-tasks.named("test") {
+test {
     // 添加AspectJ LTW的VM参数
-    jvmArgs += ["--add-opens", "java.base/java.lang=ALL-UNNAMED"]
+    jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
 }
 
 java {

@@ -3,7 +3,6 @@ package com.jmc.test.aop;
 import com.jmc.aop.DefaultArg;
 import com.jmc.aop.DefaultArgTransfer;
 import com.jmc.aop.DefaultArgsFeature;
-import lombok.Getter;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,9 +22,10 @@ public class DefaultArgsTest {
 
     // 构造方法的默认参数
     private static class TestCtor {
-        @Getter
         @SuppressWarnings("all")
         private long data;
+
+        public long getData() { return data; }
 
         public TestCtor(@DefaultArg("666") Long data) {
             this.data = data;

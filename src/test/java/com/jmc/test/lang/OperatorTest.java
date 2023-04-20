@@ -1,10 +1,10 @@
 package com.jmc.test.lang;
 
 import com.jmc.lang.Operator;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Objects;
 
 public class OperatorTest {
     @Test
@@ -186,10 +186,21 @@ public class OperatorTest {
         Assert.assertTrue(flag);
     }
 
-    @Data
-    @AllArgsConstructor
     static class Int implements Operator<Int> {
         int value;
+
+        public Int(int value) { this.value = value; }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof Int i) {
+                return value == i.value;
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() { return Objects.hash(value); }
 
         @Override
         public Int plus(Int other) {

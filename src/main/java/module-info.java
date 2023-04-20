@@ -5,7 +5,7 @@
 module jmc.utils {
     requires java.logging;
     requires jdk.attach;
-    requires org.aspectj.runtime;
+    requires org.aspectj.weaver;
     requires static lombok;
 
     exports com.jmc.aop;
