@@ -1,5 +1,7 @@
 package com.jmc.lang;
 
+import com.jmc.os.SystemInfo;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,7 +32,7 @@ public class Run {
 		var proc = Tries.tryReturnsT(() -> Runtime.getRuntime().exec(command));
 
 		// 判断系统是否为Windows
-		var isWindows = System.getProperty("os.name").contains("Windows");
+		var isWindows = SystemInfo.TYPE == SystemInfo.Type.WINDOWS;
 
 		// 设置输出信息编码
 		var encoding = isWindows ? "GBK" : "UTF-8";
@@ -68,7 +70,7 @@ public class Run {
 		var proc = Tries.tryReturnsT(() -> Runtime.getRuntime().exec(command));
 
 		// 判断系统是否为Windows
-		var isWindows = System.getProperty("os.name").contains("Windows");
+		var isWindows = SystemInfo.TYPE == SystemInfo.Type.WINDOWS;
 
 		// 设置输出信息编码
 		var encoding = isWindows ? "GBK" : "UTF-8";

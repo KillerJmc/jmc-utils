@@ -3,6 +3,7 @@ package com.jmc.lang.vm;
 import com.jmc.io.Files;
 import com.jmc.lang.Run;
 import com.jmc.lang.Tries;
+import com.jmc.os.SystemInfo;
 import com.sun.tools.attach.VirtualMachine;
 
 /**
@@ -52,11 +53,15 @@ public class JavaAgent {
      * }</pre>
      */
     public static void loadToSelf(String agentJarPath) {
+        var javaHomePropKey = "java.home";
+        var classPathPropKey = "java.class.path";
+
         // java二进制文件路径
-        var javaBinPath = System.getProperty("java.home") + "/bin/java";
+        var javaBinName = "/bin/java";
+        var javaBinPath = System.getProperty(javaHomePropKey) + javaBinName;
 
         // 类加载路径
-        var classPaths = System.getProperty("java.class.path");
+        var classPaths = System.getProperty(classPathPropKey);
 
         // 自身class的名称
         var thisClassName = JavaAgent.class.getName();
@@ -70,6 +75,13 @@ public class JavaAgent {
         var cmd = """
         "%s" -cp "%s" "%s" "%s" "%s"
         """.formatted(javaBinPath, classPaths, thisClassName, selfPid, agentJarPath);
+
+        // 如果是Linux系统，执行命令时不能带双引号
+        var isLinux = SystemInfo.TYPE == SystemInfo.Type.LINUX;
+        if (isLinux) {
+            var doubleQuotation = "\"";
+            cmd = cmd.replace(doubleQuotation, "");
+        }
 
         // 执行命令并获取执行结果
         var res = Run.execToStr(cmd);
