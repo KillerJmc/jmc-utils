@@ -9,5 +9,6 @@ com.jmc.lang.vm
 com.jmc.math
 com.jmc.math.exp
 com.jmc.net
+com.jmc.os
 com.jmc.time
 com.jmc.util
