@@ -72,14 +72,18 @@ public abstract class Array<T> implements Iterable<T> {
             return "[]";
         }
 
-        var res = new StringBuilder("[ ");
+        var leftBracket = "[ ";
+        var rightBracket = " ]";
+        var comma = ", ";
+
+        var res = new StringBuilder(leftBracket);
         for (var t : this) {
-            res.append(t).append(", ");
+            res.append(t).append(comma);
         }
 
         // 删除最后一个", "
         res.delete(res.length() - 2, res.length());
-        res.append(" ]");
+        res.append(rightBracket);
         return res.toString();
     }
 

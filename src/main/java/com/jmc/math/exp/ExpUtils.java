@@ -39,8 +39,11 @@ public class ExpUtils {
      * }</pre>
      */
     public static List<String> splitInfix(String infixExp) {
+        var spaceStr = " ";
+        var emptyStr = "";
+
         // 去除表达式空格
-        infixExp = infixExp.replace(" ", "");
+        infixExp = infixExp.replace(spaceStr, emptyStr);
         char[] cs = infixExp.toCharArray();
 
         var res = new ArrayList<String>();

@@ -18,9 +18,8 @@ public class DefaultArgsFeature {
      */
     public static void enable() {
         // 尝试获取aspectj weaver的jar中的一个class
-        var aspectjWeaverJarClass = Tries.tryReturnsT(() ->
-                Class.forName("org.aspectj.weaver.tools.WeavingClassLoader")
-        );
+        var aspectJWeaverClassName = "org.aspectj.weaver.tools.WeavingClassLoader";
+        var aspectjWeaverJarClass = Tries.tryReturnsT(() -> Class.forName(aspectJWeaverClassName));
 
         // 获取aspectj weaver的jar路径
         var aspectjAgentJarPath = Reflects.getJarPath(aspectjWeaverJarClass);

@@ -4,6 +4,7 @@ import com.jmc.io.Files;
 import com.jmc.lang.Objs;
 import com.jmc.lang.Strs;
 import com.jmc.lang.Tries;
+import com.jmc.os.SystemInfo;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,10 +44,12 @@ public class Reflects {
         }
 
         // 获取Class对应的类路径
-        var classPath = getClassPathURL(c).map(URL::getPath).orElse("");
+        var emptyStr = "";
+        var classPath = getClassPathURL(c).map(URL::getPath).orElse(emptyStr);
 
         // 不能反射本模块的Class
-        if (classPath.contains("jmc-utils")) {
+        var selfModuleName = "jmc-utils";
+        if (classPath.contains(selfModuleName)) {
             throw new RuntimeException(new IllegalAccessException("你不能反射jmc-utils模块中的类！"));
         }
     }
@@ -77,7 +80,8 @@ public class Reflects {
             return f;
         }, e -> {
             if (e instanceof InaccessibleObjectException) {
-                var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
+                String startSymbol = "opens ", endSymbol = "\"";
+                var packageName = Strs.subExclusive(e.getMessage(), startSymbol, endSymbol);
                 // Unable to make field %s accessible: module %s does not "opens %s" to unnamed module @%s
                 throw new RuntimeException("获取静态字段失败，模块 %s 并不向你开放！".formatted(packageName));
             } else {
@@ -114,7 +118,8 @@ public class Reflects {
         }, e -> {
             if (e instanceof InaccessibleObjectException) {
                 // Unable to make method %s accessible: module %s does not "opens %s" to unnamed module @%s
-                var packageName = Strs.subExclusive(e.getMessage(), "opens ", "\"");
+                String startSymbol = "opens ", endSymbol = "\"";
+                var packageName = Strs.subExclusive(e.getMessage(), startSymbol, endSymbol);
                 throw new RuntimeException("获取静态方法失败，模块 %s 并不向你开放！".formatted(packageName));
             } else {
                 throw new RuntimeException(e);
@@ -549,7 +554,16 @@ public class Reflects {
         // 处理jar路径
         if ("jar".equals(classPath.getProtocol())) {
             // 处理得到jar文件路径（jar:file:///path!/ -> path）
-            var jarFilePath = Strs.subExclusive(classPath.toString(), "jar:file:///", "!/");
+            String startSymbol = "jar:file:///", endSymbol = "!/";
+            var jarFilePath = Strs.subExclusive(classPath.toString(), startSymbol, endSymbol);
+
+            // 如果是Linux系统，在路径前加上斜杠
+            if (SystemInfo.TYPE == SystemInfo.Type.LINUX) {
+                var slash = "/";
+                if (!jarFilePath.startsWith(slash)) {
+                    jarFilePath = slash + jarFilePath;
+                }
+            }
 
             // 读取jar文件
             try (var jarFile = new JarFile(jarFilePath)) {
@@ -579,7 +593,8 @@ public class Reflects {
                             // 通过拼接类路径和文件/文件夹名来构建URL
                             var url = Tries.tryReturnsT(() -> new URL(classPath, entryName));
                             // 获取文件/文件夹名
-                            var name = entry.isDirectory() ? Strs.subExclusive(entryName, rootPath, "/")
+                            var dirEndSymbol = "/";
+                            var name = entry.isDirectory() ? Strs.subExclusive(entryName, rootPath, dirEndSymbol)
                                     : Strs.subExclusive(entryName, rootPath);
                             // 获取是否为文件的标识
                             var isFile = !entry.isDirectory();
