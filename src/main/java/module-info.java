@@ -18,6 +18,8 @@ module jmc.utils {
     exports com.jmc.math;
     exports com.jmc.math.exp;
     exports com.jmc.net;
+    exports com.jmc.os;
     exports com.jmc.time;
     exports com.jmc.util;
+
 }
