@@ -125,6 +125,7 @@ import java.util.zip.ZipOutputStream;
  *   2023.3.6      添加getAbsolutePath方法来从相对路径获取绝对路径
  *   2023.3.23     添加createTempFile和createTempDir方法来新建临时文件和文件夹
  *   2023.4.3      添加getParentPath方法来获取路径的父路径
+ *   2023.7.12     添加isFile和isDir方法
  * </pre>
  * @since 1.0
  * @author Jmc
@@ -1344,6 +1345,7 @@ public class Files
 	 * @see #createFile(String)
 	 */
 	public static void createFile(File f) {
+		Objs.throwsIfNullOrEmpty(f);
 		createFile(f.getAbsolutePath());
 	}
 
@@ -1472,7 +1474,57 @@ public class Files
 	 * @see #exists(String)
 	 */
 	public static boolean exists(File f) {
-		return exists(f.getAbsolutePath());
+		return f != null && exists(f.getAbsolutePath());
+	}
+
+	/**
+	 * 判断路径是否是文件
+	 * @param path 文件路径
+	 * @return 是否是文件
+	 * @apiNote <pre>{@code
+	 * // 判断a.txt是否是文件
+	 * boolean res = Files.isFile("/path/to/a.txt");
+	 * }</pre>
+	 * @since 3.6
+	 */
+	public static boolean isFile(String path) {
+		return exists(path) && new File(path).isFile();
+	}
+
+	/**
+	 * 判断路径是否是文件
+	 * @param f 路径的File对象
+	 * @return 是否是文件
+	 * @since 3.6
+	 * @see #isFile(String)
+	 */
+	public static boolean isFile(File f) {
+		return f != null && isFile(f.getAbsolutePath());
+	}
+
+	/**
+	 * 判断路径是否是文件夹
+	 * @param path 文件路径
+	 * @return 是否是文件夹
+	 * @apiNote <pre>{@code
+	 * // 判断a是否是文件夹
+	 * boolean res = Files.isDir("/path/to/a");
+	 * }</pre>
+	 * @since 3.6
+	 */
+	public static boolean isDir(String path) {
+		return exists(path) && new File(path).isDirectory();
+	}
+
+	/**
+	 * 判断路径是否是文件夹
+	 * @param f 路径的File对象
+	 * @return 是否是文件夹
+	 * @since 3.6
+	 * @see #isDir(String)
+	 */
+	public static boolean isDir(File f) {
+		return f != null && isDir(f.getAbsolutePath());
 	}
 
 	/**
@@ -1586,6 +1638,7 @@ public class Files
 	 * @see #getEncoding(String)
 	 */
 	public static Optional<Charset> getEncoding(File f) {
+		Objs.throwsIfNullOrEmpty(f);
 		return getEncoding(f.getAbsolutePath());
 	}
 

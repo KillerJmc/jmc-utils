@@ -141,7 +141,7 @@ public class FilesTest {
     }
 
     @Test
-    public void fileAddrTest() {
+    public void fileAttrTest() {
         // 显示文件/文件夹信息
         System.out.println(Files.fileInfo("."));
 
@@ -161,7 +161,13 @@ public class FilesTest {
         Files.setEncoding(path, StandardCharsets.UTF_16);
         Assert.assertEquals(StandardCharsets.UTF_16BE, Files.getEncoding(path).orElseThrow());
 
+        // 通过文件编码获取文件内容
         Assert.assertEquals("666", Files.read(path, StandardCharsets.UTF_16));
+
+        // 判断是否是文件
+        Assert.assertTrue(Files.isFile(path));
+        // 判断是否是文件夹
+        Assert.assertFalse(Files.isDir(path));
 
         Files.delete(path);
         Assert.assertFalse(Files.exists(path));
