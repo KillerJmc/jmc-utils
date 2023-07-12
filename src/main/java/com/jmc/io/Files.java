@@ -125,7 +125,8 @@ import java.util.zip.ZipOutputStream;
  *   2023.3.6      添加getAbsolutePath方法来从相对路径获取绝对路径
  *   2023.3.23     添加createTempFile和createTempDir方法来新建临时文件和文件夹
  *   2023.4.3      添加getParentPath方法来获取路径的父路径
- *   2023.7.12     添加isFile和isDir方法
+ *   2023.7.12     1. 添加isFile和isDir方法
+ *                 2. 删除findInfo方法
  * </pre>
  * @since 1.0
  * @author Jmc
@@ -204,7 +205,7 @@ public class Files
 
         // 检查路径是否存在
         if (!src.exists()) {
-        	throw new RuntimeException("源文件不存在，复制失败");
+			throw new RuntimeException("源文件不存在，复制失败");
 		}
 
         // 创建目标文件
@@ -222,7 +223,7 @@ public class Files
 
 			// 如果是小文件
             if (src.length() < LARGE_FILE_SIZE) {
-            	copySmallFile(src, des);
+				copySmallFile(src, des);
 			} else {
 				copyLargeFile(src, des);
 			}
@@ -232,9 +233,9 @@ public class Files
 			// 线程池
 			var pool = Executors.newFixedThreadPool(MAX_OPERATING_AMOUNT);
 
-        	// 复制文件夹
+			// 复制文件夹
 			new Object() {
-            	void loop(File srcDir, File desDir) {
+				void loop(File srcDir, File desDir) {
 					File[] fs = srcDir.listFiles();
 					if (fs == null) {
 						throw new RuntimeException("展开文件夹失败");
@@ -295,7 +296,7 @@ public class Files
 		// 日志信息
 		log(() -> "正在复制大文件: " + src.getAbsolutePath());
 
-		/*
+        /*
 		1. 采用磁盘映射 -> 内存的Buffer, 直接用指针方式控制该Buffer（Linux: mmap），从而取消Buffer和JVM的双向复制过程
 
 		2. 此方法方便于in.transferTo，因为受硬件限制，transferTo在Windows和Linux下均限制每次最多只能复制2GB
@@ -410,7 +411,7 @@ public class Files
 	 * }</pre>
 	 */
     public static void rename(String filePath, String newName) {
-    	Objs.throwsIfNullOrEmpty("文件路径和新名称不能为空", filePath, newName);
+		Objs.throwsIfNullOrEmpty("文件路径和新名称不能为空", filePath, newName);
 
         // 创建源文件
         File file = new File(filePath);
@@ -460,7 +461,7 @@ public class Files
 
         // 判断要删除的文件是否存在
         if (!f.exists()) {
-        	throw new RuntimeException("要删除的文件不存在！");
+			throw new RuntimeException("要删除的文件不存在！");
 		}
 
         // 记录开始时间
@@ -761,7 +762,7 @@ public class Files
         File src = new File(zipPath);
         // 判断是否存在
         if (!src.exists()) {
-        	throw new RuntimeException("zip文件不存在!");
+			throw new RuntimeException("zip文件不存在!");
 		}
 
         // 创建zip文件
@@ -1222,68 +1223,6 @@ public class Files
 	// endregion
 
 	// region attr
-
-	/**
-	 * 文件信息
-	 * @param path 文件/文件夹路径
-	 * @return 包含文件信息的字符串
-	 * @apiNote <pre>{@code
-	 * // 获取a.txt文件信息
-	 * var info = Files.fileInfo("./a.txt");
-	 *
-	 * // 获取a目录的信息
-	 * var info2 = Files.fileInfo("/path/to/a");
-	 * }</pre>
-	 */
-	public static String fileInfo(String path) {
-		File src = new File(path);
-		if (!src.exists()) {
-			throw new RuntimeException("路径不存在！");
-		}
-
-		// 文件夹临时列表
-		List<File> temp = new ArrayList<>();
-
-		// 文件总大小 文件个数 文件夹个数
-		long length = 0, files = 0, dirs = 0;
-
-		long startTime = System.currentTimeMillis();
-
-		if (src.isDirectory()) {
-			temp.add(src);
-			while (!temp.isEmpty()){
-				var list = temp.remove(0).listFiles();
-				if (list == null) {
-					return null;
-				}
-
-				for (File f : list) {
-					if (f.isDirectory()){
-						temp.add(f);
-						dirs++;
-					} else {
-						length += f.length();
-						files++;
-					}
-				}
-			}
-		} else {
-			files = 1;
-			length = src.length();
-		}
-
-		long endTime = System.currentTimeMillis();
-
-		return String.format("""
-      
-		正在统计：%s
-		
-		共%d个文件
-		%d个文件夹
-		大小为%s (%s个字节)
-		本次统计耗时%d秒
-		""", src.getName(), files, dirs, lengthFormatter(length), new DecimalFormat().format(length), (endTime - startTime) / 1000);
-	}
 
 	/**
 	 * 文件长度转换
@@ -1931,55 +1870,6 @@ public class Files
 	 */
 	public static File findAny(File dir, String contains) {
 		return findAny(dir.getAbsolutePath(), contains);
-	}
-
-	/**
-	 * 搜索文件和文件夹并保存结果到字符串
-	 * @param dirPath 搜索文件夹路径
-	 * @param contains 文件或文件夹包含内容
-	 * @return 字符串形式的搜索结果
-	 * @apiNote <pre>{@code
-	 * // 在a目录中搜索包含jmc的文件和文件夹并获取搜索结果字符串
-	 * var res = Files.findInfo("/path/to/a", "jmc");
-	 * }</pre>
-	 */
-	public static String findInfo(String dirPath, String contains) {
-		Objs.throwsIfNullOrEmpty("搜索内容不能为null", contains);
-
-		long startTime = System.currentTimeMillis();
-		var map = Files.findAll(dirPath, contains);
-		var sb = new StringBuilder();
-
-		var dirList = map.dirs();
-		var fileList = map.files();
-
-		sb.append("文件夹：\n");
-		for (File d : dirList) {
-			sb.append(d.getAbsolutePath()).append("\n");
-		}
-
-		sb.append("\n文件：\n");
-		for (File f : fileList) {
-			sb.append(f.getAbsolutePath()).append("\n");
-		}
-
-		long endTime = System.currentTimeMillis();
-		sb.append("\n共搜索到\n").append(dirList.size()).append("个文件夹\n")
-				.append(fileList.size()).append("个文件")
-				.append("\n本次搜索耗时").append((int) (endTime - startTime) / 1000).append("秒\n");
-
-		return sb.toString();
-	}
-
-	/**
-	 * 搜索文件和文件夹并保存结果到字符串
-	 * @param dir 搜索文件夹的File对象
-	 * @param contains 文件或文件夹名称包含内容
-	 * @return 字符串形式的搜索结果
-	 * @see #findInfo(String, String)
-	 */
-	public static String findInfo(File dir, String contains) {
-		return findInfo(dir.getAbsolutePath(), contains);
 	}
 
 	// endregion

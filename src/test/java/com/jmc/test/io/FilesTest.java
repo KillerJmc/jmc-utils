@@ -142,9 +142,6 @@ public class FilesTest {
 
     @Test
     public void fileAttrTest() {
-        // 显示文件/文件夹信息
-        System.out.println(Files.fileInfo("."));
-
         // 把字节长度变为人类可读的长度
         Assert.assertEquals("97.66KB", Files.lengthFormatter(100000));
         Assert.assertEquals("123B", Files.lengthFormatter(123));
@@ -181,9 +178,6 @@ public class FilesTest {
                 .stream()
                 .limit(3)
                 .forEach(System.out::println);
-
-        // 找到所有.下的含有java的文件/文件夹并打印仔细信息
-        System.out.println(Files.findInfo(".", "java"));
 
         // 找出.下的任意一个.java文件
         System.out.println(Files.findAny(".", ".java"));
