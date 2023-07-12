@@ -128,6 +128,7 @@ import java.util.zip.ZipOutputStream;
  *   2023.7.12     1. 添加isFile和isDir方法
  *                 2. 删除findInfo方法
  *                 3. 添加getLength和getFileInfo方法
+ *                 4. 添加getReadableLength方法
  * </pre>
  * @since 1.0
  * @author Jmc
@@ -1226,33 +1227,6 @@ public class Files
 	// region attr
 
 	/**
-	 * 文件长度转换
-	 * @param length 文件字节大小
-	 * @return 格式化后的文件长度
-	 * @apiNote <pre>{@code
-	 * // 将100000字节转换成人类可读文件大小 -> "2KB"
-	 * String res = Files.lengthFormatter(2048);
-	 * }</pre>
-	 */
-	public static String lengthFormatter(long length) {
-		long B = 1, KB = B * 1024, MB = KB * 1024,
-				GB = MB * 1024, TB = GB * 1024,
-				PB = TB * 1024, EB = PB * 1024;
-
-		// 以下代码由ChatGPT生成
-		String[] units = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
-		int idx = 0;
-		double size = length;
-
-		while (size >= 1024 && idx < units.length - 1) {
-			size /= 1024;
-			idx++;
-		}
-
-		return new DecimalFormat("#.##").format(size) + units[idx];
-	}
-
-	/**
 	 * 创建新文件
 	 * @param path 新文件路径
 	 * @since 1.8
@@ -1575,6 +1549,66 @@ public class Files
 
 		// 返回文件/文件夹长度
 		return isFile(path) ? new File(path).length() : getFileInfo(path).totalLength();
+	}
+
+	/**
+	 * 获取文件/文件夹的字节长度
+	 * @param src 文件/文件夹的File对象
+	 * @return 文件/文件夹字节长度
+	 * @since 3.6
+	 * @see #getLength(String)
+	 */
+	public static long getLength(File src) {
+		Objs.throwsIfNullOrEmpty(src);
+		return getLength(src.getAbsolutePath());
+	}
+
+	/**
+	 * 获取文件/文件夹的人类可读长度
+	 * @param path 文件/文件夹路径
+	 * @return 文件/文件夹的人类可读长度
+	 * @since 3.6
+	 */
+	public static String getReadableLength(String path) {
+		return lengthFormatter(getLength(path));
+	}
+
+	/**
+	 * 获取文件/文件夹的人类可读长度
+	 * @param src 文件/文件夹的File对象
+	 * @return 文件/文件夹的人类可读长度
+	 * @since 3.6
+	 * @see #getReadableLength(String)
+	 */
+	public static String getReadableLength(File src) {
+		return lengthFormatter(getLength(src));
+	}
+
+	/**
+	 * 文件长度转换
+	 * @param length 文件字节大小
+	 * @return 格式化后的文件长度字符串
+	 * @apiNote <pre>{@code
+	 * // 将100000字节转换成人类可读文件大小 -> "2KB"
+	 * String res = Files.lengthFormatter(2048);
+	 * }</pre>
+	 */
+	private static String lengthFormatter(long length) {
+		long B = 1, KB = B * 1024, MB = KB * 1024,
+				GB = MB * 1024, TB = GB * 1024,
+				PB = TB * 1024, EB = PB * 1024;
+
+		// 以下代码由ChatGPT生成
+		String[] units = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
+		int idx = 0;
+		double size = length;
+
+		while (size >= 1024 && idx < units.length - 1) {
+			size /= 1024;
+			idx++;
+		}
+
+		return new DecimalFormat("#.##").format(size) + units[idx];
 	}
 
 	/**

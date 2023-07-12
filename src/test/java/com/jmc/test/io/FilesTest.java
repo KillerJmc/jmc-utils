@@ -142,11 +142,6 @@ public class FilesTest {
 
     @Test
     public void fileAttrTest() {
-        // 把字节长度变为人类可读的长度
-        Assert.assertEquals("97.66KB", Files.lengthFormatter(100000));
-        Assert.assertEquals("123B", Files.lengthFormatter(123));
-        Assert.assertEquals("2KB", Files.lengthFormatter(2048));
-
         var path = getFilePath("a.txt");
         Files.out("666", path);
 
@@ -161,6 +156,12 @@ public class FilesTest {
 
         // 获取文件大小
         Assert.assertEquals(3L, Files.getLength(path));
+
+        // 显示人类可读文件夹大小
+        System.out.println(Files.getReadableLength("."));
+
+        // 显示人类可读文件大小
+        System.out.println(Files.getReadableLength(path));
 
         // 获取文件编码
         var encoding = Files.getEncoding(path).orElseThrow();
