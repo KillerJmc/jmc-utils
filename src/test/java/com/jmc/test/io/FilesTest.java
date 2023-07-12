@@ -150,6 +150,18 @@ public class FilesTest {
         var path = getFilePath("a.txt");
         Files.out("666", path);
 
+        // 显示文件夹信息
+        System.out.println(Files.getFileInfo("."));
+
+        // 显示文件信息
+        System.out.println(Files.getFileInfo(path));
+
+        // 获取文件夹大小
+        System.out.println(Files.getLength("."));
+
+        // 获取文件大小
+        Assert.assertEquals(3L, Files.getLength(path));
+
         // 获取文件编码
         var encoding = Files.getEncoding(path).orElseThrow();
         Assert.assertEquals(encoding, StandardCharsets.UTF_8);

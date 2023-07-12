@@ -127,6 +127,7 @@ import java.util.zip.ZipOutputStream;
  *   2023.4.3      添加getParentPath方法来获取路径的父路径
  *   2023.7.12     1. 添加isFile和isDir方法
  *                 2. 删除findInfo方法
+ *                 3. 添加getLength和getFileInfo方法
  * </pre>
  * @since 1.0
  * @author Jmc
@@ -1464,6 +1465,116 @@ public class Files
 	 */
 	public static boolean isDir(File f) {
 		return f != null && isDir(f.getAbsolutePath());
+	}
+
+	/**
+	 * 文件信息
+	 * @param path 文件/文件夹路径
+	 * @return FileInfo对象
+	 * @apiNote <pre>{@code
+	 * // 获取a目录的信息
+	 * FileInfo info = Files.getFileInfo("/path/to/a");
+	 * long fileCount = fileInfo.fileCount();
+	 * long dirCount = fileInfo.dirCount();
+	 * long totalLength = fileInfo.totalLength();
+	 *
+	 * // 获取b.txt文件的信息
+	 * FileInfo info2 = Files.getFileInfo("./b.txt");
+	 * long
+	 * }</pre>
+	 * @since 3.6
+	 */
+	public static FileInfo getFileInfo(String path) {
+		// 检查路径是否存在
+		if (!exists(path)) {
+			throw new RuntimeException("路径不存在！");
+		}
+
+		return FileInfo.of(path);
+	}
+
+	/**
+	 * 文件信息
+	 * @param src 文件/文件夹的File对象
+	 * @return FileInfo对象
+	 * @since 3.6
+	 * @see #getFileInfo(String)
+	 */
+	public static FileInfo getFileInfo(File src) {
+		Objs.throwsIfNullOrEmpty(src);
+		return getFileInfo(src.getAbsolutePath());
+	}
+
+	/**
+	 * 文件详细信息类
+	 * @param fileCount 文件数量
+	 * @param dirCount 文件夹数量
+	 * @param totalLength 文件总长度
+	 * @since 3.6
+	 */
+	public record FileInfo(long fileCount, long dirCount, long totalLength) {
+		/**
+		 * 创建文件详细信息类实例
+		 * @param path 文件/文件夹路径
+		 * @return 创建的实例
+		 */
+		private static FileInfo of(String path) {
+			// 如果是文件直接返回
+			if (isFile(path)) {
+				return new FileInfo(1L, 0L, getLength(path));
+			}
+
+			// 文件夹临时列表
+			var tempDirList = new ArrayList<>(List.of(new File(path)));
+
+			// 文件数量，文件夹数量和文件总长度
+			long fileCount = 0, dirCount = 0, totalLength = 0;
+
+			// 不断遍历文件夹临时列表
+			while (!tempDirList.isEmpty()){
+				var dir = tempDirList.remove(0);
+
+				var list = dir.listFiles();
+				if (list == null) {
+					// 打印错误信息
+					System.err.println("展开文件夹失败：" + dir.getAbsolutePath());
+					continue;
+				}
+
+				for (var f : list) {
+					if (f.isDirectory()){
+						dirCount++;
+						tempDirList.add(f);
+					} else {
+						fileCount++;
+						totalLength += f.length();
+					}
+				}
+			}
+			return new FileInfo(fileCount, dirCount, totalLength);
+		}
+	}
+
+	/**
+	 * 获取文件/文件夹的字节长度
+	 * @param path 文件/文件夹路径
+	 * @return 文件/文件夹字节长度
+	 * @apiNote <pre>{@code
+	 * // 获取a.jpg的文件字节长度
+	 * long length = Files.getLength("/path/to/a.jpg");
+	 * // 获取b文件夹的字节总长度
+	 * long length = Files.getLength("/path/to/b");
+	 * }</pre>
+	 * @since 3.6
+	 */
+	public static long getLength(String path) {
+		// 判断路径是否存在
+		if (!exists(path)) {
+			throw new RuntimeException("文件不存在：" + path);
+		}
+
+		// 返回文件/文件夹长度
+		return isFile(path) ? new File(path).length() : getFileInfo(path).totalLength();
 	}
 
 	/**
