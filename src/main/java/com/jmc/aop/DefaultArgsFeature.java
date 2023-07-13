@@ -5,8 +5,7 @@ import com.jmc.lang.reflect.Reflects;
 import com.jmc.lang.vm.JavaAgent;
 
 /**
- * 默认参数特性配置类 <br>
- * 基于Aspectj LTW，需要手动指定VM参数：--add-opens java.base/java.lang=ALL-UNNAMED
+ * 默认参数特性配置类
  * @since 3.0
  * @see DefaultArg
  * @author Jmc
@@ -14,7 +13,8 @@ import com.jmc.lang.vm.JavaAgent;
 public class DefaultArgsFeature {
     /**
      * 开启默认参数特性（@DefaultArg） <br>
-     * 注意：如果是Spring Boot项目，需要在启动类run方法调用之前调用该方法！
+     * 基于Aspectj LTW，需要手动指定VM参数：--add-opens java.base/java.lang=ALL-UNNAMED <br>
+     * 注意：请勿在使用特性的类中调用，请在其被JVM加载前调用！
      */
     public static void enable() {
         // 尝试获取aspectj weaver的jar中的一个class

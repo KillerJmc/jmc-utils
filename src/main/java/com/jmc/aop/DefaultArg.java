@@ -8,16 +8,18 @@ import java.lang.annotation.Target;
 /**
  * 默认参数注解
  * @apiNote <pre>{@code
- * // 开启默认参数特性
+ * // 开启默认参数特性（必须在使用类加载前调用！）
  * DefaultArgsFeature.enable();
  *
- * // 定义默认参数方法
- * long add(@DefaultArg("3") Long a, @DefaultArg("4") Long b) {
- *     return a + b;
+ * // 在另一个类中定义默认参数方法
+ * class Other {
+ *     static long add(@DefaultArg("3") Long a, @DefaultArg("4") Long b) {
+ *         return a + b;
+ *     }
  * }
  *
  * // 调用默认参数方法，结果是7
- * Assert.assertEquals(7, add(null, null));
+ * Assert.assertEquals(7, Other.add(null, null));
  * }</pre>
  * @since 3.0
  * @author Jmc
