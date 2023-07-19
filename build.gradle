@@ -26,21 +26,22 @@ dependencies {
     testImplementation "junit:junit:$junitVersion"
 }
 
-test {
-    // 添加AspectJ LTW的VM参数
-    jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
-}
-
 java {
     withSourcesJar()
     withJavadocJar()
 }
 
+test {
+    // AspectJ Weaver
+    jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
+}
+
 javadoc {
-    options.encoding = "UTF-8"
     destinationDir = file("docs")
-    // 添加javadoc注解 @apiNote
-    options.tags = ["apiNote:a:API Note:"]
+    options {
+        encoding = "UTF-8"
+        tags = ["apiNote:a:API Note:"]
+    }
 }
 
 publishing {
