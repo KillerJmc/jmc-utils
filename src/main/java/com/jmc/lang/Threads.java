@@ -25,14 +25,14 @@ public class Threads {
 
     /**
      * 线程以特定时间单位休眠一段时间，直接抛出中断异常
-     * @param unit 时间单位
      * @param timeout 休眠时间
+     * @param unit 时间单位
      * @apiNote <pre>{@code
      * // 让当前线程睡眠3分钟
-     * Threads.sleep(TimeUnit.MINUTES, 3);
+     * Threads.sleep(3, TimeUnit.MINUTES);
      * }</pre>
      */
-    public static void sleep(TimeUnit unit, long timeout) {
+    public static void sleep(long timeout, TimeUnit unit) {
         Tries.tryThis(() -> unit.sleep(timeout));
     }
 }
