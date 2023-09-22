@@ -5,7 +5,7 @@ plugins {
 }
 
 group "com.jmc"
-version "3.6.1"
+version "3.7.0"
 sourceCompatibility = "17"
 
 repositories {
