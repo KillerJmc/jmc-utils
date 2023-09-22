@@ -25,7 +25,8 @@ Providing a great number of utility classes to simplify the daily development. (
 | **Binary Conversion (Binary)**                       | Provides methods for the conversion between binary strings and numbers. |
 | **Time Conversion (Time)**                           | Provides methods for the conversion between **LocalDateTime**, **millisecond value**, **formatted time string**. |
 | **Random Number Generation (Rand)**                  | Provides a method for generating random numbers in a specified range. |
-| **Running Timers (Timers)**                          | Provide **second**, **millisecond**, **nanosecond** level code running timers. |
+| **Running Timers (Timers)**                          | Provides **second**, **millisecond**, **nanosecond** level code running timers. |
+| **Tuple Sequence (Tuple)**                           | Provides a sequence combining values of **different types**. |
 
 
 
