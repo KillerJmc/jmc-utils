@@ -41,8 +41,9 @@ javadoc {
 
 publishing {
     publications {
-        release(MavenPublication) {
-            from components.java
+        create("release", MavenPublication) {
+                var java = (SoftwareComponent) components["java"]
+                from java
         }
     }
 
