@@ -4,21 +4,22 @@ plugins {
     id "io.freefair.aspectj.post-compile-weaving" version "6.6.2"
 }
 
-group "com.jmc"
-version "3.7.1"
-sourceCompatibility = "17"
+projectInfo {
+    group = "com.jmc"
+    version = "3.7.1"
+}
 
 repositories {
     mavenCentral()
 }
 
-ext {
-    aspectjVersion = "1.9.21.1"
-    lombokVersion = "1.18.24"
-    junitVersion = "4.13.2"
-}
-
 dependencies {
+    ext {
+        aspectjVersion = "1.9.21.1"
+        lombokVersion = "1.18.24"
+        junitVersion = "4.13.2"
+    }
+
     implementation "org.aspectj:aspectjweaver:$aspectjVersion"
     compileOnly "org.projectlombok:lombok:$lombokVersion"
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"
@@ -27,6 +28,7 @@ dependencies {
 }
 
 java {
+    sourceCompatibility JavaVersion.VERSION_17
     withSourcesJar()
     withJavadocJar()
 }
@@ -42,8 +44,7 @@ javadoc {
 publishing {
     publications {
         create("release", MavenPublication) {
-                var java = (SoftwareComponent) components["java"]
-                from java
+                from((SoftwareComponent) components["java"])
         }
     }
 
@@ -52,4 +53,9 @@ publishing {
             url = "$rootDir/repo"
         }
     }
+}
+
+def projectInfo(Closure closure) {
+    closure.delegate = project
+    closure()
 }
