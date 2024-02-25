@@ -6,12 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 默认参数注解
+ * 默认参数注解 <br>
+ * 基于Aspectj LTW，会拦截正在加载中的类进行增强
  * @apiNote <pre>{@code
- * // 开启默认参数特性（必须在使用类加载前调用！）
+ * // 开启默认参数特性
  * DefaultArgsFeature.enable();
  *
- * // 在另一个类中定义默认参数方法
+ * // 在另一个类（尚未被加载的类）中定义默认参数方法
  * class Other {
  *     static long add(@DefaultArg("3") Long a, @DefaultArg("4") Long b) {
  *         return a + b;

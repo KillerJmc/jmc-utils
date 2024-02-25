@@ -13,8 +13,8 @@ import com.jmc.lang.vm.JavaAgent;
 public class DefaultArgsFeature {
     /**
      * 开启默认参数特性（@DefaultArg） <br>
-     * 基于Aspectj LTW <br>
-     * 注意：请勿在使用特性的类中调用，请在其被JVM加载前调用！
+     * 基于Aspectj LTW，会拦截正在加载中的类进行增强 <br>
+     * 注意：请勿在调用此开启方法的类方法上使用@DefaultArg，因为该类已经加载完而无法被增强！
      */
     public static void enable() {
         // 尝试获取aspectj weaver的jar中的一个class
