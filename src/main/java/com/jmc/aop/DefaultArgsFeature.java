@@ -13,7 +13,7 @@ import com.jmc.lang.vm.JavaAgent;
 public class DefaultArgsFeature {
     /**
      * 开启默认参数特性（@DefaultArg） <br>
-     * 基于Aspectj LTW，需要手动指定VM参数：--add-opens java.base/java.lang=ALL-UNNAMED <br>
+     * 基于Aspectj LTW <br>
      * 注意：请勿在使用特性的类中调用，请在其被JVM加载前调用！
      */
     public static void enable() {
