@@ -28,7 +28,7 @@ dependencies {
 }
 
 java {
-    sourceCompatibility JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_17
     withSourcesJar()
     withJavadocJar()
 }
@@ -44,7 +44,7 @@ javadoc {
 publishing {
     publications {
         create("release", MavenPublication) {
-                from((SoftwareComponent) components["java"])
+            from((SoftwareComponent) components["java"])
         }
     }
 
