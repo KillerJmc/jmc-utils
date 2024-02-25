@@ -5,7 +5,7 @@ plugins {
 }
 
 group "com.jmc"
-version "3.7.0"
+version "3.7.1"
 sourceCompatibility = "17"
 
 repositories {
@@ -13,7 +13,7 @@ repositories {
 }
 
 ext {
-    aspectjVersion = "1.9.19"
+    aspectjVersion = "1.9.21.1"
     lombokVersion = "1.18.24"
     junitVersion = "4.13.2"
 }
@@ -29,11 +29,6 @@ dependencies {
 java {
     withSourcesJar()
     withJavadocJar()
-}
-
-test {
-    // AspectJ Weaver
-    jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
 }
 
 javadoc {
