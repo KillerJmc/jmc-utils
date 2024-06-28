@@ -26,7 +26,7 @@ package com.jmc.lang.ref;
  *     invokeAdd(addFunc, 2, 3);
  *
  *     // 绑定一个方法和参数作为函数指针
- *     var bindFunc = Func.bind(this::add, 3, 4);
+ *     var bindFunc = Func.partial(this::add, 3, 4);
  *     // 执行这个函数指针并指定返回值（7）
  *     int res2 = bindFunc.invoke();
  *
@@ -500,13 +500,13 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param t 参数
      * @param <T> 参数类型
      * @return 函数引用实例
      */
-    public static <T> Func<Void> bind(Void1<T> m, T t) {
+    public static <T> Func<Void> partial(Void1<T> m, T t) {
         return new Func<>() {
             @Override
             public Void invoke(Object... args) {
@@ -518,7 +518,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param t 参数1
      * @param u 参数2
@@ -526,7 +526,7 @@ public abstract class Func<R> {
      * @param <U> 参数2类型
      * @return 函数引用实例
      */
-    public static <T, U> Func<Void> bind(Void2<T, U> m, T t, U u) {
+    public static <T, U> Func<Void> partial(Void2<T, U> m, T t, U u) {
         return new Func<>() {
             @Override
             public Void invoke(Object... args) {
@@ -538,7 +538,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param t 参数1
      * @param u 参数2
@@ -548,7 +548,7 @@ public abstract class Func<R> {
      * @param <V> 参数3类型
      * @return 函数引用实例
      */
-    public static <T, U, V> Func<Void> bind(Void3<T, U, V> m, T t, U u, V v) {
+    public static <T, U, V> Func<Void> partial(Void3<T, U, V> m, T t, U u, V v) {
         return new Func<>() {
             @Override
             public Void invoke(Object... args) {
@@ -560,7 +560,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param t 参数1
      * @param u 参数2
@@ -572,7 +572,7 @@ public abstract class Func<R> {
      * @param <W> 参数4类型
      * @return 函数引用实例
      */
-    public static <T, U, V, W> Func<Void> bind(Void4<T, U, V, W> m, T t, U u, V v, W w) {
+    public static <T, U, V, W> Func<Void> partial(Void4<T, U, V, W> m, T t, U u, V v, W w) {
         return new Func<>() {
             @Override
             public Void invoke(Object... args) {
@@ -584,7 +584,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param t 参数1
      * @param u 参数2
@@ -598,7 +598,7 @@ public abstract class Func<R> {
      * @param <X> 参数5类型
      * @return 函数引用实例
      */
-    public static <T, U, V, W, X> Func<Void> bind(Void5<T, U, V, W, X> m, T t, U u, V v, W w, X x) {
+    public static <T, U, V, W, X> Func<Void> partial(Void5<T, U, V, W, X> m, T t, U u, V v, W w, X x) {
         return new Func<>() {
             @Override
             public Void invoke(Object... args) {
@@ -610,7 +610,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param t 参数1
      * @param u 参数2
@@ -626,7 +626,7 @@ public abstract class Func<R> {
      * @param <Y> 参数6类型
      * @return 函数引用实例
      */
-    public static <T, U, V, W, X, Y> Func<Void> bind(Void6<T, U, V, W, X, Y> m, T t, U u, V v, W w, X x, Y y) {
+    public static <T, U, V, W, X, Y> Func<Void> partial(Void6<T, U, V, W, X, Y> m, T t, U u, V v, W w, X x, Y y) {
         return new Func<>() {
             @Override
             public Void invoke(Object... args) {
@@ -638,7 +638,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param t 参数1
      * @param u 参数2
@@ -656,7 +656,7 @@ public abstract class Func<R> {
      * @param <Z> 参数7类型
      * @return 函数引用实例
      */
-    public static <T, U, V, W, X, Y, Z> Func<Void> bind(Void7<T, U, V, W, X, Y, Z> m, T t, U u, V v, W w, X x, Y y, Z z) {
+    public static <T, U, V, W, X, Y, Z> Func<Void> partial(Void7<T, U, V, W, X, Y, Z> m, T t, U u, V v, W w, X x, Y y, Z z) {
         return new Func<>() {
             @Override
             public Void invoke(Object... args) {
@@ -668,14 +668,14 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param t 参数
      * @param <T> 参数类型
      * @param <R> 返回值类型
      * @return 函数引用实例
      */
-    public static <T, R> Func<R> bind(Object1<T, R> m, T t) {
+    public static <T, R> Func<R> partial(Object1<T, R> m, T t) {
         return new Func<>() {
             @Override
             public R invoke(Object... args) {
@@ -686,7 +686,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param t 参数1
      * @param u 参数2
@@ -695,7 +695,7 @@ public abstract class Func<R> {
      * @param <R> 返回值类型
      * @return 函数引用实例
      */
-    public static <T, U, R> Func<R> bind(Object2<T, U, R> m, T t, U u) {
+    public static <T, U, R> Func<R> partial(Object2<T, U, R> m, T t, U u) {
         return new Func<>() {
             @Override
             public R invoke(Object... args) {
@@ -706,7 +706,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param t 参数1
      * @param u 参数2
@@ -717,7 +717,7 @@ public abstract class Func<R> {
      * @param <R> 返回值类型
      * @return 函数引用实例
      */
-    public static <T, U, V, R> Func<R> bind(Object3<T, U, V, R> m, T t, U u, V v) {
+    public static <T, U, V, R> Func<R> partial(Object3<T, U, V, R> m, T t, U u, V v) {
         return new Func<>() {
             @Override
             public R invoke(Object... args) {
@@ -728,7 +728,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param t 参数1
      * @param u 参数2
@@ -741,7 +741,7 @@ public abstract class Func<R> {
      * @param <R> 返回值类型
      * @return 函数引用实例
      */
-    public static <T, U, V, W, R> Func<R> bind(Object4<T, U, V, W, R> m, T t, U u, V v, W w) {
+    public static <T, U, V, W, R> Func<R> partial(Object4<T, U, V, W, R> m, T t, U u, V v, W w) {
         return new Func<>() {
             @Override
             public R invoke(Object... args) {
@@ -752,7 +752,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param t 参数1
      * @param u 参数2
@@ -767,7 +767,7 @@ public abstract class Func<R> {
      * @param <R> 返回值类型
      * @return 函数引用实例
      */
-    public static <T, U, V, W, X, R> Func<R> bind(Object5<T, U, V, W, X, R> m, T t, U u, V v, W w, X x) {
+    public static <T, U, V, W, X, R> Func<R> partial(Object5<T, U, V, W, X, R> m, T t, U u, V v, W w, X x) {
         return new Func<>() {
             @Override
             public R invoke(Object... args) {
@@ -778,7 +778,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param t 参数1
      * @param u 参数2
@@ -795,7 +795,7 @@ public abstract class Func<R> {
      * @param <R> 返回值类型
      * @return 函数引用实例
      */
-    public static <T, U, V, W, X, Y, R> Func<R> bind(Object6<T, U, V, W, X, Y, R> m, T t, U u, V v, W w, X x, Y y) {
+    public static <T, U, V, W, X, Y, R> Func<R> partial(Object6<T, U, V, W, X, Y, R> m, T t, U u, V v, W w, X x, Y y) {
         return new Func<>() {
             @Override
             public R invoke(Object... args) {
@@ -806,7 +806,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param t 参数1
      * @param u 参数2
@@ -825,7 +825,7 @@ public abstract class Func<R> {
      * @param <R> 返回值类型
      * @return 函数引用实例
      */
-    public static <T, U, V, W, X, Y, Z, R> Func<R> bind(Object7<T, U, V, W, X, Y, Z, R> m, T t, U u, V v, W w, X x, Y y, Z z) {
+    public static <T, U, V, W, X, Y, Z, R> Func<R> partial(Object7<T, U, V, W, X, Y, Z, R> m, T t, U u, V v, W w, X x, Y y, Z z) {
         return new Func<>() {
             @Override
             public R invoke(Object... args) {
@@ -836,14 +836,14 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块（含数字参数的）
      * @param t 数字参数
      * @param <T> 数字类型
      * @return 函数引用实例
      * @since 1.4
      */
-    public static <T extends Number> Func<T> bind(Number1<T> m, T t) {
+    public static <T extends Number> Func<T> partial(Number1<T> m, T t) {
         return new Func<>() {
             @Override
             public T invoke(Object... args) {
@@ -854,7 +854,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块（含数字参数的）
      * @param t1 数字参数1
      * @param t2 数字参数2
@@ -862,7 +862,7 @@ public abstract class Func<R> {
      * @return 函数引用实例
      * @since 1.4
      */
-    public static <T extends Number> Func<T> bind(Number2<T> m, T t1, T t2) {
+    public static <T extends Number> Func<T> partial(Number2<T> m, T t1, T t2) {
         return new Func<>() {
             @Override
             public T invoke(Object... args) {
@@ -873,7 +873,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块（含数字参数的）
      * @param t1 数字参数1
      * @param t2 数字参数2
@@ -882,7 +882,7 @@ public abstract class Func<R> {
      * @return 函数引用实例
      * @since 1.4
      */
-    public static <T extends Number> Func<T> bind(Number3<T> m, T t1, T t2, T t3) {
+    public static <T extends Number> Func<T> partial(Number3<T> m, T t1, T t2, T t3) {
         return new Func<>() {
             @Override
             public T invoke(Object... args) {
@@ -893,7 +893,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块（含数字参数的）
      * @param t1 数字参数1
      * @param t2 数字参数2
@@ -903,7 +903,7 @@ public abstract class Func<R> {
      * @return 函数引用实例
      * @since 1.4
      */
-    public static <T extends Number> Func<T> bind(Number4<T> m, T t1, T t2, T t3, T t4) {
+    public static <T extends Number> Func<T> partial(Number4<T> m, T t1, T t2, T t3, T t4) {
         return new Func<>() {
             @Override
             public T invoke(Object... args) {
@@ -914,7 +914,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块（含数字参数的）
      * @param t1 数字参数1
      * @param t2 数字参数2
@@ -925,7 +925,7 @@ public abstract class Func<R> {
      * @return 函数引用实例
      * @since 1.4
      */
-    public static <T extends Number> Func<T> bind(Number5<T> m, T t1, T t2, T t3, T t4, T t5) {
+    public static <T extends Number> Func<T> partial(Number5<T> m, T t1, T t2, T t3, T t4, T t5) {
         return new Func<>() {
             @Override
             public T invoke(Object... args) {
@@ -936,7 +936,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块（含数字参数的）
      * @param t1 数字参数1
      * @param t2 数字参数2
@@ -948,7 +948,7 @@ public abstract class Func<R> {
      * @return 函数引用实例
      * @since 1.4
      */
-    public static <T extends Number> Func<T> bind(Number6<T> m, T t1, T t2, T t3, T t4, T t5, T t6) {
+    public static <T extends Number> Func<T> partial(Number6<T> m, T t1, T t2, T t3, T t4, T t5, T t6) {
         return new Func<>() {
             @Override
             public T invoke(Object... args) {
@@ -959,7 +959,7 @@ public abstract class Func<R> {
     }
 
     /**
-     * 返回一个绑定参数的函数引用实例
+     * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块（含数字参数的）
      * @param t1 数字参数1
      * @param t2 数字参数2
@@ -972,7 +972,7 @@ public abstract class Func<R> {
      * @return 函数引用实例
      * @since 1.4
      */
-    public static <T extends Number> Func<T> bind(Number7<T> m, T t1, T t2, T t3, T t4, T t5, T t6, T t7) {
+    public static <T extends Number> Func<T> partial(Number7<T> m, T t1, T t2, T t3, T t4, T t5, T t6, T t7) {
         return new Func<>() {
             @Override
             public T invoke(Object... args) {

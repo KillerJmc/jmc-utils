@@ -26,7 +26,7 @@ public class FuncTest {
     @Test
     public void bindTest() {
         // 绑定方法引用并绑定参数
-        var sum = Func.bind(Integer::sum, 3, 4);
+        var sum = Func.partial(Integer::sum, 3, 4);
         System.out.println(sum.invoke());
     }
 }
