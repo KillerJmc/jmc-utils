@@ -20,6 +20,7 @@ package com.jmc.aop;
  * }</pre>
  * @since 3.0
  * @author Jmc
+ * @param <T> 对应参数转换结果的类型
  */
 public class DefaultArgTransfer<T> {
     /**
