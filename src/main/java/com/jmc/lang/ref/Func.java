@@ -1,10 +1,14 @@
 package com.jmc.lang.ref;
 
+import com.jmc.lang.Tries;
+
+import java.util.Arrays;
+import java.util.stream.Stream;
+
 /**
  * 函数引用 <br><br>
  * 可将方法作为参数传入另一个方法以便调用，且支持直接传入lambda <br>
- * （参数均必须小于等于7个，支持传入基本数据类型）<br>
- * 提供了of和bind方法
+ * （参数均必须小于等于7个，支持传入基本数据类型）
  * @apiNote <pre>{@code
  * // add方法
  * public int add(int a, int b) {
@@ -25,19 +29,19 @@ package com.jmc.lang.ref;
  *     // 将函数指针传入方法
  *     invokeAdd(addFunc, 2, 3);
  *
- *     // 绑定一个方法和参数作为函数指针
- *     var bindFunc = Func.partial(this::add, 3, 4);
- *     // 执行这个函数指针并指定返回值（7）
- *     int res2 = bindFunc.invoke();
+ *     // 绑定一个方法和其中一个参数作为偏函数指针
+ *     var bindFunc = Func.partial(this::add, 3);
+ *     // 传入剩余参数，执行这个函数指针并获得返回值（7）
+ *     int res2 = bindFunc.invoke(4);
  *
  *     // 绑定一个lambda作为函数指针
  *     var lambdaFunc = Func.of((String a, String b) -> a + b);
- *     // 执行这个函数指针并指定返回值（"12"）
+ *     // 执行这个函数指针并获得返回值（"12"）
  *     String res3 = lambdaFunc.invoke("1", "2");
  *
  *     // 绑定一个纯基本数据类型的lambda作为函数指针（需要补充泛型）
  *     var numberLambdaFunc = Func.<Long>of((a, b) -> a - b);
- *     // 执行这个函数指针并获取返回值（3）
+ *     // 执行这个函数指针并获得返回值（3）
  *     long res4 = numberLambdaFunc.invoke(7L, 4L);
  * }
  * }</pre>
@@ -51,21 +55,62 @@ public abstract class Func<R> {
     private Func() {}
 
     /**
-     * 抽象的执行方法
+     * 执行方法
      * @param args 参数
      * @return 返回值
      */
     public abstract R invoke(Object... args);
 
     /**
-     * 检查参数个数是否匹配
+     * 使用反射调用执行方法
+     * @param funcInterfaceObj 承载函数的接口对象
+     * @param args 参数
+     * @return 返回值
+     * @since 3.8
+     */
+    protected R invokeUsingReflection(Object funcInterfaceObj, Object... args) {
+        var invokeMethodName = "invoke";
+
+        return (R) Tries.tryReturnsT(() -> {
+            var funcClass = funcInterfaceObj.getClass();
+            var methods = funcClass.getDeclaredMethods();
+            for (var method : methods) {
+                if (method.getName().equals(invokeMethodName)) {
+                    method.setAccessible(true);
+                    return method.invoke(funcInterfaceObj, args);
+                }
+            }
+            throw new RuntimeException("没有找到执行方法：" + invokeMethodName);
+        });
+    }
+
+    /**
+     * 检查调用方法的参数个数是否匹配
      * @param realSize 实际参数个数
      * @param assertSize 需要参数个数
      */
-    private static void checkParams(int realSize, int assertSize) {
+    protected static void checkInvokeParams(int realSize, int assertSize) {
         if (realSize != assertSize) {
             throw new IllegalArgumentException("调用参数个数不匹配，需要%d个，实际提供了%d个".formatted(assertSize, realSize));
         }
+    }
+
+    /**
+     * 检查partial方法的参数列表是否合法
+     * @param args    参数列表
+     * @param maxArgSize 最大参数个数
+     * @return 参数列表
+     * @since 3.8
+     */
+    private static Object[] checkPartialParams(Object[] args, int maxArgSize) {
+        if (args == null) {
+            args = new Object[0];
+        }
+        if (args.length > maxArgSize) {
+            throw new IllegalArgumentException("调用参数过多，最多%d个，实际提供了%d个"
+                    .formatted(maxArgSize, args.length));
+        }
+        return args;
     }
 
     /**
@@ -77,7 +122,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public Void invoke(Object... args) {
-                checkParams(args.length, 0);
+                checkInvokeParams(args.length, 0);
                 m.invoke();
                 return null;
             }
@@ -94,7 +139,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public Void invoke(Object... args) {
-                checkParams(args.length, 1);
+                checkInvokeParams(args.length, 1);
                 m.invoke((T) args[0]);
                 return null;
             }
@@ -112,7 +157,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public Void invoke(Object... args) {
-                checkParams(args.length, 2);
+                checkInvokeParams(args.length, 2);
                 m.invoke((T) args[0], (U) args[1]);
                 return null;
             }
@@ -131,7 +176,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public Void invoke(Object... args) {
-                checkParams(args.length, 3);
+                checkInvokeParams(args.length, 3);
                 m.invoke((T) args[0], (U) args[1], (V) args[2]);
                 return null;
             }
@@ -151,7 +196,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public Void invoke(Object... args) {
-                checkParams(args.length, 4);
+                checkInvokeParams(args.length, 4);
                 m.invoke((T) args[0], (U) args[1], (V) args[2], (W) args[3]);
                 return null;
             }
@@ -172,7 +217,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public Void invoke(Object... args) {
-                checkParams(args.length, 5);
+                checkInvokeParams(args.length, 5);
                 m.invoke((T) args[0], (U) args[1], (V) args[2], (W) args[3], (X) args[4]);
                 return null;
             }
@@ -194,7 +239,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public Void invoke(Object... args) {
-                checkParams(args.length, 6);
+                checkInvokeParams(args.length, 6);
                 m.invoke((T) args[0], (U) args[1], (V) args[2], (W) args[3], (X) args[4], (Y) args[5]);
                 return null;
             }
@@ -217,7 +262,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public Void invoke(Object... args) {
-                checkParams(args.length, 7);
+                checkInvokeParams(args.length, 7);
                 m.invoke((T) args[0], (U) args[1], (V) args[2], (W) args[3], (X) args[4], (Y) args[5], (Z) args[6]);
                 return null;
             }
@@ -234,7 +279,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public R invoke(Object... args) {
-                checkParams(args.length, 0);
+                checkInvokeParams(args.length, 0);
                 return m.invoke();
             }
         };
@@ -251,7 +296,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public R invoke(Object... args) {
-                checkParams(args.length, 1);
+                checkInvokeParams(args.length, 1);
                 return m.invoke((T) args[0]);
             }
         };
@@ -269,7 +314,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public R invoke(Object... args) {
-                checkParams(args.length, 2);
+                checkInvokeParams(args.length, 2);
                 return m.invoke((T) args[0], (U) args[1]);
             }
         };
@@ -288,7 +333,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public R invoke(Object... args) {
-                checkParams(args.length, 3);
+                checkInvokeParams(args.length, 3);
                 return m.invoke((T) args[0], (U) args[1], (V) args[2]);
             }
         };
@@ -308,7 +353,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public R invoke(Object... args) {
-                checkParams(args.length, 4);
+                checkInvokeParams(args.length, 4);
                 return m.invoke((T) args[0], (U) args[1], (V) args[2], (W) args[3]);
             }
         };
@@ -329,7 +374,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public R invoke(Object... args) {
-                checkParams(args.length, 5);
+                checkInvokeParams(args.length, 5);
                 return m.invoke((T) args[0], (U) args[1], (V) args[2], (W) args[3], (X) args[4]);
             }
         };
@@ -351,7 +396,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public R invoke(Object... args) {
-                checkParams(args.length, 6);
+                checkInvokeParams(args.length, 6);
                 return m.invoke((T) args[0], (U) args[1], (V) args[2], (W) args[3], (X) args[4], (Y) args[5]);
             }
         };
@@ -374,8 +419,9 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public R invoke(Object... args) {
-                checkParams(args.length, 7);
-                return m.invoke((T) args[0], (U) args[1], (V) args[2], (W) args[3], (X) args[4], (Y) args[5], (Z) args[6]);
+                checkInvokeParams(args.length, 7);
+                return m.invoke((T) args[0], (U) args[1], (V) args[2],
+                        (W) args[3], (X) args[4], (Y) args[5], (Z) args[6]);
             }
         };
     }
@@ -391,7 +437,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public T invoke(Object... args) {
-                checkParams(args.length, 1);
+                checkInvokeParams(args.length, 1);
                 return m.invoke((T) args[0]);
             }
         };
@@ -408,7 +454,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public T invoke(Object... args) {
-                checkParams(args.length, 2);
+                checkInvokeParams(args.length, 2);
                 return m.invoke((T) args[0], (T) args[1]);
             }
         };
@@ -425,7 +471,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public T invoke(Object... args) {
-                checkParams(args.length, 3);
+                checkInvokeParams(args.length, 3);
                 return m.invoke((T) args[0], (T) args[1], (T) args[2]);
             }
         };
@@ -442,7 +488,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public T invoke(Object... args) {
-                checkParams(args.length, 4);
+                checkInvokeParams(args.length, 4);
                 return m.invoke((T) args[0], (T) args[1], (T) args[2], (T) args[3]);
             }
         };
@@ -459,7 +505,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public T invoke(Object... args) {
-                checkParams(args.length, 5);
+                checkInvokeParams(args.length, 5);
                 return m.invoke((T) args[0], (T) args[1], (T) args[2], (T) args[3], (T) args[4]);
             }
         };
@@ -476,7 +522,7 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public T invoke(Object... args) {
-                checkParams(args.length, 6);
+                checkInvokeParams(args.length, 6);
                 return m.invoke((T) args[0], (T) args[1], (T) args[2], (T) args[3], (T) args[4], (T) args[5]);
             }
         };
@@ -493,194 +539,32 @@ public abstract class Func<R> {
         return new Func<>() {
             @Override
             public T invoke(Object... args) {
-                checkParams(args.length, 7);
-                return m.invoke((T) args[0], (T) args[1], (T) args[2], (T) args[3], (T) args[4], (T) args[5], (T) args[6]);
+                checkInvokeParams(args.length, 7);
+                return m.invoke((T) args[0], (T) args[1], (T) args[2],
+                        (T) args[3], (T) args[4], (T) args[5], (T) args[6]);
             }
         };
     }
 
     /**
-     * 返回一个绑定部分或者所有参数的函数引用实例
-     * @param m 方法引用或代码块
-     * @param t 参数
-     * @param <T> 参数类型
-     * @return 函数引用实例
-     */
-    public static <T> Func<Void> partial(Void1<T> m, T t) {
-        return new Func<>() {
-            @Override
-            public Void invoke(Object... args) {
-                checkParams(args.length, 0);
-                m.invoke(t);
-                return null;
-            }
-        };
-    }
-
-    /**
-     * 返回一个绑定部分或者所有参数的函数引用实例
-     * @param m 方法引用或代码块
-     * @param t 参数1
-     * @param u 参数2
-     * @param <T> 参数1类型
-     * @param <U> 参数2类型
-     * @return 函数引用实例
-     */
-    public static <T, U> Func<Void> partial(Void2<T, U> m, T t, U u) {
-        return new Func<>() {
-            @Override
-            public Void invoke(Object... args) {
-                checkParams(args.length, 0);
-                m.invoke(t, u);
-                return null;
-            }
-        };
-    }
-
-    /**
-     * 返回一个绑定部分或者所有参数的函数引用实例
-     * @param m 方法引用或代码块
-     * @param t 参数1
-     * @param u 参数2
-     * @param v 参数3
-     * @param <T> 参数1类型
-     * @param <U> 参数2类型
-     * @param <V> 参数3类型
-     * @return 函数引用实例
-     */
-    public static <T, U, V> Func<Void> partial(Void3<T, U, V> m, T t, U u, V v) {
-        return new Func<>() {
-            @Override
-            public Void invoke(Object... args) {
-                checkParams(args.length, 0);
-                m.invoke(t, u, v);
-                return null;
-            }
-        };
-    }
-
-    /**
-     * 返回一个绑定部分或者所有参数的函数引用实例
-     * @param m 方法引用或代码块
-     * @param t 参数1
-     * @param u 参数2
-     * @param v 参数3
-     * @param w 参数4
-     * @param <T> 参数1类型
-     * @param <U> 参数2类型
-     * @param <V> 参数3类型
-     * @param <W> 参数4类型
-     * @return 函数引用实例
-     */
-    public static <T, U, V, W> Func<Void> partial(Void4<T, U, V, W> m, T t, U u, V v, W w) {
-        return new Func<>() {
-            @Override
-            public Void invoke(Object... args) {
-                checkParams(args.length, 0);
-                m.invoke(t, u, v, w);
-                return null;
-            }
-        };
-    }
-
-    /**
-     * 返回一个绑定部分或者所有参数的函数引用实例
-     * @param m 方法引用或代码块
-     * @param t 参数1
-     * @param u 参数2
-     * @param v 参数3
-     * @param w 参数4
-     * @param x 参数5
-     * @param <T> 参数1类型
-     * @param <U> 参数2类型
-     * @param <V> 参数3类型
-     * @param <W> 参数4类型
-     * @param <X> 参数5类型
-     * @return 函数引用实例
-     */
-    public static <T, U, V, W, X> Func<Void> partial(Void5<T, U, V, W, X> m, T t, U u, V v, W w, X x) {
-        return new Func<>() {
-            @Override
-            public Void invoke(Object... args) {
-                checkParams(args.length, 0);
-                m.invoke(t, u, v, w, x);
-                return null;
-            }
-        };
-    }
-
-    /**
-     * 返回一个绑定部分或者所有参数的函数引用实例
-     * @param m 方法引用或代码块
-     * @param t 参数1
-     * @param u 参数2
-     * @param v 参数3
-     * @param w 参数4
-     * @param x 参数5
-     * @param y 参数6
-     * @param <T> 参数1类型
-     * @param <U> 参数2类型
-     * @param <V> 参数3类型
-     * @param <W> 参数4类型
-     * @param <X> 参数5类型
-     * @param <Y> 参数6类型
-     * @return 函数引用实例
-     */
-    public static <T, U, V, W, X, Y> Func<Void> partial(Void6<T, U, V, W, X, Y> m, T t, U u, V v, W w, X x, Y y) {
-        return new Func<>() {
-            @Override
-            public Void invoke(Object... args) {
-                checkParams(args.length, 0);
-                m.invoke(t, u, v, w, x, y);
-                return null;
-            }
-        };
-    }
-
-    /**
-     * 返回一个绑定部分或者所有参数的函数引用实例
-     * @param m 方法引用或代码块
-     * @param t 参数1
-     * @param u 参数2
-     * @param v 参数3
-     * @param w 参数4
-     * @param x 参数5
-     * @param y 参数6
-     * @param z 参数7
-     * @param <T> 参数1类型
-     * @param <U> 参数2类型
-     * @param <V> 参数3类型
-     * @param <W> 参数4类型
-     * @param <X> 参数5类型
-     * @param <Y> 参数6类型
-     * @param <Z> 参数7类型
-     * @return 函数引用实例
-     */
-    public static <T, U, V, W, X, Y, Z> Func<Void> partial(Void7<T, U, V, W, X, Y, Z> m, T t, U u, V v, W w, X x, Y y, Z z) {
-        return new Func<>() {
-            @Override
-            public Void invoke(Object... args) {
-                checkParams(args.length, 0);
-                m.invoke(t, u, v, w, x, y, z);
-                return null;
-            }
-        };
-    }
-
-    /**
-     * 返回一个绑定部分或者所有参数的函数引用实例
-     * @param m 方法引用或代码块
-     * @param t 参数
-     * @param <T> 参数类型
+     * 获取偏函数的调用对象
+     * @param funcInterfaceObj 承载函数的接口对象
+     * @param partialArgs 偏函数的前置参数
+     * @param maxArgSize 函数最多参数个数
+     * @return 偏函数调用对象
      * @param <R> 返回值类型
-     * @return 函数引用实例
+     * @since 3.8
      */
-    public static <T, R> Func<R> partial(Object1<T, R> m, T t) {
+    private static <R> Func<R> getPartialFunc(Object funcInterfaceObj, Object[] partialArgs, int maxArgSize) {
+        var validPartialArgs = checkPartialParams(partialArgs, maxArgSize);
+
         return new Func<>() {
             @Override
             public R invoke(Object... args) {
-                checkParams(args.length, 0);
-                return m.invoke(t);
+                checkInvokeParams(args.length, maxArgSize - validPartialArgs.length);
+                var completedArgs = Stream.concat(Arrays.stream(validPartialArgs), Arrays.stream(args))
+                        .toArray(Object[]::new);
+                return invokeUsingReflection(funcInterfaceObj, completedArgs);
             }
         };
     }
@@ -688,303 +572,252 @@ public abstract class Func<R> {
     /**
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
-     * @param t 参数1
-     * @param u 参数2
-     * @param <T> 参数1类型
-     * @param <U> 参数2类型
-     * @param <R> 返回值类型
+     * @param args 参数列表
      * @return 函数引用实例
+     * @since 3.8
      */
-    public static <T, U, R> Func<R> partial(Object2<T, U, R> m, T t, U u) {
-        return new Func<>() {
-            @Override
-            public R invoke(Object... args) {
-                checkParams(args.length, 0);
-                return m.invoke(t, u);
-            }
-        };
+    public static Func<Void> partial(Void1<?> m, Object... args) {
+        return getPartialFunc(m, args, 1);
     }
 
     /**
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
-     * @param t 参数1
-     * @param u 参数2
-     * @param v 参数3
-     * @param <T> 参数1类型
-     * @param <U> 参数2类型
-     * @param <V> 参数3类型
-     * @param <R> 返回值类型
+     * @param args 参数列表
      * @return 函数引用实例
+     * @since 3.8
      */
-    public static <T, U, V, R> Func<R> partial(Object3<T, U, V, R> m, T t, U u, V v) {
-        return new Func<>() {
-            @Override
-            public R invoke(Object... args) {
-                checkParams(args.length, 0);
-                return m.invoke(t, u, v);
-            }
-        };
+    public static Func<Void> partial(Void2<?, ?> m, Object... args) {
+        return getPartialFunc(m, args, 2);
     }
 
     /**
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
-     * @param t 参数1
-     * @param u 参数2
-     * @param v 参数3
-     * @param w 参数4
-     * @param <T> 参数1类型
-     * @param <U> 参数2类型
-     * @param <V> 参数3类型
-     * @param <W> 参数4类型
-     * @param <R> 返回值类型
+     * @param args 参数列表
      * @return 函数引用实例
+     * @since 3.8
      */
-    public static <T, U, V, W, R> Func<R> partial(Object4<T, U, V, W, R> m, T t, U u, V v, W w) {
-        return new Func<>() {
-            @Override
-            public R invoke(Object... args) {
-                checkParams(args.length, 0);
-                return m.invoke(t, u, v, w);
-            }
-        };
+    public static Func<Void> partial(Void3<?, ?, ?> m, Object... args) {
+        return getPartialFunc(m, args, 3);
     }
 
     /**
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
-     * @param t 参数1
-     * @param u 参数2
-     * @param v 参数3
-     * @param w 参数4
-     * @param x 参数5
-     * @param <T> 参数1类型
-     * @param <U> 参数2类型
-     * @param <V> 参数3类型
-     * @param <W> 参数4类型
-     * @param <X> 参数5类型
-     * @param <R> 返回值类型
+     * @param args 参数列表
      * @return 函数引用实例
+     * @since 3.8
      */
-    public static <T, U, V, W, X, R> Func<R> partial(Object5<T, U, V, W, X, R> m, T t, U u, V v, W w, X x) {
-        return new Func<>() {
-            @Override
-            public R invoke(Object... args) {
-                checkParams(args.length, 0);
-                return m.invoke(t, u, v, w, x);
-            }
-        };
+    public static Func<Void> partial(Void4<?, ?, ?, ?> m, Object... args) {
+        return getPartialFunc(m, args, 4);
     }
 
     /**
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
-     * @param t 参数1
-     * @param u 参数2
-     * @param v 参数3
-     * @param w 参数4
-     * @param x 参数5
-     * @param y 参数6
-     * @param <T> 参数1类型
-     * @param <U> 参数2类型
-     * @param <V> 参数3类型
-     * @param <W> 参数4类型
-     * @param <X> 参数5类型
-     * @param <Y> 参数6类型
-     * @param <R> 返回值类型
+     * @param args 参数列表
      * @return 函数引用实例
+     * @since 3.8
      */
-    public static <T, U, V, W, X, Y, R> Func<R> partial(Object6<T, U, V, W, X, Y, R> m, T t, U u, V v, W w, X x, Y y) {
-        return new Func<>() {
-            @Override
-            public R invoke(Object... args) {
-                checkParams(args.length, 0);
-                return m.invoke(t, u, v, w, x, y);
-            }
-        };
+    public static Func<Void> partial(Void5<?, ?, ?, ?, ?> m, Object... args) {
+        return getPartialFunc(m, args, 5);
     }
 
     /**
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
-     * @param t 参数1
-     * @param u 参数2
-     * @param v 参数3
-     * @param w 参数4
-     * @param x 参数5
-     * @param y 参数6
-     * @param z 参数7
-     * @param <T> 参数1类型
-     * @param <U> 参数2类型
-     * @param <V> 参数3类型
-     * @param <W> 参数4类型
-     * @param <X> 参数5类型
-     * @param <Y> 参数6类型
-     * @param <Z> 参数7类型
+     * @param args 参数列表
+     * @return 函数引用实例
+     * @since 3.8
+     */
+    public static Func<Void> partial(Void6<?, ?, ?, ?, ?, ?> m, Object... args) {
+        return getPartialFunc(m, args, 6);
+    }
+
+    /**
+     * 返回一个绑定部分或者所有参数的函数引用实例
+     * @param m 方法引用或代码块
+     * @param args 参数列表
+     * @return 函数引用实例
+     * @since 3.8
+     */
+    public static Func<Void> partial(Void7<?, ?, ?, ?, ?, ?, ?> m, Object... args) {
+        return getPartialFunc(m, args, 7);
+    }
+
+    /**
+     * 返回一个绑定部分或者所有参数的函数引用实例
+     * @param m 方法引用或代码块
+     * @param args 参数列表
      * @param <R> 返回值类型
      * @return 函数引用实例
+     * @since 3.8
      */
-    public static <T, U, V, W, X, Y, Z, R> Func<R> partial(Object7<T, U, V, W, X, Y, Z, R> m, T t, U u, V v, W w, X x, Y y, Z z) {
-        return new Func<>() {
-            @Override
-            public R invoke(Object... args) {
-                checkParams(args.length, 0);
-                return m.invoke(t, u, v, w, x, y, z);
-            }
-        };
+    public static <R> Func<R> partial(Object1<?, R> m, Object... args) {
+        return getPartialFunc(m, args, 1);
+    }
+
+    /**
+     * 返回一个绑定部分或者所有参数的函数引用实例
+     * @param m 方法引用或代码块
+     * @param args 参数列表
+     * @param <R> 返回值类型
+     * @return 函数引用实例
+     * @since 3.8
+     */
+    public static <T, U, R> Func<R> partial(Object2<?, ?, R> m, Object... args) {
+        return getPartialFunc(m, args, 2);
+    }
+
+    /**
+     * 返回一个绑定部分或者所有参数的函数引用实例
+     * @param m 方法引用或代码块
+     * @param args 参数列表
+     * @param <R> 返回值类型
+     * @return 函数引用实例
+     * @since 3.8
+     */
+    public static <R> Func<R> partial(Object3<?, ?, ?, R> m, Object... args) {
+        return getPartialFunc(m, args, 3);
+    }
+
+    /**
+     * 返回一个绑定部分或者所有参数的函数引用实例
+     * @param m 方法引用或代码块
+     * @param args 参数列表
+     * @param <R> 返回值类型
+     * @return 函数引用实例
+     * @since 3.8
+     */
+    public static <R> Func<R> partial(Object4<?, ?, ?, ?, R> m, Object... args) {
+        return getPartialFunc(m, args, 4);
+    }
+
+    /**
+     * 返回一个绑定部分或者所有参数的函数引用实例
+     * @param m 方法引用或代码块
+     * @param args 参数列表
+     * @param <R> 返回值类型
+     * @return 函数引用实例
+     * @since 3.8
+     */
+    public static <R> Func<R> partial(Object5<?, ?, ?, ?, ?, R> m, Object... args) {
+        return getPartialFunc(m, args, 5);
+    }
+
+    /**
+     * 返回一个绑定部分或者所有参数的函数引用实例
+     * @param m 方法引用或代码块
+     * @param args 参数列表
+     * @param <R> 返回值类型
+     * @return 函数引用实例
+     * @since 3.8
+     */
+    public static <R> Func<R> partial(Object6<?, ?, ?, ?, ?, ?, R> m, Object... args) {
+        return getPartialFunc(m, args, 6);
+    }
+
+    /**
+     * 返回一个绑定部分或者所有参数的函数引用实例
+     * @param m 方法引用或代码块
+     * @param args 参数列表
+     * @param <R> 返回值类型
+     * @return 函数引用实例
+     * @since 3.8
+     */
+    public static <R> Func<R> partial(Object7<?, ?, ?, ?, ?, ?, ?, R> m, Object... args) {
+        return getPartialFunc(m, args, 7);
     }
 
     /**
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块（含数字参数的）
-     * @param t 数字参数
+     * @param args 参数列表
      * @param <T> 数字类型
      * @return 函数引用实例
-     * @since 1.4
+     * @since 3.8
      */
-    public static <T extends Number> Func<T> partial(Number1<T> m, T t) {
-        return new Func<>() {
-            @Override
-            public T invoke(Object... args) {
-                checkParams(args.length, 0);
-                return m.invoke(t);
-            }
-        };
+    public static <T extends Number> Func<T> partial(Number1<T> m, T... args) {
+        return getPartialFunc(m, args, 1);
     }
 
     /**
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块（含数字参数的）
-     * @param t1 数字参数1
-     * @param t2 数字参数2
+     * @param args 参数列表
      * @param <T> 数字类型
      * @return 函数引用实例
-     * @since 1.4
+     * @since 3.8
      */
-    public static <T extends Number> Func<T> partial(Number2<T> m, T t1, T t2) {
-        return new Func<>() {
-            @Override
-            public T invoke(Object... args) {
-                checkParams(args.length, 0);
-                return m.invoke(t1, t2);
-            }
-        };
+    public static <T extends Number> Func<T> partial(Number2<T> m, T... args) {
+        return getPartialFunc(m, args, 2);
     }
 
     /**
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块（含数字参数的）
-     * @param t1 数字参数1
-     * @param t2 数字参数2
-     * @param t3 数字参数3
+     * @param args 参数列表
      * @param <T> 数字类型
      * @return 函数引用实例
-     * @since 1.4
+     * @since 3.8
      */
-    public static <T extends Number> Func<T> partial(Number3<T> m, T t1, T t2, T t3) {
-        return new Func<>() {
-            @Override
-            public T invoke(Object... args) {
-                checkParams(args.length, 0);
-                return m.invoke(t1, t2, t3);
-            }
-        };
+    public static <T extends Number> Func<T> partial(Number3<T> m, T... args) {
+        return getPartialFunc(m, args, 3);
     }
 
     /**
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块（含数字参数的）
-     * @param t1 数字参数1
-     * @param t2 数字参数2
-     * @param t3 数字参数3
-     * @param t4 数字参数4
+     * @param args 参数列表
      * @param <T> 数字类型
      * @return 函数引用实例
-     * @since 1.4
+     * @since 3.8
      */
-    public static <T extends Number> Func<T> partial(Number4<T> m, T t1, T t2, T t3, T t4) {
-        return new Func<>() {
-            @Override
-            public T invoke(Object... args) {
-                checkParams(args.length, 0);
-                return m.invoke(t1, t2, t3, t4);
-            }
-        };
+    public static <T extends Number> Func<T> partial(Number4<T> m, T... args) {
+        return getPartialFunc(m, args, 4);
     }
 
     /**
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块（含数字参数的）
-     * @param t1 数字参数1
-     * @param t2 数字参数2
-     * @param t3 数字参数3
-     * @param t4 数字参数4
-     * @param t5 数字参数5
+     * @param args 参数列表
      * @param <T> 数字类型
      * @return 函数引用实例
-     * @since 1.4
+     * @since 3.8
      */
-    public static <T extends Number> Func<T> partial(Number5<T> m, T t1, T t2, T t3, T t4, T t5) {
-        return new Func<>() {
-            @Override
-            public T invoke(Object... args) {
-                checkParams(args.length, 0);
-                return m.invoke(t1, t2, t3, t4, t5);
-            }
-        };
+    public static <T extends Number> Func<T> partial(Number5<T> m, T... args) {
+        return getPartialFunc(m, args, 5);
     }
 
     /**
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块（含数字参数的）
-     * @param t1 数字参数1
-     * @param t2 数字参数2
-     * @param t3 数字参数3
-     * @param t4 数字参数4
-     * @param t5 数字参数5
-     * @param t6 数字参数6
+     * @param args 参数列表
      * @param <T> 数字类型
      * @return 函数引用实例
-     * @since 1.4
+     * @since 3.8
      */
-    public static <T extends Number> Func<T> partial(Number6<T> m, T t1, T t2, T t3, T t4, T t5, T t6) {
-        return new Func<>() {
-            @Override
-            public T invoke(Object... args) {
-                checkParams(args.length, 0);
-                return m.invoke(t1, t2, t3, t4, t5, t6);
-            }
-        };
+    public static <T extends Number> Func<T> partial(Number6<T> m, T... args) {
+        return getPartialFunc(m, args, 6);
     }
 
     /**
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块（含数字参数的）
-     * @param t1 数字参数1
-     * @param t2 数字参数2
-     * @param t3 数字参数3
-     * @param t4 数字参数4
-     * @param t5 数字参数5
-     * @param t6 数字参数6
-     * @param t7 数字参数7
+     * @param args 参数列表
      * @param <T> 数字类型
      * @return 函数引用实例
-     * @since 1.4
+     * @since 3.8
      */
-    public static <T extends Number> Func<T> partial(Number7<T> m, T t1, T t2, T t3, T t4, T t5, T t6, T t7) {
-        return new Func<>() {
-            @Override
-            public T invoke(Object... args) {
-                checkParams(args.length, 0);
-                return m.invoke(t1, t2, t3, t4, t5, t6, t7);
-            }
-        };
+    public static <T extends Number> Func<T> partial(Number7<T> m, T... args) {
+        return getPartialFunc(m, args, 7);
     }
 
     /**
      * 无接收参数，无返回值的函数引用或代码块的接口
      */
+    @FunctionalInterface
     public interface Void0 {
         /**
          * 执行方法
@@ -996,6 +829,7 @@ public abstract class Func<R> {
      * 接收1个参数，无返回值的函数引用或代码块的接口
      * @param <T> 参数类型
      */
+    @FunctionalInterface
     public interface Void1<T> {
         /**
          * 执行方法
@@ -1009,6 +843,7 @@ public abstract class Func<R> {
      * @param <T> 参数类型1
      * @param <U> 参数类型2
      */
+    @FunctionalInterface
     public interface Void2<T, U> {
         /**
          * 执行方法
@@ -1024,6 +859,7 @@ public abstract class Func<R> {
      * @param <U> 参数类型2
      * @param <V> 参数类型3
      */
+    @FunctionalInterface
     public interface Void3<T, U, V> {
         /**
          * 执行方法
@@ -1041,6 +877,7 @@ public abstract class Func<R> {
      * @param <V> 参数类型3
      * @param <W> 参数类型4
      */
+    @FunctionalInterface
     public interface Void4<T, U, V, W> {
         /**
          * 执行方法
@@ -1060,6 +897,7 @@ public abstract class Func<R> {
      * @param <W> 参数类型4
      * @param <X> 参数类型5
      */
+    @FunctionalInterface
     public interface Void5<T, U, V, W, X> {
         /**
          * 执行方法
@@ -1081,6 +919,7 @@ public abstract class Func<R> {
      * @param <X> 参数类型5
      * @param <Y> 参数类型6
      */
+    @FunctionalInterface
     public interface Void6<T, U, V, W, X, Y> {
         /**
          * 执行方法
@@ -1104,6 +943,7 @@ public abstract class Func<R> {
      * @param <Y> 参数类型6
      * @param <Z> 参数类型7
      */
+    @FunctionalInterface
     public interface Void7<T, U, V, W, X, Y, Z> {
         /**
          * 执行方法
@@ -1122,6 +962,7 @@ public abstract class Func<R> {
      * 无接收参数，有返回值的函数引用或代码块的接口
      * @param <R> 返回值类型
      */
+    @FunctionalInterface
     public interface Object0<R> {
         /**
          * 执行方法
@@ -1135,6 +976,7 @@ public abstract class Func<R> {
      * @param <T> 参数类型
      * @param <R> 返回值类型
      */
+    @FunctionalInterface
     public interface Object1<T, R> {
         /**
          * 执行方法
@@ -1150,6 +992,7 @@ public abstract class Func<R> {
      * @param <U> 参数类型2
      * @param <R> 返回值类型
      */
+    @FunctionalInterface
     public interface Object2<T, U, R> {
         /**
          * 执行方法
@@ -1167,6 +1010,7 @@ public abstract class Func<R> {
      * @param <V> 参数类型3
      * @param <R> 返回值类型
      */
+    @FunctionalInterface
     public interface Object3<T, U, V, R> {
         /**
          * 执行方法
@@ -1186,6 +1030,7 @@ public abstract class Func<R> {
      * @param <W> 参数类型4
      * @param <R> 返回值类型
      */
+    @FunctionalInterface
     public interface Object4<T, U, V, W, R> {
         /**
          * 执行方法
@@ -1207,6 +1052,7 @@ public abstract class Func<R> {
      * @param <X> 参数类型5
      * @param <R> 返回值类型
      */
+    @FunctionalInterface
     public interface Object5<T, U, V, W, X, R> {
         /**
          * 执行方法
@@ -1230,6 +1076,7 @@ public abstract class Func<R> {
      * @param <Y> 参数类型6
      * @param <R> 返回值类型
      */
+    @FunctionalInterface
     public interface Object6<T, U, V, W, X, Y, R> {
         /**
          * 执行方法
@@ -1255,6 +1102,7 @@ public abstract class Func<R> {
      * @param <Z> 参数类型7
      * @param <R> 返回值类型
      */
+    @FunctionalInterface
     public interface Object7<T, U, V, W, X, Y, Z, R> {
         /**
          * 执行方法
@@ -1275,6 +1123,7 @@ public abstract class Func<R> {
      * @param <T> 参数类型和返回值类型
      * @since 1.4
      */
+    @FunctionalInterface
     public interface Number1<T extends Number> {
         /**
          * 执行方法
@@ -1289,6 +1138,7 @@ public abstract class Func<R> {
      * @param <T> 参数类型和返回值类型
      * @since 1.4
      */
+    @FunctionalInterface
     public interface Number2<T extends Number> {
         /**
          * 执行方法
@@ -1304,6 +1154,7 @@ public abstract class Func<R> {
      * @param <T> 参数类型和返回值类型
      * @since 1.4
      */
+    @FunctionalInterface
     public interface Number3<T extends Number> {
         /**
          * 执行方法
@@ -1320,6 +1171,7 @@ public abstract class Func<R> {
      * @param <T> 参数类型和返回值类型
      * @since 1.4
      */
+    @FunctionalInterface
     public interface Number4<T extends Number> {
         /**
          * 执行方法
@@ -1337,6 +1189,7 @@ public abstract class Func<R> {
      * @param <T> 参数类型和返回值类型
      * @since 1.4
      */
+    @FunctionalInterface
     public interface Number5<T extends Number> {
         /**
          * 执行方法
@@ -1355,6 +1208,7 @@ public abstract class Func<R> {
      * @param <T> 参数类型和返回值类型
      * @since 1.4
      */
+    @FunctionalInterface
     public interface Number6<T extends Number> {
         /**
          * 执行方法
@@ -1374,6 +1228,7 @@ public abstract class Func<R> {
      * @param <T> 参数类型和返回值类型
      * @since 1.4
      */
+    @FunctionalInterface
     public interface Number7<T extends Number> {
         /**
          * 执行方法
