@@ -525,6 +525,11 @@ public class Reflects {
          * 是否为文件
          */
         private boolean isFile;
+
+        /**
+         * 私有构造器
+         */
+        private URLInfo() {}
     }
 
     /**

@@ -45,9 +45,9 @@ import java.util.Optional;
  * @param <T> 返回数据类型
  */
 @Getter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class R<T> {
+
     /**
      * 返回状态码
      */
@@ -62,6 +62,11 @@ public class R<T> {
      * 返回数据
      */
     private T data;
+
+    /**
+     * 私有构造器
+     */
+    private R() {}
 
     /**
      * 常用Json转换器包名列表

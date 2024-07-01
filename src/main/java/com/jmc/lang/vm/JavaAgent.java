@@ -13,6 +13,11 @@ import com.sun.tools.attach.VirtualMachine;
  */
 public class JavaAgent {
     /**
+     * 私有构造器
+     */
+    private JavaAgent() {}
+
+    /**
      * 加载Java Agent到指定的JVM
      * @param pid 虚拟机进程id
      * @param agentJarPath Java Agent的jar路径

@@ -35,6 +35,11 @@ import java.util.Iterator;
 @SuppressWarnings({"all", "unchecked"})
 public abstract class Array<T> implements Iterable<T> {
     /**
+     * 私有构造器
+     */
+    private Array() {}
+
+    /**
      * 获得数组中指定下标的元素
      * @param pos 下标
      * @return 对应下标的元素

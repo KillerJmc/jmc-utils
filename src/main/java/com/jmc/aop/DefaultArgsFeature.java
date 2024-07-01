@@ -12,6 +12,11 @@ import com.jmc.lang.vm.JavaAgent;
  */
 public class DefaultArgsFeature {
     /**
+     * 私有构造器
+     */
+    private DefaultArgsFeature() {}
+
+    /**
      * 开启默认参数特性（@DefaultArg） <br>
      * 基于Aspectj LTW，会拦截正在加载中的类进行增强 <br>
      * 注意：请勿在调用此开启方法的类方法上使用@DefaultArg，因为该类已经加载完而无法被增强！

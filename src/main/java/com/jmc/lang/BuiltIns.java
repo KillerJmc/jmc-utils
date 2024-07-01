@@ -8,6 +8,7 @@ import java.util.Locale;
  * @apiNote <pre>{@code
  * import static com.jmc.lang.Builtins.*;
  *
+ * // In JDK 21
  * void main() {
  *     print(666);
  *     println();
@@ -27,6 +28,10 @@ import java.util.Locale;
  */
 @SuppressWarnings("unused")
 public class BuiltIns {
+    /**
+     * 私有构造器
+     */
+    private BuiltIns() {}
 
     // region print
 

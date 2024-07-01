@@ -7,6 +7,11 @@ package com.jmc.os;
  */
 public class SystemInfo {
     /**
+     * 私有构造器
+     */
+    private SystemInfo() {}
+
+    /**
      * 系统类型
      */
     public static final Type TYPE;

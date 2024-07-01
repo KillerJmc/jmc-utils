@@ -24,6 +24,11 @@ import java.util.function.Function;
 @Aspect
 public class DefaultArgAspect {
     /**
+     * 默认构造器
+     */
+    public DefaultArgAspect() {}
+
+    /**
      * 用于拦截成员方法和静态方法的切点
      */
     @Pointcut("execution(* *(.., @DefaultArg (*), ..))")

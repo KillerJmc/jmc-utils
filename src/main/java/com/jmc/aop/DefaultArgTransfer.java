@@ -24,6 +24,11 @@ package com.jmc.aop;
  */
 public class DefaultArgTransfer<T> {
     /**
+     * 默认构造器
+     */
+    public DefaultArgTransfer() {}
+
+    /**
      * 参数转换方法
      * @param defaultArg 注入的默认参数
      * @return 对应参数类型的转换结果
