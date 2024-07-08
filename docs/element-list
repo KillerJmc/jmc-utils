@@ -1,0 +1,14 @@
+module:jmc.utils
+com.jmc.aop
+com.jmc.array
+com.jmc.io
+com.jmc.lang
+com.jmc.lang.ref
+com.jmc.lang.reflect
+com.jmc.lang.vm
+com.jmc.math
+com.jmc.math.exp
+com.jmc.net
+com.jmc.os
+com.jmc.time
+com.jmc.util
