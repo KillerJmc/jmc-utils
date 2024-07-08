@@ -16,7 +16,7 @@ repositories {
 dependencies {
     ext {
         aspectjVersion = "1.9.21.1"
-        lombokVersion = "1.18.24"
+        lombokVersion = "1.18.30"
         junitVersion = "4.13.2"
     }
 
