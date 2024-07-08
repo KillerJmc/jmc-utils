@@ -50,7 +50,7 @@ public class Tuple {
 
     /**
      * 从一系列有命名的值构建元组
-     * @param nameToDataMap 命名的值的Map集合
+     * @param nameToDataMapEntries 命名的值的Map Entry列表
      * @return 元组对象
      * @apiNote <pre>{@code
      * // 数据
@@ -59,19 +59,20 @@ public class Tuple {
      * char gender = '男';
      *
      * // 构建存放有命名的值的元组
-     * var tuple = Tuple.fromNamed(Map.of(
-     *         "id", id,
-     *         "name", name,
-     *         "gender", gender
-     * ));
+     * var tuple = Tuple.fromNamed(
+     *     Map.entry("id", id),
+     *     Map.entry("name", name),
+     *     Map.entry("gender", gender)
+     * );
      * }</pre>
      */
-    public static Tuple fromNamed(Map<String, Object> nameToDataMap) {
+    @SafeVarargs
+    public static Tuple fromNamed(Map.Entry<String, Object>... nameToDataMapEntries) {
         // 构建含数字下标的元组
-        var instance = Tuple.of(nameToDataMap.values().toArray());
+        var instance = Tuple.of(Arrays.stream(nameToDataMapEntries).map(Map.Entry::getValue).toArray());
 
         // 加入可用命名作为下标
-        instance.data.putAll(nameToDataMap);
+        instance.data.putAll(Map.ofEntries(nameToDataMapEntries));
         return instance;
     }
 

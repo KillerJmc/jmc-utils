@@ -28,11 +28,11 @@ public class TupleTest {
         var name = "Jmc";
         char gender = '男';
 
-        var tuple = Tuple.fromNamed(Map.of(
-                "id", id,
-                "name", name,
-                "gender", gender
-        ));
+        var tuple = Tuple.fromNamed(
+                Map.entry("id", id),
+                Map.entry("name", name),
+                Map.entry("gender", gender)
+        );
         // 获取元组元素个数
         Assert.assertEquals(3, tuple.size());
 
