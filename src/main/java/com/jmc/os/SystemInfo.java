@@ -27,6 +27,8 @@ public class SystemInfo {
             TYPE = Type.WINDOWS;
         } else if (osNameValue.contains(Type.LINUX.SYMBOL_NAME)) {
             TYPE = Type.LINUX;
+        } else if (osNameValue.contains(Type.MACOS.SYMBOL_NAME)) {
+            TYPE = Type.MACOS;
         } else {
             TYPE = Type.UNKNOWN;
         }
@@ -45,6 +47,11 @@ public class SystemInfo {
          * Linux
          */
         LINUX("Linux"),
+
+        /**
+         * MacOS
+         */
+        MACOS("Mac OS X"),
 
         /**
          * 未知类型

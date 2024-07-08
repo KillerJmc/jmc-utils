@@ -15,7 +15,7 @@ public class RunTest {
                 cmd2 = "cmd /c echo 777";
             }
 
-            case LINUX -> {
+            case LINUX, MACOS -> {
                 cmd = "echo 666";
                 cmd2 = "echo 777";
             }
