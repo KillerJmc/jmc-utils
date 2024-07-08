@@ -81,9 +81,9 @@ public class JavaAgent {
         "%s" -cp "%s" "%s" "%s" "%s"
         """.formatted(javaBinPath, classPaths, thisClassName, selfPid, agentJarPath);
 
-        // 如果是Linux系统，执行命令时不能带双引号
-        var isLinux = SystemInfo.TYPE == SystemInfo.Type.LINUX;
-        if (isLinux) {
+        // 如果是Unix系统，执行命令时不能带双引号
+        var isUnix = SystemInfo.TYPE == SystemInfo.Type.LINUX || SystemInfo.TYPE == SystemInfo.Type.MACOS;
+        if (isUnix) {
             var doubleQuotation = "\"";
             cmd = cmd.replace(doubleQuotation, "");
         }
