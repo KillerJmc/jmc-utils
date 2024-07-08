@@ -27,6 +27,7 @@ Providing a great number of utility classes to simplify the daily development. (
 | **Random Number Generation (Rand)**                  | Provides a method for generating random numbers in a specified range. |
 | **Running Timers (Timers)**                          | Provides **second**, **millisecond**, **nanosecond** level code running timers. |
 | **Tuple Sequence (Tuple)**                           | Provides a sequence combining values of **different types**. |
+| **Builtin Functions (Builtins)**                     | Provides a serials static builtin functions to simplify method invocation in **JDK21**. |
 
 
 
