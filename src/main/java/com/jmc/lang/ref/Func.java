@@ -650,11 +650,12 @@ public abstract class Func<R> {
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param args 参数列表
+     * @param <T> 参数1类型
      * @param <R> 返回值类型
      * @return 函数引用实例
      * @since 3.8
      */
-    public static <R> Func<R> partial(Object1<?, R> m, Object... args) {
+    public static <T, R> Func<R> partial(Object1<T, R> m, Object... args) {
         return getPartialFunc(m, args, 1);
     }
 
@@ -662,11 +663,13 @@ public abstract class Func<R> {
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param args 参数列表
+     * @param <T> 参数1类型
+     * @param <U> 参数2类型
      * @param <R> 返回值类型
      * @return 函数引用实例
      * @since 3.8
      */
-    public static <T, U, R> Func<R> partial(Object2<?, ?, R> m, Object... args) {
+    public static <T, U, R> Func<R> partial(Object2<T, U, R> m, Object... args) {
         return getPartialFunc(m, args, 2);
     }
 
@@ -674,11 +677,14 @@ public abstract class Func<R> {
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param args 参数列表
+     * @param <T> 参数1类型
+     * @param <U> 参数2类型
+     * @param <V> 参数3类型
      * @param <R> 返回值类型
      * @return 函数引用实例
      * @since 3.8
      */
-    public static <R> Func<R> partial(Object3<?, ?, ?, R> m, Object... args) {
+    public static <T, U, V, R> Func<R> partial(Object3<T, U, V, R> m, Object... args) {
         return getPartialFunc(m, args, 3);
     }
 
@@ -686,11 +692,15 @@ public abstract class Func<R> {
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param args 参数列表
+     * @param <T> 参数1类型
+     * @param <U> 参数2类型
+     * @param <V> 参数3类型
+     * @param <W> 参数4类型
      * @param <R> 返回值类型
      * @return 函数引用实例
      * @since 3.8
      */
-    public static <R> Func<R> partial(Object4<?, ?, ?, ?, R> m, Object... args) {
+    public static <T, U, V, W, R> Func<R> partial(Object4<T, U, V, W, R> m, Object... args) {
         return getPartialFunc(m, args, 4);
     }
 
@@ -699,10 +709,15 @@ public abstract class Func<R> {
      * @param m 方法引用或代码块
      * @param args 参数列表
      * @param <R> 返回值类型
+     * @param <T> 参数1类型
+     * @param <U> 参数2类型
+     * @param <V> 参数3类型
+     * @param <W> 参数4类型
+     * @param <X> 参数5类型
      * @return 函数引用实例
      * @since 3.8
      */
-    public static <R> Func<R> partial(Object5<?, ?, ?, ?, ?, R> m, Object... args) {
+    public static <T, U, V, W, X, R> Func<R> partial(Object5<T, U, V, W, X, R> m, Object... args) {
         return getPartialFunc(m, args, 5);
     }
 
@@ -710,11 +725,17 @@ public abstract class Func<R> {
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param args 参数列表
+     * @param <T> 参数1类型
+     * @param <U> 参数2类型
+     * @param <V> 参数3类型
+     * @param <W> 参数4类型
+     * @param <X> 参数5类型
+     * @param <Y> 参数6类型
      * @param <R> 返回值类型
      * @return 函数引用实例
      * @since 3.8
      */
-    public static <R> Func<R> partial(Object6<?, ?, ?, ?, ?, ?, R> m, Object... args) {
+    public static <T, U, V, W, X, Y, R> Func<R> partial(Object6<T, U, V, W, X, Y, R> m, Object... args) {
         return getPartialFunc(m, args, 6);
     }
 
@@ -722,11 +743,18 @@ public abstract class Func<R> {
      * 返回一个绑定部分或者所有参数的函数引用实例
      * @param m 方法引用或代码块
      * @param args 参数列表
+     * @param <T> 参数1类型
+     * @param <U> 参数2类型
+     * @param <V> 参数3类型
+     * @param <W> 参数4类型
+     * @param <X> 参数5类型
+     * @param <Y> 参数6类型
+     * @param <Z> 参数6类型
      * @param <R> 返回值类型
      * @return 函数引用实例
      * @since 3.8
      */
-    public static <R> Func<R> partial(Object7<?, ?, ?, ?, ?, ?, ?, R> m, Object... args) {
+    public static <T, U, V, W, X, Y, Z, R> Func<R> partial(Object7<T, U, V, W, X, Y, Z, R> m, Object... args) {
         return getPartialFunc(m, args, 7);
     }
 
