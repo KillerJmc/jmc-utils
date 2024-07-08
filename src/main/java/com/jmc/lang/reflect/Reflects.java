@@ -562,8 +562,9 @@ public class Reflects {
             String startSymbol = "jar:file:///", endSymbol = "!/";
             var jarFilePath = Strs.subExclusive(classPath.toString(), startSymbol, endSymbol);
 
-            // 如果是Linux系统，在路径前加上斜杠
-            if (SystemInfo.TYPE == SystemInfo.Type.LINUX) {
+            // 如果是Unix系统，在路径前加上斜杠
+            var isUnix = SystemInfo.TYPE == SystemInfo.Type.LINUX || SystemInfo.TYPE == SystemInfo.Type.MACOS;
+            if (isUnix) {
                 var slash = "/";
                 if (!jarFilePath.startsWith(slash)) {
                     jarFilePath = slash + jarFilePath;
