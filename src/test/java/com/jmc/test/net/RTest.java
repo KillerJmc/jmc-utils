@@ -49,6 +49,20 @@ public class RTest {
     }
 
     @Test
+    public void errWithCodeTest() {
+        // 请求失败
+        var r = R.error(300)
+                .msg("参数欠缺！")
+                .build();
+
+        // 获取数据并进行异常处理
+        var data = Tries.tryReturnsT(r::getData, System.err::println);
+
+        // 返回数据应该为空
+        Assert.assertNull(data);
+    }
+
+    @Test
     public void errWithMsg() {
         // 请求失败
         var r = R.error("错误信息");
