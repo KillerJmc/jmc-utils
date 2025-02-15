@@ -163,7 +163,18 @@ public class R<T> {
     }
 
     /**
-     * 返回状态为错误的数据类构造器
+     * 返回带有指定错误码，状态为错误的数据类构造器
+     * @param code 指定的错误码
+     * @return 数据类构造器
+     */
+    public static RBuilder error(int code) {
+        var rBuilder = new RBuilder();
+        rBuilder.code = code;
+        return rBuilder;
+    }
+
+    /**
+     * 返回带有默认错误码，状态为错误的数据类构造器
      * @return 数据类构造器
      */
     public static RBuilder error() {
