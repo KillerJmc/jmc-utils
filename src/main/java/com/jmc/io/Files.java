@@ -263,7 +263,7 @@ public class Files
 			pool.shutdown();
 
 			// 等待执行完成
-			Tries.tryThis(() -> { while (!pool.awaitTermination(1, TimeUnit.DAYS)) {} });
+			Tries.tryRun(() -> { while (!pool.awaitTermination(1, TimeUnit.DAYS)) {} });
         }
 
 		// 统计时间
@@ -603,7 +603,7 @@ public class Files
         mkdirs(zip.getParentFile());
 
         // 创建zip输出流
-		ZipOutputStream out = Tries.tryReturnsT(() -> new ZipOutputStream(new FileOutputStream(zip)));
+		ZipOutputStream out = Tries.tryGet(() -> new ZipOutputStream(new FileOutputStream(zip)));
 
 		assert out != null;
 
@@ -635,7 +635,7 @@ public class Files
 							entry.setCrc(0);
 							entry.setSize(0);
 						}
-						Tries.tryThis(() -> out.putNextEntry(entry));
+						Tries.tryRun(() -> out.putNextEntry(entry));
 					} else {
 						for (File src : fs) {
 							// 即将被复制文件的完整路径(root为根目录)
@@ -680,7 +680,7 @@ public class Files
 		}.loop(src, src.getName());
 
         // 关闭zip输出流
-		Tries.tryThis(out::close);
+		Tries.tryRun(out::close);
 
 		long endTime = System.currentTimeMillis();
 		log(() -> "耗时" + (double) ((endTime - startTime) / 1000) + "秒，已完成");
@@ -768,7 +768,7 @@ public class Files
 		}
 
         // 创建zip文件
-        var zip = Tries.tryReturnsT(() -> new ZipFile(src));
+        var zip = Tries.tryGet(() -> new ZipFile(src));
 
         assert zip != null;
 
@@ -817,10 +817,10 @@ public class Files
         pool.shutdown();
 
 		// 等待执行完成
-		Tries.tryThis(() -> { while (!pool.awaitTermination(1, TimeUnit.DAYS)) {} });
+		Tries.tryRun(() -> { while (!pool.awaitTermination(1, TimeUnit.DAYS)) {} });
 
         //关闭流
-		Tries.tryThis(zip::close);
+		Tries.tryRun(zip::close);
 
 		long endTime = System.currentTimeMillis();
 		log(() -> "耗时" + (double) ((endTime - startTime) / 1000) + "秒，已完成");
@@ -1246,7 +1246,7 @@ public class Files
 				mkdirs(parentFile);
 			}
 
-			if (Boolean.FALSE.equals(Tries.tryReturnsT(f::createNewFile))) {
+			if (Boolean.FALSE.equals(Tries.tryGet(f::createNewFile))) {
 				throw new RuntimeException("文件创建失败!");
 			}
 		}

@@ -31,7 +31,7 @@ public class JavaAgent {
             throw new RuntimeException("Agent的Jar路径不存在：\"" + agentJarPath + '"');
         }
 
-        Tries.tryThis(() -> {
+        Tries.tryRun(() -> {
             var vm = VirtualMachine.attach(pid);
             vm.loadAgent(agentJarPath);
             vm.detach();
