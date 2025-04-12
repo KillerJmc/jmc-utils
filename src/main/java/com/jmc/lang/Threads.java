@@ -20,7 +20,7 @@ public class Threads {
      * }</pre>
      */
     public static void sleep(long millis) {
-        Tries.tryThis(() -> Thread.sleep(millis));
+        Tries.tryRun(() -> Thread.sleep(millis));
     }
 
     /**
@@ -33,6 +33,6 @@ public class Threads {
      * }</pre>
      */
     public static void sleep(long timeout, TimeUnit unit) {
-        Tries.tryThis(() -> unit.sleep(timeout));
+        Tries.tryRun(() -> unit.sleep(timeout));
     }
 }

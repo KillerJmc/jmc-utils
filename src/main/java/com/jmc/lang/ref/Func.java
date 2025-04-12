@@ -71,7 +71,7 @@ public abstract class Func<R> {
     protected R invokeUsingReflection(Object funcInterfaceObj, Object... args) {
         var invokeMethodName = "invoke";
 
-        return (R) Tries.tryReturnsT(() -> {
+        return (R) Tries.tryGet(() -> {
             var funcClass = funcInterfaceObj.getClass();
             var methods = funcClass.getDeclaredMethods();
             for (var method : methods) {

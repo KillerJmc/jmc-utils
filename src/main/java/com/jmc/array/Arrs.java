@@ -29,7 +29,7 @@ public class Arrs {
      */
     @SuppressWarnings("unchecked")
     public static <T> T[] newInstance(Class<T> c, int len) {
-        return Tries.tryReturnsT(() -> {
+        return Tries.tryGet(() -> {
             var a = (T[]) java.lang.reflect.Array.newInstance(c, len);
             var ctr = c.getConstructor();
 

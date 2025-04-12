@@ -31,7 +31,7 @@ public class RTest {
         var r = R.error().msg("参数欠缺！").build();
 
         // 获取数据并进行异常处理
-        var data = Tries.tryReturnsT(r::getData, System.err::println);
+        var data = Tries.tryGetOrHandle(r::getData, System.err::println);
 
         // 返回数据应该为空
         Assert.assertNull(data);
