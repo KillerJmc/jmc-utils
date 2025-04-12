@@ -231,7 +231,7 @@ public class R<T> {
      * var data = r.getData();
      *
      * // 或者不检查直接调用，当前端传来的R请求失败时处理异常（这里直接打印）
-     * data = Tries.tryReturnsT(r::getData, System.err::println);
+     * data = Tries.tryGet(r::getData, System.err::println);
      * }</pre>
      * @since 2.5
      */
@@ -268,14 +268,14 @@ public class R<T> {
         /**
          * 存放中间操作函数的集合
          */
-        private final List<Tries.RunnableThrowsE> OPERATIONS = new ArrayList<>();
+        private final List<Tries.CheckedRunnable> OPERATIONS = new ArrayList<>();
 
         /**
          * 运行检查函数
          * @param checkFunc 负责检查对象有效性的函数
          * @return 本对象实例
          */
-        public RStream check(Tries.RunnableThrowsE checkFunc) {
+        public RStream check(Tries.CheckedRunnable checkFunc) {
             OPERATIONS.add(checkFunc);
             return this;
         }
@@ -300,7 +300,7 @@ public class R<T> {
          * @param execFunc 执行功能的函数
          * @return 本对象实例
          */
-        public RStream exec(Tries.RunnableThrowsE execFunc) {
+        public RStream exec(Tries.CheckedRunnable execFunc) {
             OPERATIONS.add(execFunc);
             return this;
         }
@@ -333,14 +333,14 @@ public class R<T> {
          * @param <T> 返回数据类型
          * @return R实例
          */
-        public <T> R<T> build(Tries.ReturnedThrowable<T> dataSupplier) {
+        public <T> R<T> build(Tries.CheckedSupplier<T> dataSupplier) {
             return invokeAndGetErrorMsg()
                     .<R<T>>map(R::error)
                     .orElseGet(() -> {
                         // 创建错误信息字符串指针
                         var errorMsgPtr = Pointer.<String>empty();
                         // 执行返回数据构建方法
-                        var res = Tries.tryReturnsT(dataSupplier, e -> {
+                        var res = Tries.tryGetOrHandle(dataSupplier, e -> {
                             // 遇到异常就打印堆栈信息
                             e.printStackTrace();
                             // 把错误信息绑定到上述指针中
@@ -357,7 +357,7 @@ public class R<T> {
          */
         private Optional<String> invokeAndGetErrorMsg() {
             for (var operation : OPERATIONS) {
-                var throwable = Tries.tryReturnsE(operation);
+                var throwable = Tries.tryRunOrCapture(operation);
                 if (throwable.isPresent()) {
                     // 打印错误堆栈信息
                     throwable.get().printStackTrace();
