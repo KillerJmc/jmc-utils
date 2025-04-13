@@ -91,6 +91,24 @@ public class TriesTest {
     }
 
     @Test
+    public void tryGetOptionalOrHandleTest() {
+        Optional<Integer> result = Tries.tryGetOptionalOrHandle(
+                () -> 666,
+                e -> { throw new RuntimeException(e); }
+        );
+        Assert.assertTrue(result.isPresent());
+        Assert.assertEquals(Integer.valueOf(666), result.get());
+
+        Assert.assertThrows(
+                RuntimeException.class,
+                () -> Tries.tryGetOptionalOrThrow(
+                        () -> { throw new RuntimeException("777"); },
+                        RuntimeException::new
+                )
+        );
+    }
+
+    @Test
     public void tryGetOrThrowTest() {
         Integer result = Tries.tryGetOrThrow(
              () -> 666,
