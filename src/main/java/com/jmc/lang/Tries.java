@@ -177,6 +177,39 @@ public class Tries {
     }
 
     /**
+     * 执行需要被try包含的代码块并返回结果和消费异常
+     * @param c 代码块
+     * @param exceptionHandler 异常处理器
+     * @param <T> 返回结果类型
+     * @return 结果Optional
+     * @apiNote <pre>{@code
+     * // 通过接口获取用户信息，出现异常就转化为业务异常（是运行时异常）抛出
+     * var user = Tries.tryGetOptionalOrThrow(
+     *         () -> UserClient.getUserInfo(...),
+     *         e -> { throw new BusinessException("获取用户信息失败，原因：" + e.getMessage()); }
+     * );
+     *
+     * // 对Optional结果进行再次处理
+     * if (userInfo.isPresent()) {
+     *     // 进一步的操作（激活用户）
+     *     userService.activateUser(user);
+     * } else {
+     *     log.warn("获取到用户信息为空，本次不做激活操作");
+     * }
+     * }</pre>
+     * @since 3.9
+     */
+    public static <T> Optional<T> tryGetOptionalOrHandle(@NonNull CheckedSupplier<T> c,
+                                               @NonNull Consumer<Throwable> exceptionHandler) {
+        try {
+            return Optional.ofNullable(c.call());
+        } catch (Throwable e) {
+            exceptionHandler.accept(e);
+        }
+        return Optional.empty();
+    }
+
+    /**
      * 执行需要被try包含的代码块并返回结果，如果有异常进行转化为运行时异常重新抛出
      * @param c 代码块
      * @param exceptionConverter 异常转换器，把原始异常转化为运行时异常重新抛出
@@ -215,7 +248,7 @@ public class Tries {
      * );
      *
      * // 对Optional结果进行再次处理
-     * if (userInfo.isPresent()) {
+     * if (user.isPresent()) {
      *     // 进一步的操作（激活用户）
      *     userService.activateUser(user);
      * } else {
