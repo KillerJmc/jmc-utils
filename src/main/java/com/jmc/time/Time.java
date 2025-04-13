@@ -37,7 +37,7 @@ public class Time {
     /**
      * 默认时间格式
      */
-    private static final String DEFAULT_FORMAT = "yyyy-M-d HH:mm:ss";
+    public static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     /**
      * 通过LocalDateTime创建实例
@@ -70,13 +70,27 @@ public class Time {
     }
 
     /**
+     * 通过带有格式的时间字符串创建实例，使用类中的默认时间格式
+     * @param time 时间字符串
+     * @return 实例
+     * @apiNote <pre>{@code
+     * // 从格式字符串和时间字符串创建一个Time实例
+     * var time = Time.of("2001-08-09");
+     * }</pre>
+     * @since 3.9
+     */
+    public static Time of(String time) {
+        return of(DEFAULT_TIME_FORMAT, time);
+    }
+
+    /**
      * 通过带有格式的时间字符串创建实例
      * @param format 指定时间格式
      * @param time 时间字符串
      * @return 实例
      * @apiNote <pre>{@code
      * // 从格式字符串和时间字符串创建一个Time实例
-     * var time = Time.of("yyyy.M.d", "2001.8.9");
+     * var time = Time.of("yyyy.MM.dd", "2001.08.09");
      * }</pre>
      * @since 2.1
      */
@@ -111,7 +125,7 @@ public class Time {
     }
 
     /**
-     * 转化为 {@link #DEFAULT_FORMAT 默认时间格式} 字符串
+     * 转化为 {@link #DEFAULT_TIME_FORMAT 默认时间格式} 字符串
      * @return 默认时间格式字符串
      * @apiNote <pre>{@code
      * // 将Time转化为默认时间格式字符串（例子："2001-8-9 12:00:00"）
@@ -121,7 +135,7 @@ public class Time {
      */
     @Override
     public String toString() {
-        return ldt.format(getFormatter(DEFAULT_FORMAT));
+        return ldt.format(getFormatter(DEFAULT_TIME_FORMAT));
     }
 
     /**
@@ -144,7 +158,7 @@ public class Time {
      * @return 结果时间格式类（默认年份1970，月份和日期为1，小时为0）
      * @apiNote <pre>{@code
      * // 从时间格式字符串创建DateTimeFormatter
-     * DateTimeFormatter formatter = Time.getFormatter("yyyy-M-d");
+     * DateTimeFormatter formatter = Time.getFormatter("yyyy-MM-dd");
      * }</pre>
      */
     public static DateTimeFormatter getFormatter(String format) {

@@ -22,5 +22,8 @@ public class TimeTest {
 
         // 输入有格式的时间并转成LocalDateTime
         System.out.println(Time.of("yyyy.M.d", "2001.8.9").toLocalDateTime());
+
+        // 输入有格式的时间并转成LocalDateTime（使用时间类的默认格式）
+        System.out.println(Time.of("2001-08-09 12:00:00").toLocalDateTime());
     }
 }
