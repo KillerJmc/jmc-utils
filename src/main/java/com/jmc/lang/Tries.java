@@ -17,46 +17,6 @@ public class Tries {
     private Tries() {}
 
     /**
-     * 可抛出异常的Runnable
-     */
-    public interface CheckedRunnable {
-        /**
-         * 执行方法
-         * @throws Throwable 抛出的异常
-         */
-        void run() throws Throwable;
-    }
-
-    /**
-     * 可抛出Throwable异常的Supplier
-     * @param <T> 返回值类型
-     * @since 2.9
-     */
-    public interface CheckedSupplier<T> {
-        /**
-         * 执行方法
-         * @return 方法的返回值
-         * @throws Throwable 抛出的异常
-         */
-        T call() throws Throwable;
-    }
-
-    /**
-     * 可抛出异常的Consumer
-     * @param <T> 被消耗的对象
-     * @since 1.5
-     */
-    @FunctionalInterface
-    public interface CheckedConsumer<T> {
-        /**
-         * 消耗方法
-         * @param t 消耗对象
-         * @throws Throwable 抛出的异常
-         */
-        void accept(T t) throws Throwable;
-    }
-
-    /**
      * 执行需要被try包含的代码块，直接抛出运行时异常
      * @param r 代码块
      * @apiNote <pre>{@code
@@ -64,7 +24,7 @@ public class Tries {
      * Tries.tryRun(() -> Thread.sleep(3));
      * }</pre>
      */
-    public static void tryRun(@NonNull CheckedRunnable r) {
+    public static void tryRun(@NonNull FunctionalInterfaces.CheckedRunnable r) {
         try {
             r.run();
         } catch (Throwable e) {
@@ -82,7 +42,7 @@ public class Tries {
      * }</pre>
      * @since 1.5
      */
-    public static void tryRunOrHandle(@NonNull CheckedRunnable r,
+    public static void tryRunOrHandle(@NonNull FunctionalInterfaces.CheckedRunnable r,
                                       @NonNull Consumer<Throwable> exceptionHandler) {
         try {
             r.run();
@@ -101,7 +61,7 @@ public class Tries {
      * }</pre>
      * @since 3.9
      */
-    public static void tryRunOrThrow(@NonNull CheckedRunnable r,
+    public static void tryRunOrThrow(@NonNull FunctionalInterfaces.CheckedRunnable r,
                                      @NonNull Function<Throwable, ? extends RuntimeException> exceptionConverter) {
         try {
             r.run();
@@ -123,7 +83,7 @@ public class Tries {
      * }</pre>
      * @since 2.4
      */
-    public static Optional<Throwable> tryRunOrCapture(@NonNull CheckedRunnable r) {
+    public static Optional<Throwable> tryRunOrCapture(@NonNull FunctionalInterfaces.CheckedRunnable r) {
         try {
             r.run();
         } catch (Throwable e) {
@@ -142,9 +102,9 @@ public class Tries {
      * var class = Tries.tryGet(() -> Class.forName("java.lang.String"));
      * }</pre>
      */
-    public static <T> T tryGet(@NonNull CheckedSupplier<T> c) {
+    public static <T> T tryGet(@NonNull FunctionalInterfaces.CheckedSupplier<T> c) {
         try {
-            return c.call();
+            return c.get();
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -166,10 +126,10 @@ public class Tries {
      * }</pre>
      * @since 1.5
      */
-    public static <T> T tryGetOrHandle(@NonNull CheckedSupplier<T> c,
+    public static <T> T tryGetOrHandle(@NonNull FunctionalInterfaces.CheckedSupplier<T> c,
                                        @NonNull Consumer<Throwable> exceptionHandler) {
         try {
-            return c.call();
+            return c.get();
         } catch (Throwable e) {
             exceptionHandler.accept(e);
         }
@@ -199,10 +159,10 @@ public class Tries {
      * }</pre>
      * @since 3.9
      */
-    public static <T> Optional<T> tryGetOptionalOrHandle(@NonNull CheckedSupplier<T> c,
+    public static <T> Optional<T> tryGetOptionalOrHandle(@NonNull FunctionalInterfaces.CheckedSupplier<T> c,
                                                @NonNull Consumer<Throwable> exceptionHandler) {
         try {
-            return Optional.ofNullable(c.call());
+            return Optional.ofNullable(c.get());
         } catch (Throwable e) {
             exceptionHandler.accept(e);
         }
@@ -224,10 +184,10 @@ public class Tries {
      * }</pre>
      * @since 3.9
      */
-    public static <T> T tryGetOrThrow(@NonNull CheckedSupplier<T> c,
+    public static <T> T tryGetOrThrow(@NonNull FunctionalInterfaces.CheckedSupplier<T> c,
                                       @NonNull Function<Throwable, ? extends RuntimeException> exceptionConverter) {
         try {
-            return c.call();
+            return c.get();
         } catch (Throwable e) {
             var convertedException = exceptionConverter.apply(e);
             throw Objects.isNull(convertedException) ? new RuntimeException(e) : convertedException;
@@ -257,10 +217,10 @@ public class Tries {
      * }</pre>
      * @since 3.9
      */
-    public static <T> Optional<T> tryGetOptionalOrThrow(@NonNull CheckedSupplier<T> c,
+    public static <T> Optional<T> tryGetOptionalOrThrow(@NonNull FunctionalInterfaces.CheckedSupplier<T> c,
                                                         @NonNull Function<Throwable, ? extends RuntimeException> exceptionConverter) {
         try {
-            return Optional.ofNullable(c.call());
+            return Optional.ofNullable(c.get());
         } catch (Throwable e) {
             var convertedException = exceptionConverter.apply(e);
             throw Objects.isNull(convertedException) ? new RuntimeException(e) : convertedException;
@@ -283,7 +243,7 @@ public class Tries {
      * }</pre>
      * @since 1.5
      */
-    public static <T> Consumer<T> unchecked(@NonNull CheckedConsumer<T> c) {
+    public static <T> Consumer<T> unchecked(@NonNull FunctionalInterfaces.CheckedConsumer<T> c) {
         return t -> Tries.tryRun(() -> c.accept(t));
     }
 }
