@@ -1,5 +1,6 @@
 package com.jmc.net;
 
+import com.jmc.lang.FunctionalInterfaces;
 import com.jmc.lang.Tries;
 import com.jmc.lang.ref.Pointer;
 import lombok.AccessLevel;
@@ -268,14 +269,14 @@ public class R<T> {
         /**
          * 存放中间操作函数的集合
          */
-        private final List<Tries.CheckedRunnable> OPERATIONS = new ArrayList<>();
+        private final List<FunctionalInterfaces.CheckedRunnable> OPERATIONS = new ArrayList<>();
 
         /**
          * 运行检查函数
          * @param checkFunc 负责检查对象有效性的函数
          * @return 本对象实例
          */
-        public RStream check(Tries.CheckedRunnable checkFunc) {
+        public RStream check(FunctionalInterfaces.CheckedRunnable checkFunc) {
             OPERATIONS.add(checkFunc);
             return this;
         }
@@ -300,7 +301,7 @@ public class R<T> {
          * @param execFunc 执行功能的函数
          * @return 本对象实例
          */
-        public RStream exec(Tries.CheckedRunnable execFunc) {
+        public RStream exec(FunctionalInterfaces.CheckedRunnable execFunc) {
             OPERATIONS.add(execFunc);
             return this;
         }
@@ -333,7 +334,7 @@ public class R<T> {
          * @param <T> 返回数据类型
          * @return R实例
          */
-        public <T> R<T> build(Tries.CheckedSupplier<T> dataSupplier) {
+        public <T> R<T> build(FunctionalInterfaces.CheckedSupplier<T> dataSupplier) {
             return invokeAndGetErrorMsg()
                     .<R<T>>map(R::error)
                     .orElseGet(() -> {
