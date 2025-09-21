@@ -1,11 +1,19 @@
 package com.jmc.lang;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+
 /**
  * 函数式接口合集
  * @since 3.9
  * @author Jmc
  */
 public class FunctionalInterfaces {
+    /**
+     * 禁止实例化
+     */
+    private FunctionalInterfaces() {}
+
     /**
      * 可抛出异常的Runnable
      */
@@ -71,6 +79,7 @@ public class FunctionalInterfaces {
          * 对给定参数执行断言
          * @param t 输入的参数
          * @return 输入的参数是否满足条件（布尔值）
+         * @throws Throwable 抛出异常
          */
         boolean test(T t) throws Throwable;
     }
