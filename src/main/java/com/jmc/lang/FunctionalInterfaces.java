@@ -44,6 +44,7 @@ public class FunctionalInterfaces {
      * 抛出异常的Supplier
      * @param <T> 返回值类型
      */
+    @FunctionalInterface
     public interface CheckedSupplier<T> {
         /**
          * 获取一个结果
