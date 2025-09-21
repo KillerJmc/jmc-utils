@@ -34,7 +34,7 @@ public class Outs {
      * });
      * }</pre>
      */
-    public static void newLine(Tries.CheckedRunnable r) {
+    public static void newLine(FunctionalInterfaces.CheckedRunnable r) {
         newLine();
         Tries.tryRun(r);
         newLine();
