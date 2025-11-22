@@ -6,41 +6,19 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
- * 增强版switch：匹配值不限制是常量，并支持复杂的匹配条件
+ * 增强版switch，优点如下：<br>
+ * 1. 匹配值不限制是常量，可匹配自定义对象（针对JDK版本 < 21） <br>
+ * 2. 支持复杂的匹配条件（Predicate） <br>
+ *
  * @apiNote <pre>{@code
  * // 使用Switch进行复杂条件匹配
- * int x = 10;
- * String res = Switch.match(x)
- *     .when((Integer t) -> t > 10, () -> "t大于10！")
- *     .when((Integer t) -> t < 10, () -> "t小于10！")
- *     .when((Integer t) -> t == 10, () -> "t等于10！")
- *     .orElse(null);
- * Assert.assertEquals("t等于10！", res);
- *
- * // 使用Switch匹配复杂对象
- * record Student(String name) {}
- *
- * var stuJmc = new Student("Jmc");
- * var stuJack = new Student("Jack");
- * var stuLucy = new Student("Lucy");
- *
- * String res = Switch.match(() -> new Student("Jmc"))
- *     .when((Student s) -> Objects.equals(s.name(), stuJack.name()), "是Student Jack")
- *     .when((Student s) -> Objects.equals(s.name(), stuJmc.name()), "是Student Jmc")
- *     .when((Student s) -> Objects.equals(s.name(), stuLucy.name()), "是Student Lucy")
- *     .orElseThrow(() -> new NoSuchElementException("匹配学生失败"));
- *
- * Assert.assertEquals("是Student Jmc", res);
- *
- * // 支持类型匹配
- * Object obj = "123";
- * String res = Switch.match(obj)
- *     .whenType(Integer.class, i -> "是Integer.class，值是：" + i)
- *     .whenType(String.class, s -> "是String.class，长度是：" + s.length())
- *     .whenType(Double.class, d -> "是Double.class，值是：" + d)
- *     .orElseThrow(() -> new NoSuchElementException("匹配类型失败"));
- *
- * Assert.assertEquals("是String.class，长度是：3", res);
+ *  String res = Switch.of(obj)
+ *      .caseObj("你好", s -> "是字符串，值为：" + s)
+ *      .caseType(Integer.class, i -> "是整数，值为：" + i)
+ *      .caseType(Employee.class, emp -> "是职工对象，职工姓名：" + stu.getName())
+ *      .caseWhen((Student stu) -> stu.getAge() < 18, stu -> "是学生对象，年龄小于18，学生信息：" + stu)
+ *      .caseNull("为空对象")
+ *      .orElse("没命中默认值");
  * }</pre>
  * @since 3.9
  * @author Jmc
@@ -61,21 +39,14 @@ public class Switch {
      */
     private Switch() {}
 
-    /**
-     * 抛出异常的函数
-     * @param <T> 函数参数类型
-     * @param <R> 返回值类型
-     */
-    public interface CheckedFunction<T, R> {
-        R apply(T t) throws Throwable;
-    }
+    // region construct
 
     /**
      * 获取Switch实例
      * @param matchObj 匹配对象
      * @return Switch实例对象
      */
-    public static Switch match(Object matchObj) {
+    public static Switch of(Object matchObj) {
         var instance = new Switch();
         instance.matchObj = matchObj;
         return instance;
@@ -86,11 +57,17 @@ public class Switch {
      * @param matchObjSupplier 匹配对象获取函数
      * @return Switch实例对象
      */
-    public static Switch match(Tries.ReturnedThrowable<Object> matchObjSupplier) {
+    public static Switch of(FunctionalInterfaces.CheckedSupplier<Object> matchObjSupplier) {
         var instance = new Switch();
-        instance.matchObj = Tries.tryReturnsT(matchObjSupplier);
+        if (Objects.nonNull(matchObjSupplier)) {
+            instance.matchObj = Tries.tryGet(matchObjSupplier);
+        }
         return instance;
     }
+
+    // endregion
+
+    // region match by object
 
     /**
      * Switch匹配函数：匹配对象和匹配值相等就记录返回值
@@ -98,7 +75,7 @@ public class Switch {
      * @param returnObj 返回值对象
      * @return Switch对象本身
      */
-    public Switch when(Object matchObj, Object returnObj) {
+    public Switch caseObj(Object matchObj, Object returnObj) {
         if (Objects.equals(matchObj, this.matchObj)) {
             this.returnObj = returnObj;
         }
@@ -111,9 +88,9 @@ public class Switch {
      * @param action 返回值函数
      * @return Switch对象本身
      */
-    public Switch when(Object matchObj, Tries.ReturnedThrowable<Object> action) {
+    public <T> Switch caseObj(T matchObj, FunctionalInterfaces.CheckedFunction<T, Object> action) {
         if (Objects.equals(matchObj, this.matchObj)) {
-            this.returnObj = Tries.tryReturnsT(action);
+            this.returnObj = Tries.tryGet(() -> action.apply(matchObj));
         }
         return this;
     }
@@ -124,59 +101,18 @@ public class Switch {
      * @param action 返回值函数
      * @return Switch对象本身
      */
-    public Switch when(Object matchObj, Tries.RunnableThrowsE action) {
+    public Switch caseObj(Object matchObj, FunctionalInterfaces.CheckedRunnable action) {
         if (Objects.equals(matchObj, this.matchObj)) {
-            Tries.tryThis(action);
+            Tries.tryRun(action);
             // 赋值一个空对象
             this.returnObj = new Object();
         }
         return this;
     }
 
-    /**
-     * Switch匹配函数：匹配断言函数为true就记录返回值
-     * @param matchFunc 匹配断言函数
-     * @param returnObj 返回值对象
-     * @return Switch对象本身
-     * @param <T> 校验对象类型
-     */
-    @SuppressWarnings("unchecked")
-    public <T> Switch when(Predicate<T> matchFunc, Object returnObj) {
-        if (matchFunc.test((T) this.matchObj)) {
-            this.returnObj = returnObj;
-        }
-        return this;
-    }
+    // endregion
 
-    /**
-     * Switch匹配函数：匹配断言函数为true就执行函数记录返回值
-     * @param matchFunc 匹配断言函数
-     * @param function 返回值函数
-     * @return Switch对象本身
-     */
-    @SuppressWarnings("unchecked")
-    public <T> Switch when(Predicate<T> matchFunc, CheckedFunction<T, Object> function) {
-        if (matchFunc.test((T) this.matchObj)) {
-            this.returnObj = Tries.tryReturnsT(() -> function.apply((T) this.matchObj));
-        }
-        return this;
-    }
-
-    /**
-     * Switch匹配函数：匹配断言函数为true就执行函数
-     * @param matchFunc 匹配断言函数
-     * @param action 执行函数
-     * @return Switch对象本身
-     */
-    @SuppressWarnings("unchecked")
-    public <T> Switch when(Predicate<T> matchFunc, Tries.RunnableThrowsE action) {
-        if (matchFunc.test((T) this.matchObj)) {
-            Tries.tryThis(action);
-            // 赋值一个空对象
-            this.returnObj = new Object();
-        }
-        return this;
-    }
+    // region match by type
 
     /**
      * Switch匹配函数：类型匹配就记录返回值
@@ -185,8 +121,8 @@ public class Switch {
      * @return Switch对象本身
      * @param <T> 匹配的类型
      */
-    public <T> Switch whenType(Class<T> matchType, Object returnObj) {
-        if (this.matchObj.getClass().isAssignableFrom(matchType)) {
+    public <T> Switch caseType(Class<T> matchType, Object returnObj) {
+        if (Objects.nonNull(this.matchObj) && this.matchObj.getClass().isAssignableFrom(matchType)) {
             this.returnObj = returnObj;
         }
         return this;
@@ -200,9 +136,9 @@ public class Switch {
      * @param <T> 匹配的类型
      */
     @SuppressWarnings("unchecked")
-    public <T> Switch whenType(Class<T> matchType, CheckedFunction<T, Object> function) {
-        if (this.matchObj.getClass().isAssignableFrom(matchType)) {
-            this.returnObj = Tries.tryReturnsT(() -> function.apply((T) this.matchObj));
+    public <T> Switch caseType(Class<T> matchType, FunctionalInterfaces.CheckedFunction<T, Object> function) {
+        if (Objects.nonNull(this.matchObj) && this.matchObj.getClass().isAssignableFrom(matchType)) {
+            this.returnObj = Tries.tryGet(() -> function.apply((T) this.matchObj));
         }
         return this;
     }
@@ -214,90 +150,120 @@ public class Switch {
      * @return Switch对象本身
      * @param <T> 匹配的类型
      */
-    public <T> Switch whenType(Class<T> matchType, Tries.RunnableThrowsE action) {
-        if (this.matchObj.getClass().isAssignableFrom(matchType)) {
-            Tries.tryThis(action);
+    public <T> Switch caseType(Class<T> matchType, FunctionalInterfaces.CheckedRunnable action) {
+        if (Objects.nonNull(this.matchObj) && this.matchObj.getClass().isAssignableFrom(matchType)) {
+            Tries.tryRun(action);
             // 赋值一个空对象
             this.returnObj = new Object();
         }
         return this;
     }
+
+    // endregion
+
+    // region match by condition
+
+    /**
+     * Switch匹配函数：匹配断言函数为true就记录返回值
+     * @param matchFunc 匹配断言函数
+     * @param returnObj 返回值对象
+     * @return Switch对象本身
+     * @param <T> 校验对象类型
+     */
+    @SuppressWarnings("unchecked")
+    public <T> Switch caseWhen(Predicate<T> matchFunc, Object returnObj) {
+        Tries.tryRunOrCapture(() -> {
+            if (Objects.nonNull(this.matchObj) && matchFunc.test((T) this.matchObj)) {
+                this.returnObj = returnObj;
+            }
+        }).ifPresent(ex -> {
+            // 只忽略转化异常
+            if (!(ex instanceof ClassCastException)) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        return this;
+    }
+
+    /**
+     * Switch匹配函数：匹配断言函数为true就执行函数记录返回值
+     * @param matchFunc 匹配断言函数
+     * @param function 返回值函数
+     * @return Switch对象本身
+     */
+    @SuppressWarnings("unchecked")
+    public <T> Switch caseWhen(Predicate<T> matchFunc, FunctionalInterfaces.CheckedFunction<T, Object> function) {
+        Tries.tryRunOrCapture(() -> {
+            if (Objects.nonNull(this.matchObj) && matchFunc.test((T) this.matchObj)) {
+                this.returnObj = Tries.tryGet(() -> function.apply((T) this.matchObj));
+            }
+        }).ifPresent(ex -> {
+            // 只忽略转化异常
+            if (!(ex instanceof ClassCastException)) {
+                throw new RuntimeException(ex);
+            }
+        });
+        return this;
+    }
+
+    /**
+     * Switch匹配函数：匹配断言函数为true就执行函数
+     * @param matchFunc 匹配断言函数
+     * @param action 执行函数
+     * @return Switch对象本身
+     */
+    @SuppressWarnings("unchecked")
+    public <T> Switch caseWhen(Predicate<T> matchFunc, FunctionalInterfaces.CheckedRunnable action) {
+        Tries.tryRunOrCapture(() -> {
+            if (Objects.nonNull(this.matchObj) && matchFunc.test((T) this.matchObj)) {
+                Tries.tryRun(action);
+                // 赋值一个空对象
+                this.returnObj = new Object();
+            }
+        }).ifPresent(ex -> {
+            // 只忽略转化异常
+            if (!(ex instanceof ClassCastException)) {
+                throw new RuntimeException(ex);
+            }
+        });
+        return this;
+    }
+
+    // endregion
+
+    // region match null
 
     /**
      * Switch匹配函数：匹配对象为null就记录返回值
      * @param returnObj 返回值对象
      * @return Switch对象本身
      */
-    public Switch whenNull(Object returnObj) {
+    public Switch caseNull(Object returnObj) {
         if (Objects.isNull(this.matchObj)) {
             this.returnObj = returnObj;
         }
         return this;
     }
 
-    /**
-     * Switch匹配函数：匹配对象为null就执行函数记录返回值
-     * @param action 返回值函数
-     * @return Switch对象本身
-     */
-    public Switch whenNull(Tries.ReturnedThrowable<Object> action) {
-        if (Objects.isNull(this.matchObj)) {
-            this.returnObj = Tries.tryReturnsT(action);
-        }
-        return this;
-    }
 
     /**
      * Switch匹配函数：匹配对象为null就执行函数
      * @param action 返回值函数
      * @return Switch对象本身
      */
-    public Switch whenNull(Tries.RunnableThrowsE action) {
+    public Switch caseNull(FunctionalInterfaces.CheckedRunnable action) {
         if (Objects.isNull(this.matchObj)) {
-            Tries.tryThis(action);
+            Tries.tryRun(action);
             // 赋值一个空对象
             this.returnObj = new Object();
         }
         return this;
     }
 
-    /**
-     * Switch匹配函数：匹配对象不为null就记录返回值
-     * @param returnObj 返回值对象
-     * @return Switch对象本身
-     */
-    public Switch whenNonNull(Object returnObj) {
-        if (Objects.isNull(this.matchObj)) {
-            this.returnObj = returnObj;
-        }
-        return this;
-    }
+    // endregion
 
-    /**
-     * Switch匹配函数：匹配对象不为null就执行函数记录返回值
-     * @param action 返回值函数
-     * @return Switch对象本身
-     */
-    public Switch whenNonNull(Tries.ReturnedThrowable<Object> action) {
-        if (Objects.nonNull(this.matchObj)) {
-            this.returnObj = Tries.tryReturnsT(action);
-        }
-        return this;
-    }
-
-    /**
-     * Switch匹配函数：匹配对象不为null就执行函数
-     * @param action 返回值函数
-     * @return Switch对象本身
-     */
-    public Switch whenNonNull(Tries.RunnableThrowsE action) {
-        if (Objects.nonNull(this.matchObj)) {
-            Tries.tryThis(action);
-            // 赋值一个空对象
-            this.returnObj = new Object();
-        }
-        return this;
-    }
+    // region terminal operations
 
     /**
      * Switch返回函数：返回匹配结果，如果匹配不上就返回备选值
@@ -316,9 +282,9 @@ public class Switch {
      * @return 返回匹配结果，如果匹配不上就返回备选值
      * @param <R> 匹配结果类型
      */
-    public <R> R orElseGet(Tries.ReturnedThrowable<R> supplier) {
+    public <R> R orElse(FunctionalInterfaces.CheckedSupplier<R> supplier) {
         R result = getResult();
-        return result != null ? result : Tries.tryReturnsT(supplier);
+        return result != null ? result : Tries.tryGet(supplier);
     }
 
     /**
@@ -326,9 +292,9 @@ public class Switch {
      * @param action 备选值
      * @param <R> 匹配结果类型
      */
-    public <R> void orElseRun(Tries.RunnableThrowsE action) {
+    public <R> void orElseRun(FunctionalInterfaces.CheckedRunnable action) {
         if (getResult() == null) {
-            Tries.tryThis(action);
+            Tries.tryRun(action);
         }
     }
 
@@ -350,7 +316,6 @@ public class Switch {
      * @param exceptionSupplier 异常获取函数
      * @return 返回匹配结果，如果匹配不上就抛出异常
      * @param <R> 匹配结果类型
-     * @param <E> 异常类型
      */
     public <R> R orElseThrow(Supplier<? extends RuntimeException> exceptionSupplier) {
         R result = getResult();
@@ -359,6 +324,8 @@ public class Switch {
         }
         return result;
     }
+
+    // endregion
 
     /**
      * 获取Switch匹配结果
