@@ -34,9 +34,9 @@ public class Outs {
      * });
      * }</pre>
      */
-    public static void newLine(Tries.RunnableThrowsE r) {
+    public static void newLine(FunctionalInterfaces.CheckedRunnable r) {
         newLine();
-        Tries.tryThis(r);
+        Tries.tryRun(r);
         newLine();
     }
 
@@ -116,7 +116,7 @@ public class Outs {
         }
 
         // 在java中直接打印ANSI颜色字符串在Windows CMD中会显示异常，因此执行时必须完全绕开java输出
-        Tries.tryThis(() -> new ProcessBuilder("cmd", "/c", "echo", colorStr)
+        Tries.tryRun(() -> new ProcessBuilder("cmd", "/c", "echo", colorStr)
                 // 将标准输出和错误输出都重定向到控制台，绕开java输出
                 .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                 .redirectError(ProcessBuilder.Redirect.INHERIT)

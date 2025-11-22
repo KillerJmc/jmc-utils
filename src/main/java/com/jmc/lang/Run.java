@@ -29,7 +29,7 @@ public class Run {
 		var res = new StringBuilder();
 
 		// 构建进程
-		var proc = Tries.tryReturnsT(() -> Runtime.getRuntime().exec(command));
+		var proc = Tries.tryGet(() -> Runtime.getRuntime().exec(command));
 
 		// 判断系统是否为Windows
 		var isWindows = SystemInfo.TYPE == SystemInfo.Type.WINDOWS;
@@ -52,7 +52,7 @@ public class Run {
 		}
 
 		// 等待程序执行结束
-		Tries.tryThis(proc::waitFor);
+		Tries.tryRun(proc::waitFor);
 
 		return res.toString();
 	}
@@ -67,7 +67,7 @@ public class Run {
 	 */
 	public static void exec(String command) {
 		// 构建进程
-		var proc = Tries.tryReturnsT(() -> Runtime.getRuntime().exec(command));
+		var proc = Tries.tryGet(() -> Runtime.getRuntime().exec(command));
 
 		// 判断系统是否为Windows
 		var isWindows = SystemInfo.TYPE == SystemInfo.Type.WINDOWS;
@@ -96,6 +96,6 @@ public class Run {
 		}
 
 		// 等待程序执行结束
-		Tries.tryThis(proc::waitFor);
+		Tries.tryRun(proc::waitFor);
     }
 }

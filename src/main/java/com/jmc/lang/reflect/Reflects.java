@@ -74,7 +74,7 @@ public class Reflects {
     public static Field getField(Class<?> c, String fieldName) {
         illegalAccessCheck(c);
 
-        return Tries.tryReturnsT(() -> {
+        return Tries.tryGetOrHandle(() -> {
             Field f = c.getDeclaredField(fieldName);
             f.setAccessible(true);
             return f;
@@ -111,7 +111,7 @@ public class Reflects {
     public static Method getMethod(Class<?> c, String methodName, Class<?>... parameterTypes) {
         illegalAccessCheck(c);
 
-        return Tries.tryReturnsT(() -> {
+        return Tries.tryGetOrHandle(() -> {
             Method m = c.getDeclaredMethod(methodName, parameterTypes);
             m.setAccessible(true);
             return m;
@@ -150,7 +150,7 @@ public class Reflects {
                 .map(Object::getClass)
                 .toArray(Class[]::new);
 
-        return Tries.tryReturnsT(() -> {
+        return Tries.tryGet(() -> {
             var ctor = c.getDeclaredConstructor(argTypes);
             ctor.setAccessible(true);
             return ctor.newInstance(args);
@@ -178,7 +178,7 @@ public class Reflects {
      * @since 2.7
      */
     public static <T> T getFieldValue(Object instance, String fieldName) {
-        return (T) Tries.tryReturnsT(() -> getField(instance.getClass(), fieldName).get(instance));
+        return (T) Tries.tryGet(() -> getField(instance.getClass(), fieldName).get(instance));
     }
 
     /**
@@ -198,7 +198,7 @@ public class Reflects {
      * @since 2.7
      */
     public static <T> T getFieldValue(Class<?> c, String fieldName) {
-        return (T) Tries.tryReturnsT(() -> getField(c, fieldName).get(null));
+        return (T) Tries.tryGet(() -> getField(c, fieldName).get(null));
     }
 
     /**
@@ -227,7 +227,7 @@ public class Reflects {
      * }</pre>
      */
     public static <R> R invokeMethod(Object instance, String methodName, Object... args) {
-        return (R) Tries.tryReturnsT(() -> getMethod(instance.getClass(), methodName,
+        return (R) Tries.tryGet(() -> getMethod(instance.getClass(), methodName,
                 Arrays.stream(args).map(Object::getClass).toArray(Class[]::new)).invoke(instance, args));
     }
 
@@ -251,7 +251,7 @@ public class Reflects {
      * @since 1.5
      */
     public static <R> R invokeMethod(Class<?> c, String methodName, Object... args) {
-        return (R) Tries.tryReturnsT(() -> getMethod(c, methodName,
+        return (R) Tries.tryGet(() -> getMethod(c, methodName,
                 Arrays.stream(args).map(Object::getClass).toArray(Class[]::new)).invoke(null, args));
     }
 
@@ -287,7 +287,7 @@ public class Reflects {
             }
         };
 
-        return Tries.tryReturnsT(() -> classLoader.loadClass(className));
+        return Tries.tryGet(() -> classLoader.loadClass(className));
     }
 
     /**
@@ -322,7 +322,7 @@ public class Reflects {
         var classFileRelativePath = className.replace(".", "/")
                 .concat(".class");
 
-        var classFileURL = Tries.tryReturnsT(() ->
+        var classFileURL = Tries.tryGet(() ->
                 new URL("jar:file:///%s!/%s".formatted(jarFilePath, classFileRelativePath))
         );
 
@@ -429,7 +429,7 @@ public class Reflects {
                 // 第一次去除协议 -> file://path/to/xxx.jar!/
                 .map(URL::getFile)
                 // 重新包装 -> file://path/to/xxx.jar!/
-                .map(path -> Tries.tryReturnsT(() -> new URL(path)))
+                .map(path -> Tries.tryGet(() -> new URL(path)))
                 // 第二次去除协议 -> /path/to/xxx.jar!/
                 .map(URL::getFile)
                 // 去除路径中的!符号 -> /path/to/xxx.jar/
@@ -493,7 +493,7 @@ public class Reflects {
                     // 如果对应的是jar路径
                     if (classPathStr.endsWith(".jar")) {
                         // 返回标准的java jar URL
-                        return Tries.tryReturnsT(() ->
+                        return Tries.tryGet(() ->
                                 // 替换 /D:/xxx.jar -> jar:file:///D:/xxx.jar!/
                                 new URL("jar:file://%s!/".formatted(classPathStr)
                         ));
@@ -597,7 +597,7 @@ public class Reflects {
                             var entryName = entry.getName();
 
                             // 通过拼接类路径和文件/文件夹名来构建URL
-                            var url = Tries.tryReturnsT(() -> new URL(classPath, entryName));
+                            var url = Tries.tryGet(() -> new URL(classPath, entryName));
                             // 获取文件/文件夹名
                             var dirEndSymbol = "/";
                             var name = entry.isDirectory() ? Strs.subExclusive(entryName, rootPath, dirEndSymbol)
@@ -622,7 +622,7 @@ public class Reflects {
                 // 将文件列表流化为URL信息列表流
                 .map(stream -> stream.map(file -> {
                     // 通过加上”file:///“前缀将文件地址转化为URL
-                    var url = Tries.tryReturnsT(() -> new URL("file:///" + file.getAbsolutePath()));
+                    var url = Tries.tryGet(() -> new URL("file:///" + file.getAbsolutePath()));
                     // 获取文件名
                     var name = file.getName();
                     // 获取是否为文件的标识

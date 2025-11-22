@@ -28,6 +28,8 @@ Providing a great number of utility classes to simplify the daily development. (
 | **Running Timers (Timers)**                          | Provides **second**, **millisecond**, **nanosecond** level code running timers. |
 | **Tuple Sequence (Tuple)**                           | Provides a sequence combining values of **different types**. |
 | **Builtin Functions (Builtins)**                     | Provides a serials static builtin functions to simplify method invocation in **JDK21**. |
+| **Switch (Switch)**                                  | Provides an enhanced Switch that supports complex matching conditions. |
+| **Functional Interfaces (FunctionInterfaces)**       | Provides a collection of enhanced functional interfaces.     |
 
 
 

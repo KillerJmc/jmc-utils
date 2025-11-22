@@ -1,5 +1,6 @@
 package com.jmc.util;
 
+import com.jmc.lang.FunctionalInterfaces;
 import com.jmc.lang.Tries;
 
 /**
@@ -22,7 +23,7 @@ public class Timers {
      * }, "test");
      * }</pre>
      */
-    public static void secondTimer(Tries.RunnableThrowsE r, String name) {
+    public static void secondTimer(FunctionalInterfaces.CheckedRunnable r, String name) {
         printTimer(name, nano(r), 9);
     }
 
@@ -36,7 +37,7 @@ public class Timers {
      * });
      * }</pre>
      */
-    public static void secondTimer(Tries.RunnableThrowsE r) {
+    public static void secondTimer(FunctionalInterfaces.CheckedRunnable r) {
         secondTimer(r, "");
     }
 
@@ -51,7 +52,7 @@ public class Timers {
      * }, "test");
      * }</pre>
      */
-    public static void milliTimer(Tries.RunnableThrowsE r, String name) {
+    public static void milliTimer(FunctionalInterfaces.CheckedRunnable r, String name) {
         printTimer(name, nano(r), 6);
     }
 
@@ -65,7 +66,7 @@ public class Timers {
      * });
      * }</pre>
      */
-    public static void milliTimer(Tries.RunnableThrowsE r) {
+    public static void milliTimer(FunctionalInterfaces.CheckedRunnable r) {
         milliTimer(r, "");
     }
 
@@ -80,7 +81,7 @@ public class Timers {
      * }, "test");
      * }</pre>
      */
-    public static void nanoTimer(Tries.RunnableThrowsE r, String name) {
+    public static void nanoTimer(FunctionalInterfaces.CheckedRunnable r, String name) {
         printTimer(name, nano(r), 1);
     }
 
@@ -94,7 +95,7 @@ public class Timers {
      * });
      * }</pre>
      */
-    public static void nanoTimer(Tries.RunnableThrowsE r) {
+    public static void nanoTimer(FunctionalInterfaces.CheckedRunnable r) {
         nanoTimer(r, "");
     }
 
@@ -103,9 +104,9 @@ public class Timers {
      * @param r 代码块
      * @return 计时的纳秒值
      */
-    private static long nano(Tries.RunnableThrowsE r) {
+    private static long nano(FunctionalInterfaces.CheckedRunnable r) {
         long startTime = System.nanoTime();
-        Tries.tryThis(r);
+        Tries.tryRun(r);
         long endTime = System.nanoTime();
         return endTime - startTime;
     }

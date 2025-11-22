@@ -39,15 +39,15 @@ public class ReflectsTest {
 
     @Test
     public void moduleNotOpenTest() {
-        Tries.tryHandlesE(() -> Reflects.getFieldValue(String.class, "COMPACT_STRINGS"),
+        Tries.tryRunOrHandle(() -> Reflects.getFieldValue(String.class, "COMPACT_STRINGS"),
                 System.err::println);
-        Tries.tryHandlesE(() -> Reflects.getFieldValue("", "value"),
+        Tries.tryRunOrHandle(() -> Reflects.getFieldValue("", "value"),
                 System.err::println);
     }
 
     @Test
     public void illegalAccessTest() {
-        Tries.tryHandlesE(() -> Reflects.getMethod(Strs.class, "isNum"),
+        Tries.tryRunOrHandle(() -> Reflects.getMethod(Strs.class, "isNum"),
                 System.err::println);
     }
 
@@ -74,7 +74,7 @@ public class ReflectsTest {
     @Test
     public void classPathTest() {
         // 内置类找不到类加载路径
-        Tries.tryHandlesE(() -> Reflects.getClassPath(String.class),
+        Tries.tryRunOrHandle(() -> Reflects.getClassPath(String.class),
                 e -> System.out.println(e.getMessage()));
 
         // 获取非在jar内的类路径
