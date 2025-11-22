@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 
 /**
  * 增强版switch，优点如下：<br>
- * 1. 匹配值不限制是常量，可匹配自定义对象（针对JDK版本 < 21） <br>
+ * 1. 匹配值不限制是常量，可匹配自定义对象（针对JDK版本&lt;21） <br>
  * 2. 支持复杂的匹配条件（Predicate） <br>
  *
  * @apiNote <pre>{@code
@@ -87,6 +87,7 @@ public class Switch {
      * @param matchObj 匹配对象
      * @param action 返回值函数
      * @return Switch对象本身
+     * @param <T> 匹配对象类型
      */
     public <T> Switch caseObj(T matchObj, FunctionalInterfaces.CheckedFunction<T, Object> action) {
         if (Objects.equals(matchObj, this.matchObj)) {
@@ -191,6 +192,7 @@ public class Switch {
      * @param matchFunc 匹配断言函数
      * @param function 返回值函数
      * @return Switch对象本身
+     * @param <T> 匹配对象类型
      */
     @SuppressWarnings("unchecked")
     public <T> Switch caseWhen(Predicate<T> matchFunc, FunctionalInterfaces.CheckedFunction<T, Object> function) {
@@ -212,6 +214,7 @@ public class Switch {
      * @param matchFunc 匹配断言函数
      * @param action 执行函数
      * @return Switch对象本身
+     * @param <T> 匹配对象类型
      */
     @SuppressWarnings("unchecked")
     public <T> Switch caseWhen(Predicate<T> matchFunc, FunctionalInterfaces.CheckedRunnable action) {

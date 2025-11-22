@@ -83,7 +83,7 @@ public class Strs {
         public static final String UNDERSCORE = Symbols.UNDERSCORE;
 
         /**
-         * & 符号
+         * &amp; 符号
          */
         public static final String AMP = Symbols.AMP;
 
@@ -208,7 +208,7 @@ public class Strs {
             public static final String DASH = "-";
 
             /**
-             * @ 符号
+             * &#64; 符号
              */
             public static final String AT = "@";
 
@@ -218,7 +218,7 @@ public class Strs {
             public static final String HASH = "#";
 
             /**
-             * & 符号
+             * &amp; 符号
              */
             public static final String AMP = "&";
 
@@ -441,7 +441,7 @@ public class Strs {
             public static final String PARAM_EQUALS = "=";
 
             /**
-             * URL 参数连接符 &
+             * URL 参数连接符 &amp;
              */
             public static final String PARAM_AND = "&";
         }
