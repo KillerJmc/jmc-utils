@@ -1,8 +1,5 @@
 package com.jmc.lang;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-
 /**
  * 函数式接口合集
  * @since 3.9
