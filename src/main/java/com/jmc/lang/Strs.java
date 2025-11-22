@@ -1,5 +1,6 @@
 package com.jmc.lang;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,561 @@ import java.util.List;
 public class Strs {
 
     private Strs() {}
+
+    /**
+     * 通用字符串常量类
+     * @since 3.9
+     */
+    public static final class Const {
+
+        private Const() {}
+
+        // region 最常用的符号
+        /**
+         * 空字符串
+         */
+        public static final String EMPTY = Whitespace.EMPTY;
+
+        /**
+         * 空格
+         */
+        public static final String SPACE = Whitespace.SPACE;
+
+        /**
+         * 制表符
+         */
+        public static final String TAB = Whitespace.TAB;
+
+        /**
+         * 换行符(LF)
+         */
+        public static final String LF = Whitespace.LF;
+
+        /**
+         * 单引号
+         */
+        public static final String SINGLE_QUOTE = Symbols.SINGLE_QUOTE;
+
+        /**
+         * 双引号
+         */
+        public static final String DOUBLE_QUOTE = Symbols.DOUBLE_QUOTE;
+
+        /**
+         * 正斜杠
+         */
+        public static final String SLASH = Symbols.SLASH;
+
+        /**
+         * 反斜杠
+         */
+        public static final String BACKSLASH = Symbols.BACKSLASH;
+
+        /**
+         * 点号
+         */
+        public static final String DOT = Symbols.DOT;
+
+        /**
+         * 逗号
+         */
+        public static final String COMMA = Symbols.COMMA;
+
+        /**
+         * 冒号
+         */
+        public static final String COLON = Symbols.COLON;
+
+        /**
+         * 下划线
+         */
+        public static final String UNDERSCORE = Symbols.UNDERSCORE;
+
+        /**
+         * & 符号
+         */
+        public static final String AMP = Symbols.AMP;
+
+        /**
+         * % 符号
+         */
+        public static final String PERCENT = Symbols.PERCENT;
+
+        // endregion
+
+        /**
+         * 常用空白与控制字符
+         */
+        public static final class Whitespace {
+            private Whitespace() {}
+
+            /**
+             * 空字符串
+             */
+            public static final String EMPTY = "";
+
+            /**
+             * 空格
+             */
+            public static final String SPACE = " ";
+
+            /**
+             * 制表符
+             */
+            public static final String TAB = "\t";
+
+            /**
+             * 换行符(LF)
+             */
+            public static final String LF = "\n";
+
+            /**
+             * 回车符(CR)
+             */
+            public static final String CR = "\r";
+
+            /**
+             * 回车换行符(CRLF)
+             */
+            public static final String CRLF = "\r\n";
+        }
+
+        /**
+         * 常用标点和符号
+         */
+        public static final class Symbols {
+            private Symbols() {}
+
+            /**
+             * 单引号
+             */
+            public static final String SINGLE_QUOTE = "'";
+
+            /**
+             * 双引号
+             */
+            public static final String DOUBLE_QUOTE = "\"";
+
+            /**
+             * 正斜杠
+             */
+            public static final String SLASH = "/";
+
+            /**
+             * 反斜杠
+             */
+            public static final String BACKSLASH = "\\";
+
+            /**
+             * 点号
+             */
+            public static final String DOT = ".";
+
+            /**
+             * 逗号
+             */
+            public static final String COMMA = ",";
+
+            /**
+             * 冒号
+             */
+            public static final String COLON = ":";
+
+            /**
+             * 分号
+             */
+            public static final String SEMICOLON = ";";
+
+            /**
+             * 问号
+             */
+            public static final String QUESTION = "?";
+
+            /**
+             * 感叹号
+             */
+            public static final String EXCLAMATION = "!";
+
+            /**
+             * 反引号
+             */
+            public static final String BACKTICK = "`";
+
+            /**
+             * 管道符
+             */
+            public static final String PIPE = "|";
+
+            /**
+             * 下划线
+             */
+            public static final String UNDERSCORE = "_";
+
+            /**
+             * 破折号/连字符
+             */
+            public static final String DASH = "-";
+
+            /**
+             * @ 符号
+             */
+            public static final String AT = "@";
+
+            /**
+             * # 符号
+             */
+            public static final String HASH = "#";
+
+            /**
+             * & 符号
+             */
+            public static final String AMP = "&";
+
+            /**
+             * % 符号
+             */
+            public static final String PERCENT = "%";
+
+            /**
+             * * 符号
+             */
+            public static final String STAR = "*";
+
+            /**
+             * ~ 符号
+             */
+            public static final String TILDE = "~";
+
+            /**
+             * ^ 符号
+             */
+            public static final String CARET = "^";
+
+            /**
+             * $ 符号
+             */
+            public static final String DOLLAR = "$";
+        }
+
+        /**
+         * 常用括号符号
+         */
+        public static final class Brackets {
+            private Brackets() {}
+
+            /**
+             * 左圆括号
+             */
+            public static final String LPAREN = "(";
+
+            /**
+             * 右圆括号
+             */
+            public static final String RPAREN = ")";
+
+            /**
+             * 左方括号
+             */
+            public static final String LBRACKET = "[";
+
+            /**
+             * 右方括号
+             */
+            public static final String RBRACKET = "]";
+
+            /**
+             * 左花括号
+             */
+            public static final String LBRACE = "{";
+
+            /**
+             * 右花括号
+             */
+            public static final String RBRACE = "}";
+
+            /**
+             * 左尖括号
+             */
+            public static final String LANGLE = "<";
+
+            /**
+             * 右尖括号
+             */
+            public static final String RANGLE = ">";
+        }
+
+        /**
+         * 常用数学与逻辑操作符
+         */
+        public static final class Operators {
+            private Operators() {}
+
+            /**
+             * 加号
+             */
+            public static final String PLUS = "+";
+
+            /**
+             * 减号
+             */
+            public static final String MINUS = "-";
+
+            /**
+             * 乘号
+             */
+            public static final String MULTIPLY = "*";
+
+            /**
+             * 除号
+             */
+            public static final String DIVIDE = "/";
+
+            /**
+             * 取模
+             */
+            public static final String MOD = "%";
+
+            /**
+             * 赋值符号
+             */
+            public static final String ASSIGN = "=";
+
+            /**
+             * 等于
+             */
+            public static final String EQ = "==";
+
+            /**
+             * 不等于
+             */
+            public static final String NE = "!=";
+
+            /**
+             * 大于
+             */
+            public static final String GT = ">";
+
+            /**
+             * 小于
+             */
+            public static final String LT = "<";
+
+            /**
+             * 大于等于
+             */
+            public static final String GE = ">=";
+
+            /**
+             * 小于等于
+             */
+            public static final String LE = "<=";
+
+            /**
+             * 逻辑与
+             */
+            public static final String AND = "&&";
+
+            /**
+             * 逻辑或
+             */
+            public static final String OR = "||";
+
+            /**
+             * Java lambda 箭头
+             */
+            public static final String ARROW = "->";
+
+            /**
+             * Java 方法引用 ::
+             */
+            public static final String DOUBLE_COLON = "::";
+        }
+
+        /**
+         * 系统路径相关常量
+         */
+        public static final class Path {
+            private Path() {}
+
+            /**
+             * 文件分隔符
+             */
+            public static final String FILE_SEPARATOR = File.separator;
+
+            /**
+             * 路径分隔符
+             */
+            public static final String PATH_SEPARATOR = File.pathSeparator;
+
+            /**
+             * 当前目录
+             */
+            public static final String CURRENT_DIR = ".";
+
+            /**
+             * 父目录
+             */
+            public static final String PARENT_DIR = "..";
+        }
+
+        /**
+         * URL和网络相关常量
+         */
+        public static final class Url {
+            private Url() {}
+
+            /**
+             * HTTP 协议
+             */
+            public static final String HTTP = "http";
+
+            /**
+             * HTTPS 协议
+             */
+            public static final String HTTPS = "https";
+
+            /**
+             * 协议分隔符 ://
+             */
+            public static final String COLON_SLASH_SLASH = "://";
+
+            /**
+             * URL 参数前缀 ?
+             */
+            public static final String PARAM_PREFIX = "?";
+
+            /**
+             * URL 参数等号 =
+             */
+            public static final String PARAM_EQUALS = "=";
+
+            /**
+             * URL 参数连接符 &
+             */
+            public static final String PARAM_AND = "&";
+        }
+
+        /**
+         * 常用转义字符
+         */
+        public static final class Escape {
+            private Escape() {}
+
+            /**
+             * 反斜杠 \
+             */
+            public static final String ESCAPE = "\\";
+
+            /**
+             * 双引号转义 \"
+             */
+            public static final String ESC_QUOTE = "\\\"";
+
+            /**
+             * 单引号转义 \'
+             */
+            public static final String ESC_SINGLE_QUOTE = "\\'";
+
+            /**
+             * 点号转义 \.
+             */
+            public static final String ESC_DOT = "\\.";
+
+            /**
+             * 星号转义 \*
+             */
+            public static final String ESC_STAR = "\\*";
+        }
+
+        /**
+         * 常用文件扩展名
+         */
+        public static final class FileExt {
+            private FileExt() {}
+
+            /**
+             * java文件 .java
+             */
+            public static final String JAVA = ".java";
+
+            /**
+             * class文件 .class
+             */
+            public static final String CLASS = ".class";
+
+            /**
+             * jar文件 .jar
+             */
+            public static final String JAR = ".jar";
+
+            /**
+             * 文本文件 .txt
+             */
+            public static final String TXT = ".txt";
+
+            /**
+             * JSON 文件 .json
+             */
+            public static final String JSON = ".json";
+
+            /**
+             * XML 文件 .xml
+             */
+            public static final String XML = ".xml";
+
+            /**
+             * YAML 文件 .yml
+             */
+            public static final String YAML = ".yml";
+
+            /**
+             * 属性文件 .properties
+             */
+            public static final String PROPERTIES = ".properties";
+
+            /**
+             * CSV 文件 .csv
+             */
+            public static final String CSV = ".csv";
+
+            /**
+             * 日志文件 .log
+             */
+            public static final String LOG = ".log";
+        }
+
+        /**
+         * JSON相关常量
+         */
+        public static final class Json {
+            private Json() {}
+
+            /**
+             * 布尔值 true
+             */
+            public static final String TRUE = "true";
+
+            /**
+             * 布尔值 false
+             */
+            public static final String FALSE = "false";
+
+            /**
+             * null 值
+             */
+            public static final String NULL = "null";
+
+            /**
+             * 空 JSON 对象 {}
+             */
+            public static final String EMPTY_OBJECT = "{}";
+
+            /**
+             * 空 JSON 数组 []
+             */
+            public static final String EMPTY_ARRAY = "[]";
+        }
+    }
 
     /**
      * 判断一个字符串是否由数字构成（正数，负数或小数）
