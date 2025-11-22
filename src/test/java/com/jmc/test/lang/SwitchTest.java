@@ -1,6 +1,9 @@
 package com.jmc.test.lang;
 
+import com.jmc.lang.Strs;
 import com.jmc.lang.Switch;
+import com.jmc.lang.ref.Func;
+import com.jmc.lang.ref.Pointer;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -9,197 +12,106 @@ import java.util.Objects;
 
 public class SwitchTest {
     @Test
-    public void matchExecSwitchTest() {
-        Class<?> clazz = String.class;
-        // 会打印“是String.class”
-        Switch.match(clazz)
-                .when(Integer.class, () -> System.out.println("是Integer.class"))
-                .when(String.class, () -> System.out.println("是String.class"))
-                .when(Double.class, () -> System.out.println("是Double.class"))
-                .orElseRun(() -> System.out.println("兜底逻辑"));
+    public void caseGet() {
+        Func<String> f = Func.of((Object obj) ->
+                Switch.of(obj)
+                        .caseObj("caseObj返回对象条件", "caseObj返回对象")
+                        .caseObj("caseObj返回对象条件2", s -> s + "!")
+                        .caseType(Integer.class, "caseType整数")
+                        .caseType(Long.class, l -> "caseType长整数" + l)
+                        .caseWhen((Double d) -> d > 3, "caseWhen浮点数大于3")
+                        .caseWhen((Double d) -> d < 3, d -> "caseWhen浮点数小于3，是" + d)
+                        .caseNull("caseNull")
+                        .orElse("没命中")
+        );
 
-        // 会打印“兜底逻辑”
-        Switch.match(clazz)
-                .when(Integer.class, () -> System.out.println("是Integer.class"))
-                .orElseRun(() -> System.out.println("兜底逻辑"));
+        Assert.assertEquals("caseObj返回对象", f.invoke("caseObj返回对象条件"));
+        Assert.assertEquals("caseObj返回对象条件2!", f.invoke("caseObj返回对象条件2"));
+        Assert.assertEquals("caseType整数", f.invoke(1));
+        Assert.assertEquals("caseType长整数666", f.invoke(666L));
+        Assert.assertEquals("caseWhen浮点数大于3", f.invoke(10.0));
+        Assert.assertEquals("caseWhen浮点数小于3，是1.0", f.invoke(1.0));
+        Assert.assertEquals("caseNull", f.invoke((Object) null));
+        Assert.assertEquals("没命中", f.invoke("你好呀"));
     }
 
     @Test
-    public void matchReturnSwitchTest() {
-        Class<?> clazz = String.class;
+    public void caseRun() {
+        var strResPtr = Pointer.of(Strs.Const.EMPTY);
+        Func<Void> f = Func.of((Object obj) ->
+                Switch.of(() -> obj)
+                        .caseObj("caseObj执行方法", () -> strResPtr.reset("caseObj执行方法"))
+                        .caseType(Integer.class, () -> strResPtr.reset("caseType执行方法"))
+                        .caseWhen((Double d) -> d > 3, () -> strResPtr.reset("caseWhen执行方法，浮点数大于3"))
+                        .caseNull(() -> strResPtr.reset("caseNull"))
+                        .orElseRun(() -> strResPtr.reset("没命中"))
+        );
 
-        // 会返回“是String.class”
-        String res = Switch.match(clazz)
-                .when(Integer.class, "是Integer.class")
-                .when(String.class, "是String.class")
-                .when(Double.class, "是Double.class")
-                .orElseThrow();
-        System.out.println(res);
-        Assert.assertEquals("是String.class", res);
+        f.invoke("caseObj执行方法");
+        Assert.assertEquals("caseObj执行方法", strResPtr.get());
+        f.invoke(2);
+        Assert.assertEquals("caseType执行方法", strResPtr.get());
+        f.invoke(6.0);
+        Assert.assertEquals("caseWhen执行方法，浮点数大于3", strResPtr.get());
+        f.invoke((Object) null);
+        Assert.assertEquals("caseNull", strResPtr.get());
+        f.invoke("你好呀");
+        Assert.assertEquals("没命中", strResPtr.get());
+    }
 
-        // 匹配不上，会抛出NoSuchElementException异常
+    @Test
+    public void caseOrElseGetSupplier() {
+        Object obj = 666;
+        String res = Switch.of(() -> obj).caseObj(1, "匹配上了").orElse(() -> "没匹配上");
+        Assert.assertEquals("没匹配上", res);
+    }
+
+    @Test
+    public void caseGetOrElseThrow() {
+        Object obj = 666;
+        Assert.assertThrows(
+                RuntimeException.class,
+                () -> Switch.of(() -> obj).caseObj(1, "匹配上了").orElseThrow(RuntimeException::new)
+        );
+    }
+
+    @Test
+    public void caseGetOrElseThrowCustom() {
+        Object obj = 666;
         Assert.assertThrows(
                 NoSuchElementException.class,
-                () -> Switch.match(clazz)
-                        .when(Integer.class, "是Integer.class")
-                        .orElseThrow()
+                () -> Switch.of(obj).orElseThrow()
         );
     }
 
     @Test
-    public void matchReturnSupplierSwitchTest() {
-        // 会返回“是String.class”
-        String res = Switch.match(() -> String.class)
-                .when(Integer.class, () -> "是Integer.class")
-                .when(String.class, () -> "是String.class")
-                .when(Double.class, () -> "是Double.class")
-                .orElseThrow(() -> new IllegalArgumentException("新异常"));
-        System.out.println(res);
-        Assert.assertEquals("是String.class", res);
+    public void objTest() {
+        record Employee(String name) {}
+        record Student(String name, int age) {}
 
-        // 匹配不上，会抛出转化后的IllegalArgumentException异常
-        Assert.assertThrows(
-                IllegalArgumentException.class,
-                () -> Switch.match(() -> String.class)
-                        .when(Integer.class, () -> "是Integer.class")
-                        .orElseThrow(() -> new IllegalArgumentException("新异常"))
+        Func<String> f = Func.of((Object obj) ->
+                Switch.of(obj)
+                        .caseObj("你好", s -> "是字符串，值为：" + s)
+                        .caseType(Integer.class, i -> "是整数，值为：" + i)
+                        .caseType(Employee.class, emp -> "是职工对象，职工姓名：" + emp.name())
+                        .caseWhen((Student stu) -> stu.age() < 18, stu -> "是学生对象，年龄小于18，学生信息：" + stu)
+                        .caseNull("为空对象")
+                        .orElse("没命中默认值")
         );
-    }
 
-    @Test
-    public void typeMatchExecSwitchTest() {
-        Object obj = "123";
+        Assert.assertEquals("是字符串，值为：你好", f.invoke("你好"));
+        Assert.assertEquals("是整数，值为：42", f.invoke(42));
 
-        // 会打印“obj是String类型”
-        Switch.match(obj)
-                .whenType(Integer.class, () -> System.out.println("obj是Integer类型"))
-                .whenType(String.class, () -> System.out.println("obj是String类型"))
-                .whenType(Double.class, () -> System.out.println("obj是Double类型"))
-                .orElseRun(() -> System.out.println("兜底逻辑"));
+        Employee emp = new Employee("张三");
+        Assert.assertEquals("是职工对象，职工姓名：张三", f.invoke(emp));
 
-        // 会打印“兜底逻辑”
-        Switch.match(obj)
-                .when(Integer.class, () -> System.out.println("obj是Integer类型"))
-                .orElseRun(() -> System.out.println("兜底逻辑"));
-    }
+        Student stu1 = new Student("Jmc", 16);
+        Assert.assertEquals("是学生对象，年龄小于18，学生信息：" + stu1, f.invoke(stu1));
 
-    @Test
-    public void matchTypeReturnSwitchTest() {
-        Object obj = "123";
+        Student stu2 = new Student("Jack", 20);
+        Assert.assertEquals("没命中默认值", f.invoke(stu2));
 
-        // 会返回“obj是String类型”
-        String res = Switch.match(obj)
-                .whenType(Integer.class, "obj是Integer类型")
-                .whenType(String.class, "obj是String类型")
-                .whenType(Double.class, "obj是Double类型")
-                .orElseThrow();
-        System.out.println(res);
-        Assert.assertEquals("obj是String类型", res);
-
-        // 匹配不上，会抛出NoSuchElementException异常
-        Assert.assertThrows(
-                NoSuchElementException.class,
-                () -> Switch.match(obj)
-                        .when(Integer.class, "obj是Integer类型")
-                        .orElseThrow()
-        );
-    }
-
-    @Test
-    public void matchTypeReturnSupplierSwitchTest() {
-        // 会返回“是String.class，长度是：3”
-        String res = Switch.match(() -> "123")
-                .whenType(Integer.class, i -> "是Integer.class，值是：" + i)
-                .whenType(String.class, s -> "是String.class，长度是：" + s.length())
-                .whenType(Double.class, d -> "是Double.class，值是：" + d)
-                .orElseThrow(() -> new IllegalArgumentException("新异常"));
-        System.out.println(res);
-        Assert.assertEquals("是String.class，长度是：3", res);
-
-        // 匹配不上，会抛出转化后的IllegalArgumentException异常
-        Assert.assertThrows(
-                IllegalArgumentException.class,
-                () -> Switch.match(() -> String.class)
-                        .when(Integer.class, () -> "是Integer.class")
-                        .orElseThrow(() -> new IllegalArgumentException("新异常"))
-        );
-    }
-
-    @Test
-    public void judgeExecSwitchTest() {
-        int x = 10;
-        // 会打印“t等于10！”
-        Switch.match(x)
-                .when((Integer t) -> t > 10, () -> System.out.println("t大于10！"))
-                .when((Integer t) -> t < 10, () -> System.out.println("t小于10！"))
-                .when((Integer t) -> t == 10, () -> System.out.println("t等于10！"));
-    }
-
-    @Test
-    public void judgeExecSwitchSpecialTest() {
-        Class<?> clazz = String.class;
-        // 会打印“是String.class”
-        Switch.match(clazz)
-                .when((Class<?> c) -> c.getName().equals(Integer.class.getName()), () -> System.out.println("是Integer.class"))
-                .when((Class<?> c) -> c.getName().equals(String.class.getName()), () -> System.out.println("是String.class"))
-                .when((Class<?> c) -> c.getName().equals(Double.class.getName()), () -> System.out.println("是Double.class"));
-    }
-
-    @Test
-    public void judgeReturnSwitchTest() {
-        int x = 10;
-        // 会返回“t等于10！”
-        String res = Switch.match(x)
-                .when((Integer t) -> t > 10, "t大于10！")
-                .when((Integer t) -> t < 10, "t小于10！")
-                .when((Integer t) -> t == 10, "t等于10！")
-                .orElse(null);
-        System.out.println(res);
-        Assert.assertEquals("t等于10！", res);
-
-        // 会走到兜底，返回“兜底结果”
-        res = Switch.match(x)
-                .when((Integer t) -> t > 10, "t大于10！")
-                .orElse("兜底结果");
-        System.out.println(res);
-        Assert.assertEquals("兜底结果", res);
-    }
-
-    @Test
-    public void judgeReturnSupplierSwitchTest() {
-        int x = 10;
-        // 会返回“t等于10！”
-        String res = Switch.match(x)
-                .when((Integer t) -> t > 10, t -> "t大于10！")
-                .when((Integer t) -> t < 10, t -> "t小于10！")
-                .when((Integer t) -> t == 10, t -> "t等于10！")
-                .orElse(null);
-        System.out.println(res);
-        Assert.assertEquals("t等于10！", res);
-
-        // 会走到兜底，返回“兜底结果”
-        res = Switch.match(x)
-                .when((Integer t) -> t > 10, t -> "t大于10！")
-                .orElseGet(() -> "兜底结果");
-        System.out.println(res);
-        Assert.assertEquals("兜底结果", res);
-    }
-
-    @Test
-    public void judgeReturnSupplierComplexObjectSwitchTest() {
-        record Student(String name) {}
-
-        var stuJmc = new Student("Jmc");
-        var stuJack = new Student("Jack");
-        var stuLucy = new Student("Lucy");
-
-        String res = Switch.match(() -> new Student("Jmc"))
-                .when((Student s) -> Objects.equals(s.name(), stuJack.name()), "是Student Jack")
-                .when((Student s) -> Objects.equals(s.name(), stuJmc.name()), "是Student Jmc")
-                .when((Student s) -> Objects.equals(s.name(), stuLucy.name()), "是Student Lucy")
-                .orElseThrow(() -> new NoSuchElementException("匹配学生失败"));
-
-        System.out.println(res);
-        Assert.assertEquals("是Student Jmc", res);
+        Assert.assertEquals("为空对象", f.invoke((Object) null));
+        Assert.assertEquals("没命中默认值", f.invoke(3.14));
     }
 }
